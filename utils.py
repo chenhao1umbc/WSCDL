@@ -1,29 +1,16 @@
 from scipy.io import loadmat# for matlab mat 7.0 , 7.1 , 7.2
-import h5py  # for matlab mat 7.3
+import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import multiprocessing
 from scipy.linalg import toeplitz
          # zeros([5,5])# from mpl_toolkits.mplot3d import Axes3D
 
 """here is the rename of some functions because it is too long and often used"""
-"""----->"""
-conv = np.convolve
 fft = np.fft.fft
-fft2 = np.fft.fft2
 ifft = np.fft.ifft
 norm = np.linalg.norm
 np.set_printoptions(linewidth=200)
-ones = np.ones              # ones([5,5])
-pinv = np.linalg.pinv
-rand = np.random.rand
-randn = np.random.randn
-rank = np.linalg.matrix_rank
-svd = np.linalg.svd
-zeros = np.zeros            # zeros([5,5])
-
-"""<-----"""
-"""here is the rename of some functions because it is too long and often used"""
+torch.backends.cudnn.deterministic = True
 
 
 class OPT:
@@ -34,7 +21,7 @@ class OPT:
         self.miu, self.lamb = miu, lamb
 
 
-def bpg_m( x, M, Mw, gradf, type = 0):
+def bpg_m( x, M, Mw, gradf, type=0):
     """typ1 =0 means updating dictionary itoms
         type =1 meaning updating the sparse coeff. """
     maxiter = 500
@@ -42,7 +29,7 @@ def bpg_m( x, M, Mw, gradf, type = 0):
         d_old, d = x, x
         for i in range(500):
             d_til = d + Mw@(d -d_old)
-            nu = d_til - pinv(M)@gradf(d_til)
+            nu = d_til - np.linalg.pinv(M)@gradf(d_til)
             if norm(nu)**2 <=1 :
                 d_new = nu
             else:
@@ -69,9 +56,7 @@ def prox_d(P, q):
     return psi_new
 
 
-
-
-def fast_conv(an,bn):
+def fast_conv(an, bn):
     """an, bn are numpy arrays
     an \in R^T*N, bn \in R^M*N, T>M,
     using fft to do the 1-d convlution and trucate to the lenght T"""
