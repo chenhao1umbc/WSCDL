@@ -56,12 +56,12 @@ def prox_d(P, q):
 
 
 def conv(a, b):
-    """an, bn are in the shape (N, T), N is batch_size, T is sequence length, 2 means real and complex
+    """an, bn are in the shape (N, Ta), (N,Tb), where N is batch_size, T is sequence length,
     an, and bn are all torch.tensor
     """
     pad = a.shape[1] if a.shape[1] < b.shape[1] else b.shape[1]
-    r9 = torch.nn.functional.conv1d(a.unsqueeze(1),b.flip(1).unsqueeze(1), padding=pad-1)
-    return r9.squeeze()
+    rab = torch.nn.functional.conv1d(a.unsqueeze(1), b.flip(1).unsqueeze(1), padding=pad-1)
+    return rab.squeeze()
 
 
 def fconv(an, bn):
@@ -90,26 +90,27 @@ def fconv(an, bn):
     return cn
 
 
-def updateD(D_bar, S_bar, X, Y, opts):
+def updateD0():
+    pass
+
+
+def updateD(DD0SS0, X, Y, opts):
     """this function is to update the distinctive D using BPG-M, updating each d_k^(c)
     input is initialed D,
     sparse coeffecient S_bar
         the structure is not a matrix for computation simplexity
-        S_bar is 4-d tensor [T,K_bar,C,N] [time seiry, atoms, classes, samples]
+        S is 4-d tensor [N,C,T,K] [samples,classes,time series, num of atoms]
+        D is 3-d tensor [K,C,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
     training Data X
-    training labels Y \in Z ^(C*N)
+    training labels Y \in Z ^(N*C)
     training paremeters opts
-    output is updated D"""
-    T, N = X.shape[0,1] # N is the number of samples
-    dim_dk = D_bar.shape[0] # the atom length
-    Md = np.diag()
-    for n in range(N):
-        toeplitz(np.r_[rand(int(1e5)), zeros(dim_dk - 1)], np.r_[b[0], zeros(dim_dk - 1)])
-        rn = fast_conv(D_bar[:, 0:opts.k0], S_bar[:, 0:opts.k0, 0, n])# the shared part reconstruction
+    output is updated D_bar
+    """
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    rn = conv(D0, S0)
 
-        for k in range(opts.C * opts.K): # this loop is parrellizable
-            D_bar[opts.K0 + k] = bpg_m(D_bar[opts.K0 + k], Md, Mw, gradf)
-    return D
 
 
 def load_data():
