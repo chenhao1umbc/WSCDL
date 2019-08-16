@@ -55,10 +55,10 @@ def acc_newton(P, q):
     dim = P.shape[0]
     maxiter = 200
     for i in range(maxiter):
-        f_grad = - 2 * ((P.diag()+psi*torch.eye(dim))**(-3)*q*q).sum()
-        f = ((P.diag()+psi*torch.eye(dim))**(-2)*q*q).sum()
+        f_grad = - 2 * ((P.diag()+psi)**(-3)*q*q).sum()
+        f = ((P.diag()+psi)**(-2)*q*q).sum()
         psi_new = psi - 2 * f/f_grad * (f.sqrt() - 1)
-        if psi_new.item() - psi.item() < 1e-5:  # psi_new should always larger than psi
+        if (psi_new - psi).item() < 1e-5:  # psi_new should always larger than psi
             break
         else:
             psi = psi_new.clone()
