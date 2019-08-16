@@ -90,16 +90,22 @@ def fconv(an, bn):
     return cn
 
 
-def toepliz(x, m=0):
+def toeplitz(x, m=0):
     """This is a the toepliz matrx for torch.tensor
     input x has the shape of [N, T]
         M is an interger
     output tx has the shape of [N, M, T]
     """
-    for i in range(x.shape[0]):
-        for ii in range(m):
-
-            pass
+    dev = x.device
+    N, T = x.shape
+    x_append0 = torch.cat([x, torch.zeros(N, m, device=dev)], dim=1)
+    xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, T+2m]
+    tx = torch.zeros(N, m, T, device=dev)
+    m2 = int(m/2)
+    for i in range(m):
+        ind = range(m2 + i, m2 + i + T)
+        tx[:, i, :] = xm[:, i, ind]
+    return tx
 
 
 def updateD(DD0SS0, X, Y, opts):
@@ -142,11 +148,11 @@ def updateD(DD0SS0, X, Y, opts):
     for c, k in [(i, j) for i in range(C) for j in range(K)]:
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
-        Tsck = toeplitz()
+        Tsck = toeplitz(sck)  # shape of [N, M, T]
         dck_conv_sck = F.conv1d(sck.unsqeeze(1), dck.reshape(1,1,M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
-        b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is bn with all N
+        b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
         torch.cuda.empty_cache()
 
 
