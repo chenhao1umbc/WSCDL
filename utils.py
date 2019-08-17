@@ -30,7 +30,7 @@ def solv_dck(x, M, Minv, Mw, Tsck, b):
         b is bn with all N, with shape of [N, T]
         """
     maxiter = 500
-    d_old, d = x, x
+    d_old, d = x.clone(), x.clone()
     coef = Minv @ (Tsck@Tsck.permute(0, 2, 1)).sum(0)
     term = Minv @ (Tsck@b.unsqueeze(2)).sum(0)
     for i in range(maxiter):
@@ -66,7 +66,8 @@ def acc_newton(P, q):
             break
         else:
             psi = psi_new.clone()
-    return psi_new
+    dck = -((P.diag() + psi_new)**(-1)).diag() @ q
+    return dck
 
 
 def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu):
@@ -78,13 +79,13 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu):
         b is bn with all N, with shape of [N, T]
         """
     maxiter = 500
-    d_old, d = x, x
+    d_old, d = x.clone(), x.clone()
     coef = Minv @ (Tsck@Tsck.permute(0, 2, 1)).sum(0)
     term = Minv @ (Tsck@b.unsqueeze(2)).sum(0)
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
-        d_new = argmin_lowrank(M, nu, mu, D0)
+        d_new = argmin_lowrank(d, M, nu, mu, D0)
         d, d_old = d_new, d
         if torch.norm(d - d_old).item() < 1e-4:
             break
@@ -92,15 +93,21 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu):
     return d
 
 
-def argmin_lowrank(M, nu, mu, D0):
+def argmin_lowrank(d, M, nu, mu, D0):
     """
-    Solving the QCQP with low rank panelty term
+    Solving the QCQP with low rank panelty term. This function is using ADMM to solve dck0
+    :param d: dck0 with shape of [M]
     :param M: majorizer matrix
     :param nu: make d close to ||d-nu||_M^2
     :param mu: hyper-param of ||D0||_*
     :param D0: common dict contains all the dk0, shape of [K0, M]
     :return: dk0
     """
+    Z = D0.clone()
+    dev = Z.device
+    rho = 10 * mu
+    P = M + rho*torch.eye(M, device=dev)
+    q = -(M@nu)
 
     return 0
 
@@ -222,5 +229,7 @@ def updateD0(DD0SS0, X, Y, opts):
         torch.cuda.empty_cache()
         D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsck0, b, D0copy, opts.mu)
     return D0
+
+
 def load_data():
     pass
