@@ -205,18 +205,22 @@ def updateD0(DD0SS0, X, Y, opts):
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
     alpha_plus_dk0 = DconvS.sum(1) + R
     beta_plus_dk0 = ycDcconvSc.sum(1) + R
+    D0copy = D0.clone()
 
     # '''update the current dk0'''
     for k0 in range(K0):
         dk0 = D0[k0, :]
         sck0 = S0[:, k0, :]  # shape of [N, T]
+        dk0convsck0 = F.conv1d(sck0.unsqueeze(1), dk0.flip().unsqueeze(0).unsqeeze(0), padding=M-1)[:, M_2:M_2 + T]
         Tsck0 = toeplitz(sck0)  # shape of [N, M, T]
         abs_Tsck0 = abs(Tsck0)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
         MD_diag = 4*((abs_Tsck0@abs_Tsck0.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
-
-        D0[k0, :] = solv_dck0(dck, MD, MD_inv, Mw, 2*Tsck0, b, D0, opts.mu)
+        b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
+        torch.cuda.empty_cache()
+        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsck0, b, D0copy, opts.mu)
+    return D0
 def load_data():
     pass
