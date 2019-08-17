@@ -70,14 +70,19 @@ def acc_newton(P, q):
     return dck
 
 
-def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu):
-    """x, is the dck, shape of [M]
-        M, is MD, with shape of [M, M], diagonal matrix
-        Minv, is MD^(-1)
-        Mw, is a number not diagonal matrix
-        Tsck, is truncated toeplitz matrix of sck with shape of [N, M, T]
-        b is bn with all N, with shape of [N, T]
-        """
+def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
+    """
+    :param x: is the dck, shape of [M]
+    :param M: is MD, the majorizer matrix with shape of [M, M], diagonal matrix
+    :param Minv: is MD^(-1)
+    :param Mw: is a number not diagonal matrix
+    :param Tsck: is truncated toeplitz matrix of sck with shape of [N, M, T]
+    :param b: bn with all N, with shape of [N, T]
+    :param D0: is the shared dictionary
+    :param mu: is the coefficient fo low-rank term
+    :param k0: the current index of for loop of K0
+    :return: dck0
+    """
     maxiter = 500
     d_old, d = x.clone(), x.clone()
     coef = Minv @ (Tsck@Tsck.permute(0, 2, 1)).sum(0)
@@ -85,7 +90,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu):
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
-        d_new = argmin_lowrank(d, M, nu, mu, D0)
+        d_new = argmin_lowrank(M, nu, mu, D0, k0)
         d, d_old = d_new, d
         if torch.norm(d - d_old).item() < 1e-4:
             break
@@ -93,23 +98,42 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu):
     return d
 
 
-def argmin_lowrank(d, M, nu, mu, D0):
+def argmin_lowrank(M, nu, mu, D0, k0):
     """
     Solving the QCQP with low rank panelty term. This function is using ADMM to solve dck0
-    :param d: dck0 with shape of [M]
     :param M: majorizer matrix
     :param nu: make d close to ||d-nu||_M^2
     :param mu: hyper-param of ||D0||_*
     :param D0: common dict contains all the dk0, shape of [K0, M]
     :return: dk0
     """
+    K0, m = D0.shape
     Z = D0.clone()
     dev = Z.device
-    rho = 10 * mu
+    rho = 10 * mu  # agrangian coefficients
+    Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
     P = M + rho*torch.eye(M, device=dev)
-    q = -(M@nu)
+    maxiter = 200
+    # begin of ADMM
+    for i in range(maxiter):
+        q = -(M @ nu + rho * Z[k0, :] + Y[k0, :])
+        dk0 = acc_newton(P, q)
+        Z = svt(Z, D0, Y, rho, mu)
 
-    return 0
+    return dk0
+
+def svt(Z, D0, Y, rho, mu):
+    """
+    This function is to implement the signular value thresholding
+    :param Z:
+    :param D0:
+    :param Y:
+    :param rho:
+    :param mu:
+    :return:
+    """
+
+    return Z
 
 
 def toeplitz(x, m=0):
@@ -227,7 +251,7 @@ def updateD0(DD0SS0, X, Y, opts):
         MD_inv = (1/MD_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
         torch.cuda.empty_cache()
-        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsck0, b, D0copy, opts.mu)
+        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsck0, b, D0copy, opts.mu, k0)
     return D0
 
 
