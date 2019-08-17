@@ -15,9 +15,9 @@ torch.backends.cudnn.deterministic = True
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
     miu is the coeff of low-rank term, lamb is the coeff of sparsity """
-    def __init__(self, C=5, K0=10, K=20, miu=0.1, lamb=0.1, delta = 0.9):
+    def __init__(self, C=5, K0=10, K=20, mu=0.1, lamb=0.1, delta = 0.9):
         self.C, self.K, self.K0 = C, K, K0
-        self.mu, self.lamb , self.delta = miu, lamb, delta
+        self.mu, self.lamb , self.delta = mu, lamb, delta
         self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -90,7 +90,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
-        d_new = argmin_lowrank(M, nu, mu, D0, k0)
+        d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
         if torch.norm(d - d_old).item() < 1e-4:
             break
@@ -108,32 +108,39 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     :return: dk0
     """
     K0, m = D0.shape
-    Z = D0.clone()
-    dev = Z.device
     rho = 10 * mu  # agrangian coefficients
+    dev = D0.device
+    Z = torch.eye(K0, m, device=dev)
     Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
-    P = M + rho*torch.eye(M, device=dev)
+    P = M + rho*torch.eye(m, device=dev)
+    Mbynu = M @ nu
     maxiter = 200
+    cr = []
     # begin of ADMM
     for i in range(maxiter):
-        q = -(M @ nu + rho * Z[k0, :] + Y[k0, :])
-        dk0 = acc_newton(P, q)
-        Z = svt(Z, D0, Y, rho, mu)
-
+        Z = svt(D0-1/rho*Y, mu/rho)
+        q = -(Mbynu + rho * Z[k0, :] + Y[k0, :])
+        dk0 = D0[k0, :] = acc_newton(P, q)
+        cr.append(Z - D0)
+        Y = Y + rho*cr
+        if torch.norm(cr[i]) < 1e-4 : break
+        if i > 10:  # if not going anywhere
+            if abs(cr[i] - cr[i-10]).sum() < 5e-5: break
     return dk0
 
-def svt(Z, D0, Y, rho, mu):
+def svt(L, tau):
     """
-    This function is to implement the signular value thresholding
-    :param Z:
-    :param D0:
-    :param Y:
-    :param rho:
-    :param mu:
-    :return:
+    This function is to implement the signular value thresholding, solving the following
+    min_P tau||P||_* + 1/2||P-L||_F^2
+    :param L: low rank matrix to proximate
+    :param tau: the threshold
+    :return: P the matrix after singular value thresholding
     """
-
-    return Z
+    u, s, v = torch.svd(L)
+    s = s - tau
+    s[s<0] = 0
+    P = u @ s.diag() @ v.t()
+    return P
 
 
 def toeplitz(x, m=0):
