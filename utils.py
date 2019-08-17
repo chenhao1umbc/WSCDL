@@ -17,7 +17,7 @@ class OPT:
     miu is the coeff of low-rank term, lamb is the coeff of sparsity """
     def __init__(self, C=5, K0=10, K=20, miu=0.1, lamb=0.1, delta = 0.9):
         self.C, self.K, self.K0 = C, K, K0
-        self.miu, self.lamb , self.delta = miu, lamb, delta
+        self.mu, self.lamb , self.delta = miu, lamb, delta
         self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -67,6 +67,42 @@ def acc_newton(P, q):
         else:
             psi = psi_new.clone()
     return psi_new
+
+
+def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu):
+    """x, is the dck, shape of [M]
+        M, is MD, with shape of [M, M], diagonal matrix
+        Minv, is MD^(-1)
+        Mw, is a number not diagonal matrix
+        Tsck, is truncated toeplitz matrix of sck with shape of [N, M, T]
+        b is bn with all N, with shape of [N, T]
+        """
+    maxiter = 500
+    d_old, d = x, x
+    coef = Minv @ (Tsck@Tsck.permute(0, 2, 1)).sum(0)
+    term = Minv @ (Tsck@b.unsqueeze(2)).sum(0)
+    for i in range(maxiter):
+        d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
+        nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
+        d_new = argmin_lowrank(M, nu, mu, D0)
+        d, d_old = d_new, d
+        if torch.norm(d - d_old).item() < 1e-4:
+            break
+        torch.cuda.empty_cache()
+    return d
+
+
+def argmin_lowrank(M, nu, mu, D0):
+    """
+    Solving the QCQP with low rank panelty term
+    :param M: majorizer matrix
+    :param nu: make d close to ||d-nu||_M^2
+    :param mu: hyper-param of ||D0||_*
+    :param D0: common dict contains all the dk0, shape of [K0, M]
+    :return: dk0
+    """
+
+    return 0
 
 
 def toeplitz(x, m=0):
@@ -131,7 +167,7 @@ def updateD(DD0SS0, X, Y, opts):
         Tsck = toeplitz(sck)  # shape of [N, M, T]
         abs_Tsck = abs(Tsck)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD_diag = ((abs_Tsck @ abs_Tsck).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()
+        MD_diag = ((abs_Tsck @ abs_Tsck.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
 
@@ -145,9 +181,42 @@ def updateD(DD0SS0, X, Y, opts):
     return D
 
 
-def updateD0():
-    pass
+def updateD0(DD0SS0, X, Y, opts):
+    """this function is to update the distinctive D using BPG-M, updating each d_k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        X is a matrix [N, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+    """
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    N, K0, T = S0.shape
+    M =D0.shape[1]
+    M_2 = int(M/2)  # dictionary atom dimension
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    ycDcconvSc = S[:, :, 0, :].clone()
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], D[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+        ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    alpha_plus_dk0 = DconvS.sum(1) + R
+    beta_plus_dk0 = ycDcconvSc.sum(1) + R
 
+    # '''update the current dk0'''
+    for k0 in range(K0):
+        dk0 = D0[k0, :]
+        sck0 = S0[:, k0, :]  # shape of [N, T]
+        Tsck0 = toeplitz(sck0)  # shape of [N, M, T]
+        abs_Tsck0 = abs(Tsck0)
+        Mw = opts.delta   # * torch.eye(M, device=opts.dev)
+        MD_diag = 4*((abs_Tsck0@abs_Tsck0.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
+        MD = MD_diag.diag()
+        MD_inv = (1/MD_diag).diag()
 
+        D0[k0, :] = solv_dck0(dck, MD, MD_inv, Mw, 2*Tsck0, b, D0, opts.mu)
 def load_data():
     pass
