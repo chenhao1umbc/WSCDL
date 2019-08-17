@@ -21,35 +21,39 @@ class OPT:
         self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
-def bpg_m(x_M_Minv_Mw_gradf, type=0):
-    """typ1 =0 means updating dictionary itoms
-        type =1 meaning updating the sparse coeff.
-        x_M_Minv_Mw_gradf is a list
+def solv_dck(x, M, Minv, Mw, Tsck, b):
+    """x, is the dck, shape of [M]
+        M, is MD, with shape of [M, M], diagonal matrix
+        Minv, is MD^(-1)
+        Mw, is a number not diagonal matrix
+        Tsck, is truncated toeplitz matrix of sck with shape of [N, M, T]
+        b is bn with all N, with shape of [N, T]
         """
-    x, M, Minv, Mw, gradf = x_M_Minv_Mw_gradf
     maxiter = 500
-    if type == 0:
-        d_old, d = x, x
-        for i in range(500):
-            d_til = d + Mw@(d -d_old)
-            nu = d_til - Minv@gradf(d_til)
-            if torch.norm(nu).item()**2 <=1 :
-                d_new = nu
-            else:
-                d_new = acc_newton(M, -M@nu)  # QCQP(P, q)
-            d, d_old = d_new, d
-            if torch.norm(d - d_old).item() < 1e-3:
-                break
-        return d
+    d_old, d = x, x
+    coef = Minv @ (Tsck@Tsck.permute(0, 2, 1)).sum(0)
+    term = Minv @ (Tsck@b.unsqueeze(2)).sum(0)
+    for i in range(maxiter):
+        d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
+        nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
+        if torch.norm(nu).item()**2 <= 1:
+            d_new = nu
+        else:
+            d_new = acc_newton(M, -M@nu)  # QCQP(P, q)
+        d, d_old = d_new, d
+        if torch.norm(d - d_old).item() < 1e-4:
+            break
+        torch.cuda.empty_cache()
+    return d
 
 
 def acc_newton(P, q):
     """proximal operator for majorized form using Accelorated Newton's method
     follow the solutions of `convex optimization` by boyd, exercise 4.22, solving QCQP
     where P is a square diagonal matrix, q is a vector
-    for update D  q =- M_D \nu = -MD@nu, P = M_D = MD
+    for update D  q = -M_D \nu = -MD@nu, P = M_D = MD
     for update D0, q = -(M_D \nu + \rho z_k + Y_k), P = M_D + \rho I
-                    q = MD@nu + rho*Z + Y[:, k] , P = MD + rho*eye(M)
+                    q = -(MD@nu + rho*Z + Y[:, k]), P = MD + rho*eye(M)
     """
     psi = 0
     dim = P.shape[0]
@@ -103,7 +107,7 @@ def updateD(DD0SS0, X, Y, opts):
     for i in range(k0):
         print(F.conv1d(s0[:, :, i, :], d0[:, :, i, :]))
     'compare wth'
-    print(F.conv1d(a, b.flip(1).unsqueeze(1), groups=4))
+    print(F.conv1d(a, b.flip(1).unsqueeze(1), groups=k0))
     """
     D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
     N, K0, T = S0.shape
@@ -115,8 +119,9 @@ def updateD(DD0SS0, X, Y, opts):
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     Crange = torch.tensor(range(C))
     for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
         DconvS[:, c, :] = F.conv1d(S[:, c, :, :], D[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
-        # D*S, not the D'*S', And here D'*S' will not be updated for each d_k,c update
+        # D*S, not the D'*S', And here D'*S' will not be updated for each d_c,k update
         torch.cuda.empty_cache()
 
     # '''update the current d_c,k '''
@@ -125,17 +130,19 @@ def updateD(DD0SS0, X, Y, opts):
         sck = S[:, c, k, :]  # shape of [N, T]
         Tsck = toeplitz(sck)  # shape of [N, M, T]
         abs_Tsck = abs(Tsck)
-        Mw = opts.delta * torch.eye(M, device=opts.dev)
+        Mw = opts.delta   # * torch.eye(M, device=opts.dev)
         MD_diag = ((abs_Tsck @ abs_Tsck).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()
         MD = MD_diag.diag()
-        MD_inu = (1/MD_diag).diag()
-        nu = 0
+        MD_inv = (1/MD_diag).diag()
 
         dck_conv_sck = F.conv1d(sck.unsqeeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
+        # the following line is to get the sum_c'(D^(c')*S^(c'))
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
         b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
         torch.cuda.empty_cache()
+        D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck, b)
+    return D
 
 
 def updateD0():

@@ -6,5 +6,3 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 from utils import *
 
 opts = OPT()
-
-toeplitz()
