@@ -126,6 +126,30 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
     return d
 
 
+def solv_wc(x, sc, yc, delta):
+    """
+    This fuction is using bpgm to update wc
+    :param x: shape of [K], init value of wc
+    :param skc: shape of [N, K, T]
+    :param yc: shape of [N]
+    :param delta: real number
+    :return: wc
+    """
+    maxiter = 500
+    snk0_old, snk0 = x.clone(), x.clone()
+    coef = Minv @ Tdck.t() @ Tdck  # shape of [T, T]
+    term = (Minv @ Tdck.t() @b.t()).t()  # shape of [N, T]
+    for i in range(maxiter):
+        snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
+        nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
+        snk0_new = svt_s(M, nu, lamb)  #
+        snk0, snk0_old = snk0_new, snk0
+        if torch.norm(snk0 - snk0_old) < 1e-4:
+            break
+        torch.cuda.empty_cache()
+    return wc
+
+
 def argmin_lowrank(M, nu, mu, D0, k0):
     """
     Solving the QCQP with low rank panelty term. This function is using ADMM to solve dck0
@@ -156,6 +180,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
             if abs(cr[i] - cr[i-10]).sum() < 5e-5: break
     return dk0
 
+
 def svt(L, tau):
     """
     This function is to implement the signular value thresholding, solving the following
@@ -164,12 +189,18 @@ def svt(L, tau):
     :param tau: the threshold
     :return: P the matrix after singular value thresholding
     """
-    u, s, v = torch.svd(L)  ########## so far in version 1.2 the torch.svd for GPU could be much slower than CPU
-                            ########## and torch.svd may have convergence issues for GPU and CPU.
+    dev = L.device
+    L = L.cpu()
+    l, h = L.shape
+    try:
+        u, s, v = torch.svd(L)  ########## so far in version 1.2 the torch.svd for GPU could be much slower than CPU
+    except:                     ########## and torch.svd may have convergence issues for GPU and CPU.
+        u, s, v = torch.svd(L + 1e-5*torch.rand(l, h))
+        print('unstable svd happened')
     s = s - tau
     s[s<0] = 0
     P = u @ s.diag() @ v.t()
-    return P
+    return P.to(dev)
 
 
 def svt_s(M, nu, lamb):
@@ -342,6 +373,22 @@ def updateS0(DD0SS0, X, Y, opts):
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
         S0[:, k0, :] = solv_snk0(snk0, MS0, MS0_inv, opts.delta, 2*Tdk0_t.t(), b, opts.lamb)
     return S0
+
+
+def updateW(S, X, Y, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        X is a matrix [N, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+    """
+    N, C, K, T = S.shape
+    W = torch.eye(K, C, device=opts.dev)
+    for c in range(C):
+        W[:, c] = solv_wc(W[:,c].clone(), S[:, c, :, :], Y[:, c], opts.delta)
+
+
 
 
 def load_data():
