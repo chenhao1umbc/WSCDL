@@ -21,6 +21,29 @@ class OPT:
         self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
+def acc_newton(P, q):
+    """proximal operator for majorized form using Accelorated Newton's method
+    follow the solutions of `convex optimization` by boyd, exercise 4.22, solving QCQP
+    where P is a square diagonal matrix, q is a vector
+    for update D  q = -M_D \nu = -MD@nu, P = M_D = MD
+    for update D0, q = -(M_D \nu + \rho z_k + Y_k), P = M_D + \rho I
+                    q = -(MD@nu + rho*Z + Y[:, k]), P = MD + rho*eye(M)
+    """
+    psi = 0
+    dim = P.shape[0]
+    maxiter = 200
+    for i in range(maxiter):
+        f_grad = - 2 * ((P.diag()+psi)**(-3)*q*q).sum()
+        f = ((P.diag()+psi)**(-2)*q*q).sum()
+        psi_new = psi - 2 * f/f_grad * (f.sqrt() - 1)
+        if (psi_new - psi).item() < 1e-5:  # psi_new should always larger than psi
+            break
+        else:
+            psi = psi_new.clone()
+    dck = -((P.diag() + psi_new)**(-1)).diag() @ q
+    return dck
+
+
 def solv_dck(x, M, Minv, Mw, Tsck, b):
     """x, is the dck, shape of [M]
         M, is MD, with shape of [M, M], diagonal matrix
@@ -47,27 +70,32 @@ def solv_dck(x, M, Minv, Mw, Tsck, b):
     return d
 
 
-def acc_newton(P, q):
-    """proximal operator for majorized form using Accelorated Newton's method
-    follow the solutions of `convex optimization` by boyd, exercise 4.22, solving QCQP
-    where P is a square diagonal matrix, q is a vector
-    for update D  q = -M_D \nu = -MD@nu, P = M_D = MD
-    for update D0, q = -(M_D \nu + \rho z_k + Y_k), P = M_D + \rho I
-                    q = -(MD@nu + rho*Z + Y[:, k]), P = MD + rho*eye(M)
+def solv_snk0(x, M, Minv, Mw, Tdck, b, lamb):
     """
-    psi = 0
-    dim = P.shape[0]
-    maxiter = 200
+    :param x: is the snk0, shape of [N, T]
+    :param M: is MD, the majorizer matrix with shape of [T, T], diagonal matrix
+    :param Minv: is MD^(-1)
+    :param Mw: is a number, not diagonal matrix
+    :param Tdck: is truncated toeplitz matrix of dk0 with shape of [M, T], already *2
+    :param b: bn with all N, with shape of [N, T]
+    :param D0: is the shared dictionary
+    :param mu: is the coefficient fo low-rank term
+    :param k0: the current index of for loop of K0
+    :return: dck0
+    """
+    maxiter = 500
+    snk0_old, snk0 = x.clone(), x.clone()
+    coef = Minv @ Tdck.t() @ Tdck  # shape of [T, T]
+    term = (Minv @ Tdck.t() @b.t()).t()  # shape of [N, T]
     for i in range(maxiter):
-        f_grad = - 2 * ((P.diag()+psi)**(-3)*q*q).sum()
-        f = ((P.diag()+psi)**(-2)*q*q).sum()
-        psi_new = psi - 2 * f/f_grad * (f.sqrt() - 1)
-        if (psi_new - psi).item() < 1e-5:  # psi_new should always larger than psi
+        snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
+        nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
+        snk0_new = svt_s(M, nu, lamb)  #
+        snk0, snk0_old = snk0_new, snk0
+        if torch.norm(snk0 - snk0_old) < 1e-4:
             break
-        else:
-            psi = psi_new.clone()
-    dck = -((P.diag() + psi_new)**(-1)).diag() @ q
-    return dck
+        torch.cuda.empty_cache()
+    return snk0
 
 
 def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
@@ -76,7 +104,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
     :param M: is MD, the majorizer matrix with shape of [M, M], diagonal matrix
     :param Minv: is MD^(-1)
     :param Mw: is a number not diagonal matrix
-    :param Tsck: is truncated toeplitz matrix of sck with shape of [N, M, T]
+    :param Tsck: is truncated toeplitz matrix of sck with shape of [N, M, T], already *2
     :param b: bn with all N, with shape of [N, T]
     :param D0: is the shared dictionary
     :param mu: is the coefficient fo low-rank term
@@ -136,10 +164,25 @@ def svt(L, tau):
     :param tau: the threshold
     :return: P the matrix after singular value thresholding
     """
-    u, s, v = torch.svd(L)
+    u, s, v = torch.svd(L)  ########## so far in version 1.2 the torch.svd for GPU could be much slower than CPU
+                            ########## and torch.svd may have convergence issues for GPU and CPU.
     s = s - tau
     s[s<0] = 0
     P = u @ s.diag() @ v.t()
+    return P
+
+
+def svt_s(M, nu, lamb):
+    """
+    This function is to implement the signular value thresholding, solving the following
+    min_p lamb||p||_1 + 1/2||\nu-p||_M^2, p is a vector
+    :param M: is used for matrix norm 
+    :param lamb: is coefficient of L-1 norm
+    :param nu: the the matrix to be pruned
+    :return: P the matrix after singular value thresholding
+    """
+    b = lamb / M.diag()
+    P = torch.sign(nu) * F.relu(abs(nu) -b)
     return P
 
 
@@ -185,7 +228,7 @@ def updateD(DD0SS0, X, Y, opts):
     """
     D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
     N, K0, T = S0.shape
-    M =D0.shape[1]
+    M = D0.shape[1]
     M_2 = int(M/2)  # dictionary atom dimension
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2+T]  # r is shape of [N, T)
     C, K, _ = D.shape
@@ -220,7 +263,7 @@ def updateD(DD0SS0, X, Y, opts):
 
 
 def updateD0(DD0SS0, X, Y, opts):
-    """this function is to update the distinctive D using BPG-M, updating each d_k^(0)
+    """this function is to update the common dictionary D0 using BPG-M, updating each d_k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
@@ -232,7 +275,7 @@ def updateD0(DD0SS0, X, Y, opts):
     """
     D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
     N, K0, T = S0.shape
-    M =D0.shape[1]
+    M = D0.shape[1]
     M_2 = int(M/2)  # dictionary atom dimension
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     ycDcconvSc = S[:, :, 0, :].clone()
@@ -248,18 +291,57 @@ def updateD0(DD0SS0, X, Y, opts):
     # '''update the current dk0'''
     for k0 in range(K0):
         dk0 = D0[k0, :]
-        sck0 = S0[:, k0, :]  # shape of [N, T]
-        dk0convsck0 = F.conv1d(sck0.unsqueeze(1), dk0.flip().unsqueeze(0).unsqeeze(0), padding=M-1)[:, M_2:M_2 + T]
-        Tsck0 = toeplitz(sck0)  # shape of [N, M, T]
-        abs_Tsck0 = abs(Tsck0)
+        snk0 = S0[:, k0, :]  # shape of [N, T]
+        dk0convsnk0 = F.conv1d(snk0.unsqueeze(1), dk0.flip().unsqueeze(0).unsqeeze(0), padding=M-1)[:, M_2:M_2 + T]
+        Tsnk0 = toeplitz(snk0)  # shape of [N, M, T]
+        abs_Tsnk0 = abs(Tsnk0)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD_diag = 4*((abs_Tsck0@abs_Tsck0.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
+        MD_diag = 4*((abs_Tsnk0 @ abs_Tsnk0.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
-        b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
+        b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
-        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsck0, b, D0copy, opts.mu, k0)
+        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0, b, D0copy, opts.mu, k0)
     return D0
+
+
+def updateS0(DD0SS0, X, Y, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        X is a matrix [N, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+    """
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    N, K0, T = S0.shape
+    M = D0.shape[1]
+    M_2 = int(M/2)  # dictionary atom dimension
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    ycDcconvSc = S[:, :, 0, :].clone()
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], D[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+        ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    alpha_plus_dk0 = DconvS.sum(1) + R
+    beta_plus_dk0 = ycDcconvSc.sum(1) + R
+
+    for k0 in range(K0):
+        dk0 = D0[k0, :]
+        snk0 = S0[:, k0, :]  # shape of [N, T]
+        dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip().unsqueeze(0).unsqeeze(0), padding=M-1)[:, M_2:M_2 + T]
+        Tdk0_t = toeplitz(dk0.unsqueeze(0), T).squeeze()  # in shape of [T, M]
+        abs_Tdk0 = abs(Tdk0_t).t()
+        MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T, T]
+        MS0 = MS0_diag.diag()
+        MS0_inv = (1/MS0_diag).diag()
+        b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
+        S0[:, k0, :] = solv_snk0(snk0, MS0, MS0_inv, opts.delta, 2*Tdk0_t.t(), b, opts.lamb)
+    return S0
 
 
 def load_data():
