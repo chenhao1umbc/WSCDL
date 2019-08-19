@@ -92,7 +92,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if torch.norm(d - d_old).item() < 1e-4:
+        if torch.norm(d - d_old) < 1e-4:
             break
         torch.cuda.empty_cache()
     return d
