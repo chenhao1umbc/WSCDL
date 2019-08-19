@@ -375,19 +375,20 @@ def updateS0(DD0SS0, X, Y, opts):
     return S0
 
 
-def updateW(S, X, Y, opts):
+def updateW(SW, Y, opts):
     """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
+        SW is a list of [S, W]
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
         X is a matrix [N, T], training Data
         Y is a matrix [N, C] \in {0,1}, training labels
     """
+    S, W = SW
     N, C, K, T = S.shape
-    W = torch.eye(K, C, device=opts.dev)
     for c in range(C):
         W[:, c] = solv_wc(W[:,c].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-
+    return W
 
 
 
