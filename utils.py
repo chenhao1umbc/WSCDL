@@ -126,28 +126,54 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
     return d
 
 
-def solv_wc(x, sc, yc, delta):
+def solv_wc(x, snc, yc, delta):
     """
     This fuction is using bpgm to update wc
     :param x: shape of [K], init value of wc
-    :param skc: shape of [N, K, T]
+    :param snc: shape of [N, K, T]
     :param yc: shape of [N]
     :param delta: real number
     :return: wc
     """
     maxiter = 500
-    snk0_old, snk0 = x.clone(), x.clone()
-    coef = Minv @ Tdck.t() @ Tdck  # shape of [T, T]
-    term = (Minv @ Tdck.t() @b.t()).t()  # shape of [N, T]
+    wc_old, wc = x.clone(), x.clone()
+    sncp = snc.mean(2)  # shape of [N, K]
+    abs_sncp = abs(sncp)
+    sncp_wc = sncp @ wc
+    M = ((yc / (sncp_wc)**2 + (1-yc)/(1-sncp_wc)**2) *abs_sncp * abs_sncp.sum(1)).sum(0)  # shape of [K]
+    M_old = M.clone()
     for i in range(maxiter):
-        snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
-        nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
-        snk0_new = svt_s(M, nu, lamb)  #
-        snk0, snk0_old = snk0_new, snk0
-        if torch.norm(snk0 - snk0_old) < 1e-4:
+        Mw = delta * M**(-1/2) * M_old**(1/2)
+        wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
+        sncp_wc_til = sncp @ wc_til
+        nu = wc_til + M.diag()**(-1) * ((yc/sncp_wc_til + (yc-1)/(1-sncp_wc_til))*sncp).sum(0)  # nu is [K]
+        wc_new, M_new = gradd(abs_sncp, sncp, yc, nu)  # gradient descend to get wc
+        wc, wc_old = wc_new, wc
+        M, M_old = M_new, M
+        if torch.norm(wc - wc_old) < 1e-4:
             break
         torch.cuda.empty_cache()
     return wc
+
+
+def gradd(abs_sncp, sncp, yc, nu):
+    """
+    This function is meant to solve 1/2||x-\nu||_M^2, where M is a function of x,
+    This looks like a convex problem but it is not because M = f(x), x is part of demoninator
+    :param abs_sncp: abs(snc(mean(2)) constant, shape of [N, K]
+    :param sncp: snc(mean(2) constant, shape of [N, K]
+    :param yc: y_n^(c) constant, shape of [N]
+    :param nu: constant, shape of [M]
+    :return:
+    """
+    wc = nu.clone().requires_grad_()
+    sncp_wc = sncp @ wc
+    M = ((yc / (sncp_wc) ** 2 + (1 - yc) / (1 - sncp_wc) ** 2) * abs_sncp * abs_sncp.sum(1)).sum(0)  # shape of [K]
+    loss = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
+    lr = 0.005
+
+    torch.cuda.empty_cache()
+    return wc.requires_grad_(False), M.requires_grad_(False)
 
 
 def argmin_lowrank(M, nu, mu, D0, k0):
