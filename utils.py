@@ -147,7 +147,7 @@ def solv_wc(x, snc, yc, delta):
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         sncp_wc_til = sncp @ wc_til
         nu = wc_til + M.diag()**(-1) * ((yc/sncp_wc_til + (yc-1)/(1-sncp_wc_til))*sncp).sum(0)  # nu is [K]
-        wc_new, M_new = gradd(abs_sncp, sncp, yc, nu)  # gradient descend to get wc
+        wc_new, M_new = gradd(abs_sncp, sncp, yc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
         if torch.norm(wc - wc_old) < 1e-4:
@@ -156,7 +156,7 @@ def solv_wc(x, snc, yc, delta):
     return wc
 
 
-def gradd(abs_sncp, sncp, yc, nu):
+def gradd(abs_sncp, sncp, yc, nu, init_wc):
     """
     This function is meant to solve 1/2||x-\nu||_M^2, where M is a function of x,
     This looks like a convex problem but it is not because M = f(x), x is part of demoninator
@@ -164,15 +164,28 @@ def gradd(abs_sncp, sncp, yc, nu):
     :param sncp: snc(mean(2) constant, shape of [N, K]
     :param yc: y_n^(c) constant, shape of [N]
     :param nu: constant, shape of [M]
+    :param init_wc: is a clone of wc for the initialization
     :return:
     """
-    wc = nu.clone().requires_grad_()
-    sncp_wc = sncp @ wc
-    M = ((yc / (sncp_wc) ** 2 + (1 - yc) / (1 - sncp_wc) ** 2) * abs_sncp * abs_sncp.sum(1)).sum(0)  # shape of [K]
-    loss = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
+    wc = init_wc.requires_grad_()
     lr = 0.005
+    const = abs_sncp * abs_sncp.sum(1)
+    maxiter = 500
+    loss = []
+    for i in range(maxiter):
+        sncp_wc = sncp @ wc
+        M = ((yc / (sncp_wc) ** 2 + (1 - yc) / (1 - sncp_wc) ** 2) * const).sum(0)  # shape of [K]
+        lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
+        lossfunc.backward()
+        loss.append(lossfunc.detach().cpu().item())
+        if abs(wc.grad).sum() < 1e-4: break  # stop criteria
+        if i > 30 and abs(loss[i]-loss[i-1]) < 1e-4: break  # stop criteria
+        with torch.no_grad():
+            wc = wc - lr*wc.grad
+            wc.requires_grad_()
+        torch.cuda.empty_cache()
 
-    torch.cuda.empty_cache()
+
     return wc.requires_grad_(False), M.requires_grad_(False)
 
 
