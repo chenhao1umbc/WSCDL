@@ -4,7 +4,7 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 """
 
 from utils import *
-
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT()
 X, Y = load_data(opts)
 D, D0, S, S0, W = init(X, Y, opts)

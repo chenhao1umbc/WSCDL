@@ -1,8 +1,9 @@
 ##
 # """This file constains all the necessary classes and functions"""
+import os
+import time
 import torch
 import torch.nn.functional as F
-import time
 import numpy as np
 import matplotlib.pyplot as plt
 # from scipy.linalg import toeplitz   # This is too slow
@@ -15,12 +16,18 @@ torch.backends.cudnn.deterministic = True
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
     miu is the coeff of low-rank term, lamb is the coeff of sparsity """
-    def __init__(self, C=5, K0=10, K=20, M= 20, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
+    def __init__(self, C=5, K0=10, K=20, M=20, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.lamb, self.delta = mu, lamb, delta
         self.maxiter, self.plot = maxiter, False
         self.dataset = 0
-        self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
+        if torch.cuda.is_available():
+            self.dev = 'cuda'
+            print('Running on GPU')
+        else:
+            self.dev = 'cpu'
+            print('GPU is not available \nRunning on CPU')
+
 
 
 def init(X, Y, opts):
@@ -72,18 +79,18 @@ def acc_newton(P, q):
     return dck
 
 
-def solv_dck(x, M, Minv, Mw, Tsck, b):
+def solv_dck(x, M, Minv, Mw, Tsck_t, b):
     """x, is the dck, shape of [M]
         M, is MD, with shape of [M, M], diagonal matrix
         Minv, is MD^(-1)
         Mw, is a number not diagonal matrix
-        Tsck, is truncated toeplitz matrix of sck with shape of [N, M, T]
+        Tsck_t, is truncated toeplitz matrix of sck with shape of [N, M, T]
         b is bn with all N, with shape of [N, T]
         """
     maxiter = 500
     d_old, d = x.clone(), x.clone()
-    coef = Minv @ (Tsck@Tsck.permute(0, 2, 1)).sum(0)
-    term = Minv @ (Tsck@b.unsqueeze(2)).sum(0)
+    coef = Minv @ (Tsck_t@Tsck_t.permute(0, 2, 1)).sum(0)
+    term = Minv @ (Tsck_t@b.unsqueeze(2)).sum(0)
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
@@ -98,13 +105,13 @@ def solv_dck(x, M, Minv, Mw, Tsck, b):
     return d
 
 
-def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
+def solv_dck0(x, M, Minv, Mw, Tsck_t, b, D0, mu, k0):
     """
     :param x: is the dck, shape of [M]
     :param M: is MD, the majorizer matrix with shape of [M, M], diagonal matrix
     :param Minv: is MD^(-1)
     :param Mw: is a number not diagonal matrix
-    :param Tsck: is truncated toeplitz matrix of sck with shape of [N, M, T], already *2
+    :param Tsck_t: is truncated toeplitz matrix of sck with shape of [N, M, T], already *2
     :param b: bn with all N, with shape of [N, T]
     :param D0: is the shared dictionary
     :param mu: is the coefficient fo low-rank term
@@ -113,8 +120,8 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
     """
     maxiter = 500
     d_old, d = x.clone(), x.clone()
-    coef = Minv @ (Tsck@Tsck.permute(0, 2, 1)).sum(0)
-    term = Minv @ (Tsck@b.unsqueeze(2)).sum(0)
+    coef = Minv @ (Tsck_t @ Tsck_t.permute(0, 2, 1)).sum(0)
+    term = Minv @ (Tsck_t @ b.unsqueeze(2)).sum(0)
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
@@ -126,21 +133,21 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
     return d
 
 
-def solv_snk0(x, M, Minv, Mw, Tdck, b, lamb):
+def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
     """
     :param x: is the snk0, shape of [N, T]
     :param M: is MD, the majorizer matrix with shape of [T], diagonal of matrix
     :param Minv: is MD^(-1)
     :param Mw: is a number, not diagonal matrix
-    :param Tdck: is truncated toeplitz matrix of dk0 with shape of [M, T], already *2
+    :param Tdk0: is truncated toeplitz matrix of dk0 with shape of [M, T], already *2
     :param b: bn with all N, with shape of [N, T]
     :param lamb: sparsity hyper parameter
     :return: dck0
     """
     maxiter = 500
     snk0_old, snk0 = x.clone(), x.clone()
-    coef = Minv @ Tdck.t() @ Tdck  # shape of [T, T]
-    term = (Minv @ Tdck.t() @b.t()).t()  # shape of [N, T]
+    coef = Minv @ Tdk0.t() @ Tdk0  # shape of [T, T]
+    term = (Minv @ Tdk0.t() @b.t()).t()  # shape of [N, T]
     for i in range(maxiter):
         snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
@@ -158,7 +165,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     :param sc: shape of [N, K, T]
     :param wc: shape of [K]
     :param yc: shape of [N]
-    :param Tdck: shape of [M, T]
+    :param Tdck: shape of [T, m=T]
     :param b: shape of [N, T]
     :param k: integer, which atom to update
     :return: sck
@@ -190,10 +197,13 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         PtSncWc = sc.mean(2) @ wc  # shape of [N]
         long = abs(term3 / PtSncWc**2 + term2 / (1-PtSncWc)**2)
         M_new = term1 + long.unsqueeze(1) @ P.unsqueeze(0)  # shape of [N, T]
-        nu = sck_til - (8*Tdck_t_Tdck@sck.t()).t()/M  # shape of [N, T]
+        nu = sck_til - (8*Tdck_t_Tdck @ (sck.t()-b.t())).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
         M, M_old = M_new, M
+        if torch.norm(sck - sck_old) < 1e-4:
+            break
+        torch.cuda.empty_cache()
     return sck
 
 
@@ -208,17 +218,18 @@ def solv_wc(x, snc, yc, delta):
     """
     maxiter = 500
     wc_old, wc = x.clone(), x.clone()
-    sncp = snc.mean(2)  # shape of [N, K]
-    abs_sncp = abs(sncp)
-    sncp_wc = sncp @ wc
-    M = ((yc / (sncp_wc)**2 + (1-yc)/(1-sncp_wc)**2) *abs_sncp * abs_sncp.sum(1)).sum(0)  # shape of [K]
+    pt_snc = snc.mean(2)  # shape of [N, K]
+    abs_pt_snc = abs(pt_snc)
+    pt_snc_wc = pt_snc @ wc  # shape of [N]
+    M = ((yc / (pt_snc_wc) ** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * abs_pt_snc * (
+        abs_pt_snc.sum(1).unsqueeze(1))).sum(0)  # shape of [K]
     M_old = M.clone()
     for i in range(maxiter):
         Mw = delta * M**(-1/2) * M_old**(1/2)
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
-        sncp_wc_til = sncp @ wc_til
-        nu = wc_til + M.diag()**(-1) * ((yc/sncp_wc_til + (yc-1)/(1-sncp_wc_til))*sncp).sum(0)  # nu is [K]
-        wc_new, M_new = gradd(abs_sncp, sncp, yc, nu, wc.clone())  # gradient descend to get wc
+        pt_snc_wc_til = pt_snc @ wc_til
+        nu = wc_til + M**(-1) * ((yc/pt_snc_wc_til + (yc-1)/(1-pt_snc_wc_til)).unsqueeze(1)*pt_snc).sum(0)  # nu is [K]
+        wc_new, M_new = gradd(abs_pt_snc, pt_snc, yc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
         if torch.norm(wc - wc_old) < 1e-4:
@@ -227,12 +238,12 @@ def solv_wc(x, snc, yc, delta):
     return wc
 
 
-def gradd(abs_sncp, sncp, yc, nu, init_wc):
+def gradd(abs_pt_snc, pt_snc, yc, nu, init_wc):
     """
     This function is meant to solve 1/2||x-\nu||_M^2, where M is a function of x,
     This looks like a convex problem but it is not because M = f(x), x is part of demoninator
-    :param abs_sncp: abs(snc(mean(2)) constant, shape of [N, K]
-    :param sncp: snc(mean(2) constant, shape of [N, K]
+    :param abs_pt_snc: abs(snc(mean(2)) constant, shape of [N, K]
+    :param pt_snc: snc(mean(2) constant, shape of [N, K]
     :param yc: y_n^(c) constant, shape of [N]
     :param nu: constant, shape of [M]
     :param init_wc: is a clone of wc for the initialization
@@ -240,22 +251,22 @@ def gradd(abs_sncp, sncp, yc, nu, init_wc):
     """
     wc = init_wc.requires_grad_()
     lr = 0.005
-    const = abs_sncp * abs_sncp.sum(1)
+    const = abs_pt_snc * abs_pt_snc.sum(1).unsqueeze(1)
     maxiter = 500
     loss = []
     for i in range(maxiter):
-        sncp_wc = sncp @ wc
-        M = ((yc / (sncp_wc) ** 2 + (1 - yc) / (1 - sncp_wc) ** 2) * const).sum(0)  # shape of [K]
+        pt_snc_wc = pt_snc @ wc
+        M = ((yc / (pt_snc_wc) ** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * const).sum(0)  # shape of [K]
         lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
         lossfunc.backward()
         loss.append(lossfunc.detach().cpu().item())
         if abs(wc.grad).sum() < 1e-4: break  # stop criteria
-        if i > 30 and abs(loss[i]-loss[i-1]) < 1e-4: break  # stop criteria
+        if i > 10 and abs(loss[i]-loss[i-1]) < 1e-4: break  # stop criteria
         with torch.no_grad():
             wc = wc - lr*wc.grad
             wc.requires_grad_()
         torch.cuda.empty_cache()
-    return wc.requires_grad_(False), M.requires_grad_(False)
+    return wc.detach().requires_grad_(False), M.detach().requires_grad_(False)
 
 
 def argmin_lowrank(M, nu, mu, D0, k0):
@@ -325,20 +336,22 @@ def svt_s(M, nu, lamb):
     return P
 
 
-def toeplitz(x, m=0):
+def toeplitz(x, m=10, T=10):
     """This is a the toepliz matrx for torch.tensor
-    input x has the shape of [N, T]
+    input x has the shape of [N, ?], ? is M or T
         M is an interger
-    output tx has the shape of [N, M, T]
+        T is truncated length
+    output tx has the shape of [N, m, T]
     """
     dev = x.device
-    N, T = x.shape
+    N, m0 = x.shape  # m0 is T for Tsck, and m0 is M for Tdck
+    M = m if m < m0 else m0
     x_append0 = torch.cat([x, torch.zeros(N, 2*m, device=dev)], dim=1)
-    xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, T+2m]
+    xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
     tx = torch.zeros(N, m, T, device=dev)
-    m2 = int(m/2)
+    M2 = int(M/2)  # half length of M, for truncation purpose
     for i in range(m):
-        ind = range(m2 + i, m2 + i + T)
+        ind = range(M2 + i, M2 + i + T)
         tx[:, i, :] = xm[:, i, ind]
     return tx
 
@@ -384,10 +397,10 @@ def updateD(DD0SS0, X, Y, opts):
     for c, k in [(i, j) for i in range(C) for j in range(K)]:
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
-        Tsck = toeplitz(sck, M)  # shape of [N, M, T]
-        abs_Tsck = abs(Tsck)
+        Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T],
+        abs_Tsck_t = abs(Tsck_t)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD_diag = ((abs_Tsck @ abs_Tsck.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
+        MD_diag = ((abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
 
@@ -397,7 +410,7 @@ def updateD(DD0SS0, X, Y, opts):
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
         b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
         torch.cuda.empty_cache()
-        D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck, b)
+        D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
     return D
 
 
@@ -434,15 +447,15 @@ def updateD0(DD0SS0, X, Y, opts):
         dk0 = D0[k0, :]
         snk0 = S0[:, k0, :]  # shape of [N, T]
         dk0convsnk0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0,  M_2:M_2 + T]
-        Tsnk0 = toeplitz(snk0, M)  # shape of [N, M, T]
-        abs_Tsnk0 = abs(Tsnk0)
+        Tsnk0_t = toeplitz(snk0, M, T)  # shape of [N, M, T]
+        abs_Tsnk0_t = abs(Tsnk0_t)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD_diag = 4*((abs_Tsnk0 @ abs_Tsnk0.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
+        MD_diag = 4*((abs_Tsnk0_t @ abs_Tsnk0_t.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
-        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0, b, D0copy, opts.mu, k0)
+        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0copy, opts.mu, k0)
     return D0
 
 
@@ -477,7 +490,7 @@ def updateS0(DD0SS0, X, Y, opts):
         dk0 = D0[k0, :]
         snk0 = S0[:, k0, :]  # shape of [N, T]
         dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
-        Tdk0_t = toeplitz(dk0.unsqueeze(0), T).squeeze()  # in shape of [T, M]
+        Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
         abs_Tdk0 = abs(Tdk0_t).t()
         MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
         MS0_inv = (1/MS0_diag).diag()
@@ -518,7 +531,7 @@ def updateS(DD0SS0W, X, Y, opts):
         sck = S[:, c, k, :]  # shape of [N, T]
         wc = W[c, :]  # shape of [K]
         yc = Y[:, c]  # shape of [N]
-        Tdck = (toeplitz(dck.unsqueeze(0), T).squeeze()).t()  # shape of [M, T]
+        Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
@@ -549,7 +562,7 @@ def updateW(SW, Y, opts):
 
 
 def load_data(opts):
-    X = torch.rand(500, 10000, device=opts.dev)
+    X = torch.rand(500, 3000, device=opts.dev)
     Y = torch.zeros(500, opts.C, device=opts.dev)
     for i in range(opts.C):
         Y[:100+100*i, i] = 1.0
