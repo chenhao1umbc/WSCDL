@@ -542,6 +542,5 @@ def updateW(SW, Y, opts):
     return W
 
 
-
 def load_data():
     pass
