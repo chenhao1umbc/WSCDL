@@ -14,8 +14,7 @@ d0 = b.flip(1).unsqueeze(0).unsqueeze(0)  # expand dimension for conv1d
 aa, ba = a.cpu().numpy(), b.cpu().numpy()
 for i in range(300):
     for ii in range(k0):
-        # r1 = F.conv1d(s0[i,:, :, ii, :], d0[:, :, ii, :])
-        r1 = np.fft.ifft(np.fft.fft(aa[i, ii, :])*np.fft.fft(ba[ii,:], 500))
+        r1 = F.conv1d(s0[i,:, :, ii, :], d0[:, :, ii, :])
 print('Double for-loop time is :', time.time()-t )
 
 t = time.time()
@@ -52,8 +51,7 @@ if torch.cuda.is_available():
     aa, ba = a.cpu().numpy(), b.cpu().numpy()
     for i in range(300):
         for ii in range(k0):
-            # r1 = F.conv1d(s0[i,:, :, ii, :], d0[:, :, ii, :])
-            r1 = np.fft.ifft(np.fft.fft(aa[i, ii, :]) * np.fft.fft(ba[ii, :], 500))
+            r1 = F.conv1d(s0[i,:, :, ii, :], d0[:, :, ii, :])
     print('Double for-loop time is :', time.time() - t)
 
     t = time.time()
