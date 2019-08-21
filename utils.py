@@ -15,21 +15,37 @@ torch.backends.cudnn.deterministic = True
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
     miu is the coeff of low-rank term, lamb is the coeff of sparsity """
-    def __init__(self, C=5, K0=10, K=20, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
-        self.C, self.K, self.K0 = C, K, K0
+    def __init__(self, C=5, K0=10, K=20, M= 20, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
+        self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.lamb, self.delta = mu, lamb, delta
-        self.maxiter, self.plot = 300, False
+        self.maxiter, self.plot = maxiter, False
         self.dataset = 0
         self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
-def init(opts):
+def init(X, Y, opts):
     """
     This function will generate the initial value for D D0 S S0 and W
+    :param X: training data with shape of [N, T]
+    :param Y: training labels with shape of [N, C]
     :param opts: an object with hyper-parameters
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        X is a matrix [N, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+        W is a matrix [C, K], where K is per-class atoms
     :return: D, D0, S, S0, W
     """
-    D, D0, S, S0, W = 0, 0, 0, 0, 0
+    N, T = X.shape
+    ind = list(range(N))
+    np.random.shuffle(ind)
+    D = torch.rand(opts.C, opts.K, opts.M, device=opts.dev)
+    D0 = torch.rand(opts.K0, opts.M, device=opts.dev)
+    S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
+    S0 = torch.rand(N, opts.K0, T, device=opts.dev)
+    W = torch.rand(opts.C, opts.K, device=opts.dev)
     return D, D0, S, S0, W
 
 
@@ -157,23 +173,23 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     sck_old = sck.clone()
     PtSncWc = sc.mean(2) @ wc  # shape of [N]
     yc_wkc = yc * wc[k]  #shape of [N]
-    wkc = wc[k]
+    wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
-    term1 = (abs(8 * Tdck_t_Tdck)).sum(1).uns
-    term2 = (wkc ** 2 + yc_wkc * wkc)
-    term3 = yc_wkc * wkc
+    term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  #shape of [T]
+    term2 = wkc ** 2 + yc_wkc * wkc  # scaler
+    term3 = yc_wkc * wkc  # shape of [N]
     # M is the diagonal of majorization matrix with shape of [N, T]
     long = abs(term3 / PtSncWc**2 + term2 / (1-PtSncWc)**2)
-    M = term1 + long.unsqueez(1) @ P.unsqueeze(0)
+    M = term1 + long.unsqueeze(1) @ P.unsqueeze(0)  # shape of [N, T]
     M_old = M.clone()
 
-    maxiter = 500
+    maxiter = 5  # for test, set it to a small number
     for i in range(maxiter):
         Mw = delta * M**(-0.5) * M_old**0.5
         sck_til = sck + Mw * (sck - sck_old)
         PtSncWc = sc.mean(2) @ wc  # shape of [N]
         long = abs(term3 / PtSncWc**2 + term2 / (1-PtSncWc)**2)
-        M_new = term1 + long.unsqueez(1) @ P.unsqueeze(0)  # shape of [N, T]
+        M_new = term1 + long.unsqueeze(1) @ P.unsqueeze(0)  # shape of [N, T]
         nu = sck_til - (8*Tdck_t_Tdck@sck.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
@@ -266,7 +282,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
         q = -(Mbynu + rho * Z[k0, :] + Y[k0, :])
         dk0 = D0[k0, :] = acc_newton(P, q)
         cr.append(Z - D0)
-        Y = Y + rho*cr
+        Y = Y + rho*cr[i]
         if torch.norm(cr[i]) < 1e-4 : break
         if i > 10:  # if not going anywhere
             if abs(cr[i] - cr[i-10]).sum() < 5e-5: break
@@ -355,12 +371,12 @@ def updateD(DD0SS0, X, Y, opts):
     M_2 = int(M/2)  # dictionary atom dimension
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2+T]  # r is shape of [N, T)
     C, K, _ = D.shape
-    D = D.flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     Crange = torch.tensor(range(C))
     for c in range(C):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], D[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
         # D*S, not the D'*S', And here D'*S' will not be updated for each d_c,k update
         torch.cuda.empty_cache()
 
@@ -375,7 +391,7 @@ def updateD(DD0SS0, X, Y, opts):
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
 
-        dck_conv_sck = F.conv1d(sck.unsqeeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
+        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
         # the following line is to get the sum_c'(D^(c')*S^(c'))
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
@@ -401,11 +417,12 @@ def updateD0(DD0SS0, X, Y, opts):
     C, K, _ = D.shape
     M = D0.shape[1]
     M_2 = int(M/2)  # dictionary atom dimension
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     ycDcconvSc = S[:, :, 0, :].clone()
     for c in range(C):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], D[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
         ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
     alpha_plus_dk0 = DconvS.sum(1) + R
@@ -416,7 +433,7 @@ def updateD0(DD0SS0, X, Y, opts):
     for k0 in range(K0):
         dk0 = D0[k0, :]
         snk0 = S0[:, k0, :]  # shape of [N, T]
-        dk0convsnk0 = F.conv1d(snk0.unsqueeze(1), dk0.flip().unsqueeze(0).unsqeeze(0), padding=M-1)[:, M_2:M_2 + T]
+        dk0convsnk0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0,  M_2:M_2 + T]
         Tsnk0 = toeplitz(snk0, M)  # shape of [N, M, T]
         abs_Tsnk0 = abs(Tsnk0)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
@@ -445,11 +462,12 @@ def updateS0(DD0SS0, X, Y, opts):
     C, K, _ = D.shape
     M = D0.shape[1]
     M_2 = int(M/2)  # dictionary atom dimension
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     ycDcconvSc = S[:, :, 0, :].clone()
     for c in range(C):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], D[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
         ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
     alpha_plus_dk0 = DconvS.sum(1) + R
@@ -458,7 +476,7 @@ def updateS0(DD0SS0, X, Y, opts):
     for k0 in range(K0):
         dk0 = D0[k0, :]
         snk0 = S0[:, k0, :]  # shape of [N, T]
-        dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip().unsqueeze(0).unsqeeze(0), padding=M-1)[:, M_2:M_2 + T]
+        dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
         Tdk0_t = toeplitz(dk0.unsqueeze(0), T).squeeze()  # in shape of [T, M]
         abs_Tdk0 = abs(Tdk0_t).t()
         MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
@@ -486,11 +504,12 @@ def updateS(DD0SS0W, X, Y, opts):
     M = D0.shape[1]  # dictionary atom dimension
     M_2 = int(M/2)
     C, K, _ = D.shape
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     Crange = torch.tensor(range(C))
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     for c in range(C):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], D[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
     # '''update the current s_n,k^(c) '''
@@ -501,7 +520,7 @@ def updateS(DD0SS0W, X, Y, opts):
         yc = Y[:, c]  # shape of [N]
         Tdck = (toeplitz(dck.unsqueeze(0), T).squeeze()).t()  # shape of [M, T]
 
-        dck_conv_sck = F.conv1d(sck.unsqeeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
+        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
         # the following line is to get the sum_c'(D^(c')*S^(c'))
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
@@ -529,8 +548,12 @@ def updateW(SW, Y, opts):
     return W
 
 
-def load_data():
-    pass
+def load_data(opts):
+    X = torch.rand(500, 10000, device=opts.dev)
+    Y = torch.zeros(500, opts.C, device=opts.dev)
+    for i in range(opts.C):
+        Y[:100+100*i, i] = 1.0
+    return X, Y
 
 
 
