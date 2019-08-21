@@ -15,9 +15,11 @@ torch.backends.cudnn.deterministic = True
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
     miu is the coeff of low-rank term, lamb is the coeff of sparsity """
-    def __init__(self, C=5, K0=10, K=20, mu=0.1, lamb=0.1, delta = 0.9):
+    def __init__(self, C=5, K0=10, K=20, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
         self.C, self.K, self.K0 = C, K, K0
-        self.mu, self.lamb , self.delta = mu, lamb, delta
+        self.mu, self.lamb, self.delta = mu, lamb, delta
+        self.maxiter, self.plot = 300, False
+        self.dataset = 0
         self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -27,7 +29,7 @@ def init(opts):
     :param opts: an object with hyper-parameters
     :return: D, D0, S, S0, W
     """
-    D, D0, S, S0, W = 0
+    D, D0, S, S0, W = 0, 0, 0, 0, 0
     return D, D0, S, S0, W
 
 
@@ -111,7 +113,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck, b, D0, mu, k0):
 def solv_snk0(x, M, Minv, Mw, Tdck, b, lamb):
     """
     :param x: is the snk0, shape of [N, T]
-    :param M: is MD, the majorizer matrix with shape of [T, T], diagonal matrix
+    :param M: is MD, the majorizer matrix with shape of [T], diagonal of matrix
     :param Minv: is MD^(-1)
     :param Mw: is a number, not diagonal matrix
     :param Tdck: is truncated toeplitz matrix of dk0 with shape of [M, T], already *2
@@ -126,7 +128,7 @@ def solv_snk0(x, M, Minv, Mw, Tdck, b, lamb):
     for i in range(maxiter):
         snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
-        snk0_new = svt_s0(M, nu, lamb)  # shape of [N, T]
+        snk0_new = svt_s(M, nu, lamb)  # shape of [N, T]
         snk0, snk0_old = snk0_new, snk0
         if torch.norm(snk0 - snk0_old) < 1e-4:
             break
@@ -291,20 +293,6 @@ def svt(L, tau):
     s[s<0] = 0
     P = u @ s.diag() @ v.t()
     return P.to(dev)
-
-
-def svt_s0(M, nu, lamb):
-    """
-    This function is to implement the signular value thresholding, solving the following
-    min_p lamb||p||_1 + 1/2||\nu-p||_M^2, p is a vector
-    :param M: is used for matrix norm, shape of [T, T]
-    :param lamb: is coefficient of L-1 norm, scaler
-    :param nu: the the matrix to be pruned, shape of [N, T]
-    :return: P the matrix after singular value thresholding
-    """
-    b = lamb / M.diag()
-    P = torch.sign(nu) * F.relu(abs(nu) -b)
-    return P
 
 
 def svt_s(M, nu, lamb):
@@ -473,12 +461,11 @@ def updateS0(DD0SS0, X, Y, opts):
         dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip().unsqueeze(0).unsqeeze(0), padding=M-1)[:, M_2:M_2 + T]
         Tdk0_t = toeplitz(dk0.unsqueeze(0), T).squeeze()  # in shape of [T, M]
         abs_Tdk0 = abs(Tdk0_t).t()
-        MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T, T]
-        MS0 = MS0_diag.diag()
+        MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
         MS0_inv = (1/MS0_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
         torch.cuda.empty_cache()
-        S0[:, k0, :] = solv_snk0(snk0, MS0, MS0_inv, opts.delta, 2*Tdk0_t.t(), b, opts.lamb)
+        S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, 2*Tdk0_t.t(), b, opts.lamb)
     return S0
 
 
@@ -544,3 +531,6 @@ def updateW(SW, Y, opts):
 
 def load_data():
     pass
+
+
+
