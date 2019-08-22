@@ -38,7 +38,7 @@ def init(X, Y, opts):
     :param opts: an object with hyper-parameters
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
         D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
-        S0 is 3-d tensor [N, K0, T]
+        S0 is 3-d tensor [N, K0, T]pyth
         D0 is a matrix [K0, M]
         X is a matrix [N, T], training Data
         Y is a matrix [N, C] \in {0,1}, training labels
