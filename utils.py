@@ -314,7 +314,7 @@ def svt(L, tau):
     try:
         u, s, v = torch.svd(L)  ########## so far in version 1.2 the torch.svd for GPU could be much slower than CPU
     except:                     ########## and torch.svd may have convergence issues for GPU and CPU.
-        u, s, v = torch.svd(L + 1e-5*torch.rand(l, h))
+        u, s, v = torch.svd(L + 1e-3*L.mean()*torch.rand(l, h))
         print('unstable svd happened')
     s = s - tau
     s[s<0] = 0
