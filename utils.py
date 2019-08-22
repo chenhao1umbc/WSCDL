@@ -23,10 +23,10 @@ class OPT:
         self.dataset = 0
         if torch.cuda.is_available():
             self.dev = 'cuda'
-            print('Running on GPU')
+            print('\nGPU is available and GPU will be used')
         else:
             self.dev = 'cpu'
-            print('GPU is not available \nRunning on CPU')
+            print('\nGPU is not available and CPU will be used')
 
 
 
