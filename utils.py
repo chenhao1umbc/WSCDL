@@ -561,11 +561,42 @@ def updateW(SW, Y, opts):
     return W
 
 
+def znorm(x):
+    """
+    This function will make the data with zero-mean, variance = 1
+    :param x: input tensor with shape of [N, T]
+    :return: x_z
+    """
+    if x.dim() == 1:
+        x_z = (x-x.mean())/x.var().sqrt()
+    else:
+        x_z = (x-x.mean(1))/x.var(1).sqrt()
+    return x_z
+
+
 def load_data(opts):
-    X = torch.rand(500, 3000, device=opts.dev)
-    Y = torch.zeros(500, opts.C, device=opts.dev)
-    for i in range(opts.C):
-        Y[:100+100*i, i] = 1.0
+    """
+    So far Aug. 24. 2019, we are loading the synthetic data to see if it works, the time series length is 500
+    there are 4 classes, with its mixtures but without overlapping. the features are sin waves and rectangular waves,
+    500 samples will be cut into 10 fragments, each fragment contains 30 samples long feature with a random start posion from 0 to 20.
+    :param opts:
+    :return:
+    """
+    '''The common features'''
+    x = torch.arange(30).float()
+    c_f = torch.sin(x*2*np.pi/30)
+    feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
+    feature2 = torch.sin(x * 2 * np.pi / 20) + torch.sin(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
+    feature3 = torch.zeros(30)
+    feature3[np.r_[np.arange(5), np.arange(10, 15), np.arange(20, 25)]] = 1
+    feature3 = feature3 + torch.sin(x * 2 * np.pi / 13)
+    feature4 = torch.zeros(30)
+    feature4[np.r_[np.arange(10), np.arange(20, 30)]] = 1
+    feature4 = feature4 + torch.sin(x *  np.pi / 6)
+
+
+    X, Y = 0, 0
+
     return X, Y
 
 
