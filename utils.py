@@ -595,9 +595,29 @@ def load_data(opts):
     feature4 = feature4 + torch.sin(x * np.pi / 6)
     start_point = torch.randint(0, 21, (1,))
     idx_feat = torch.randint(0, 2, (1,))
+    X = torch.zeros(750, 500)
+    Y = torch.zeros(750, 4)
+    for i in range(4):
+        current_label = torch.tensor([1, 0, 0, 0]).float()
+        current_label = torch.cat((current_label[-i:], current_label[:-i]))
+        Y[i*50 : (i+1)*50] = current_label
+        print(current_label)
 
-    X, Y = 0, 0
-
+        X[i*50 : (i+1)*50] = 0
+    from itertools import combinations
+    comb = list(combinations([0, 1, 2, 3], 2))  # this will give a list of tuples
+    for i in range(5, 11):
+        current_label = torch.zeros(4)
+        current_label[list(comb[i-5])] = 1.0  # make tuple into list for indexing
+        Y[i*50 : (i+1)*50] = current_label
+        print(current_label)
+    for i in range(11, 15):
+        current_label = torch.tensor([1, 1, 1, 0]).float()
+        current_label = torch.cat((current_label[-(i - 11):], current_label[:-(i - 11)]))
+        Y[i*50 : (i+1)*50] = current_label
+        print(current_label)
+    current_label = torch.tensor([1, 1, 1, 1]).float()
+    Y[i * 50: (i + 1) * 50] = current_label
     return X, Y
 
 
