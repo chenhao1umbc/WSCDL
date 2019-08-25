@@ -314,7 +314,7 @@ def svt(L, tau):
     try:
         u, s, v = torch.svd(L)  ########## so far in version 1.2 the torch.svd for GPU could be much slower than CPU
     except:                     ########## and torch.svd may have convergence issues for GPU and CPU.
-        u, s, v = torch.svd(L + 1e-5*torch.rand(l, h))
+        u, s, v = torch.svd(L + 1e-3*L.mean()*torch.rand(l, h))
         print('unstable svd happened')
     s = s - tau
     s[s<0] = 0
@@ -346,14 +346,14 @@ def toeplitz(x, m=10, T=10):
     dev = x.device
     N, m0 = x.shape  # m0 is T for Tsck, and m0 is M for Tdck
     M = m if m < m0 else m0
-    x_append0 = torch.cat([x, torch.zeros(N, 2*m, device=dev)], dim=1)
+    M2 = int((M - 1) / 2) + 1  # half length of M, for truncation purpose
+    x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
     xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
     tx = torch.zeros(N, m, T, device=dev)
-    M2 = int(M/2)  # half length of M, for truncation purpose
     for i in range(m):
         ind = range(M2 + i, M2 + i + T)
         tx[:, i, :] = xm[:, i, ind]
-    return tx
+    return tx.flip(1)
 
 
 def updateD(DD0SS0, X, Y, opts):
@@ -381,7 +381,7 @@ def updateD(DD0SS0, X, Y, opts):
     D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
     N, K0, T = S0.shape
     M = D0.shape[1]
-    M_2 = int(M/2)  # dictionary atom dimension
+    M_2 = int((M-1)/2)  # dictionary atom dimension
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2+T]  # r is shape of [N, T)
     C, K, _ = D.shape
     Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
@@ -429,7 +429,7 @@ def updateD0(DD0SS0, X, Y, opts):
     N, K0, T = S0.shape
     C, K, _ = D.shape
     M = D0.shape[1]
-    M_2 = int(M/2)  # dictionary atom dimension
+    M_2 = int((M-1)/2)  # dictionary atom dimension
     Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     ycDcconvSc = S[:, :, 0, :].clone()
@@ -474,7 +474,7 @@ def updateS0(DD0SS0, X, Y, opts):
     N, K0, T = S0.shape
     C, K, _ = D.shape
     M = D0.shape[1]
-    M_2 = int(M/2)  # dictionary atom dimension
+    M_2 = int((M-1)/2)  # dictionary atom dimension
     Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     ycDcconvSc = S[:, :, 0, :].clone()
@@ -515,7 +515,7 @@ def updateS(DD0SS0W, X, Y, opts):
     D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
     N, K0, T = S0.shape
     M = D0.shape[1]  # dictionary atom dimension
-    M_2 = int(M/2)
+    M_2 = int((M-1)/2)
     C, K, _ = D.shape
     Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     Crange = torch.tensor(range(C))
