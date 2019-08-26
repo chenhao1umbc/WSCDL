@@ -6,7 +6,7 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT()
-X, Y = load_data(opts)
+X, Y = load_toy(opts)
 D, D0, S, S0, W = init(X, Y, opts)
 
 for i in range(opts.maxiter):
@@ -23,18 +23,3 @@ for i in range(opts.maxiter):
     print('pass W, time is ', time.time() -t)
 
 
-for i in range(4):
-    plt.figure(i)
-    plt.imshow(X[i*50:i*50+50,:], aspect='auto')
-    plt.title('Class ' + str(i+1) + ' training examples')
-    plt.ylabel('Example index')
-    plt.xlabel('Time index')
-    plt.colorbar()
-
-ft = [featurec, feature1, feature2, feature3, feature4]
-for i in ft:
-    plt.plot(i.numpy())
-plt.xlabel('Time index')
-plt.ylabel('Magnitude')
-plt.title('Plot of features')
-plt.legend(['feature0', 'feature1', 'feature2', 'feature3', 'feature4'])

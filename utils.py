@@ -16,7 +16,7 @@ torch.backends.cudnn.deterministic = True
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
     miu is the coeff of low-rank term, lamb is the coeff of sparsity """
-    def __init__(self, C=5, K0=10, K=20, M=20, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
+    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.lamb, self.delta = mu, lamb, delta
         self.maxiter, self.plot = maxiter, False
@@ -574,14 +574,21 @@ def znorm(x):
     return x_z
 
 
-def load_data(opts):
+def load_data(opts=0):
+    """
+    :param opts:
+    :return:
+    """
+
+
+def load_toy(opts):
     """
     So far Aug. 24. 2019, we are loading the synthetic data to see if it works, the time series length is 500
     there are 4 classes, with its mixtures but without overlapping. the features are sin waves and rectangular waves,
     500 samples will be cut into 10 fragments, each fragment contains 30 samples long feature with a random start posion from 0 to 20.
-    :param opts:
-    :return:
+    :return: X, Y, the data and the label matrix
     """
+    '''Generate toy data'''
     x = torch.arange(30).float()
     featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
@@ -798,7 +805,7 @@ def load_data(opts):
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[i * 50: (i + 1) * 50] = current_label
 
-    return X, Y
+    return X.to(opts.dev), Y.to(opts.dev)
 
 
 
