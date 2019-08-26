@@ -808,4 +808,24 @@ def load_toy(opts):
     return X.to(opts.dev), Y.to(opts.dev)
 
 
+def lossfunc(X, Y, D, D0, S, S0, W, opts):
+    """
+    This function will calculate the costfunction value
+    :param X: the input data with shape of [N, T]
+    :param Y: the input label with shape of [N, C]
+    :param D: the discriminative dictionary
+    :param D0: the common dictionary
+    :param S: the sparse coefficients, shape of [N,C,K,T] [samples, classes, num of atoms, time series,]
+    :param S0: the common coefficients, 3-d tensor [N, K0, T]
+    :param W: the projection for labels, shape of [C, K]
+    :param opts: the hyper-parameters
+    :return: cost, the value of loss function
+    """
+    Y_hat = 0
+    fisher = 0
+    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
+    label = -1 * opts.mu * (Y*Y_hat.log() + (1-Y)*(1-Y_hat).log()).sum()
+    low_rank = opts.nv * D0.norm(p='nuc')
+    cost = fisher + sparse + label + low_rank
+    return cost
 

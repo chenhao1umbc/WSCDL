@@ -8,7 +8,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT()
 X, Y = load_toy(opts)
 D, D0, S, S0, W = init(X, Y, opts)
-
+loss = []
 for i in range(opts.maxiter):
     t = time.time()
     D = updateD([D, D0, S, S0], X, Y, opts)
@@ -21,5 +21,5 @@ for i in range(opts.maxiter):
     print('pass S0, time is ', time.time() -t); t = time.time()
     W = updateW([S, W], Y, opts)
     print('pass W, time is ', time.time() -t)
-
+    loss.append(lossfunc(X, Y, D, D0, S, S0, W))
 
