@@ -582,28 +582,175 @@ def load_data(opts):
     :param opts:
     :return:
     """
-    '''The common features'''
     x = torch.arange(30).float()
-    feature0 = torch.sin(x*2*np.pi/30)
+    featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
-    feature2 = torch.sin(x * 2 * np.pi / 20) + torch.sin(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
+    feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
     feature3 = torch.zeros(30)
     feature3[np.r_[np.arange(5), np.arange(10, 15), np.arange(20, 25)]] = 1
     feature3 = feature3 + torch.sin(x * 2 * np.pi / 13)
     feature4 = torch.zeros(30)
     feature4[np.r_[np.arange(10), np.arange(20, 30)]] = 1
-    feature4 = feature4 + torch.sin(x * np.pi / 6)
-    start_point = torch.randint(0, 21, (1,))
-    idx_feat = torch.randint(0, 2, (1,))
+    feature4 = feature4 + torch.cos(x * np.pi / 6)
     X = torch.zeros(750, 500)
+    # just the  1 feature
+    for ii in range(50):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
+        while idx_feat[idx_feat==2].shape[0] < 1:  # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 3, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature1
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(50, 100):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
+        while idx_feat[idx_feat==2].shape[0] < 1:  # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 3, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature2
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(100, 150):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
+        while idx_feat[idx_feat==2].shape[0] < 1:  # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 3, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature3
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(150, 200):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
+        while idx_feat[idx_feat==2].shape[0] < 1:  # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 3, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    # just two features
+    for ii in range(200, 250):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 4, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:  
+            # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 4, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature1
+            if idx_feat[i].item() == 3: current_feature = feature2
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(250, 300):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 4, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:  
+            # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 4, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature1
+            if idx_feat[i].item() == 3: current_feature = feature3
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(300, 350):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 4, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:  
+            # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 4, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature1
+            if idx_feat[i].item() == 3: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(350, 400):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 4, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:  
+            # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 4, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature2
+            if idx_feat[i].item() == 3: current_feature = feature3
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(400, 450):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 4, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:  
+            # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 4, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature2
+            if idx_feat[i].item() == 3: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(450, 500):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 4, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:  
+            # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 4, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature3
+            if idx_feat[i].item() == 3: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    # just three features
+    for ii in range(500, 550):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 5, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:  
+            # make sure there are discriminative features to learn
+            idx_feat = torch.randint(0, 4, (10,))
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature3
+            if idx_feat[i].item() == 3: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(550, 600):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(600, 650):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+    for ii in range(650, 700):
+        start_point = torch.randint(0, 21, (10,)) + torch.arange(0, 500, 50)
+        idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
+        for i in range(10):  # loop over fragment
+            if idx_feat[i].item() == 0: current_feature = 0
+            if idx_feat[i].item() == 1: current_feature = featurec
+            if idx_feat[i].item() == 2: current_feature = feature4
+            X[ii, start_point[i]: 30 + start_point[i]] = current_feature
+
     Y = torch.zeros(750, 4)
     for i in range(4):
         current_label = torch.tensor([1, 0, 0, 0]).float()
         current_label = torch.cat((current_label[-i:], current_label[:-i]))
         Y[i*50 : (i+1)*50] = current_label
         print(current_label)
-
-        X[i*50 : (i+1)*50] = 0
     from itertools import combinations
     comb = list(combinations([0, 1, 2, 3], 2))  # this will give a list of tuples
     for i in range(5, 11):
@@ -618,6 +765,7 @@ def load_data(opts):
         print(current_label)
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[i * 50: (i + 1) * 50] = current_label
+
     return X, Y
 
 

@@ -21,3 +21,20 @@ for i in range(opts.maxiter):
     print('pass S0, time is ', time.time() -t); t = time.time()
     W = updateW([S, W], Y, opts)
     print('pass W, time is ', time.time() -t)
+
+
+for i in range(4):
+    plt.figure(i)
+    plt.imshow(X[i*50:i*50+50,:], aspect='auto')
+    plt.title('Class ' + str(i+1) + ' training examples')
+    plt.ylabel('Example index')
+    plt.xlabel('Time index')
+    plt.colorbar()
+
+ft = [featurec, feature1, feature2, feature3, feature4]
+for i in ft:
+    plt.plot(i.numpy())
+plt.xlabel('Time index')
+plt.ylabel('Magnitude')
+plt.title('Plot of features')
+plt.legend(['feature0', 'feature1', 'feature2', 'feature3', 'feature4'])
