@@ -14,10 +14,13 @@ torch.backends.cudnn.deterministic = True
 
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
-    mu is the coeff of low-rank term, lamb is the coeff of sparsity """
-    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
+    mu is the coeff of low-rank term,
+    lamb is the coeff of sparsity
+     nu is the coeff of cross-entropy loss
+     """
+    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500):
         self.C, self.K, self.K0, self.M = C, K, K0, M
-        self.mu, self.lamb, self.delta = mu, lamb, delta
+        self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot = maxiter, False
         self.dataset = 0
         if torch.cuda.is_available():
@@ -28,7 +31,7 @@ class OPT:
             print('\nGPU is not available and CPU will be used')
 
 
-def init(X, Y, opts):
+def init(X, opts):
     """
     This function will generate the initial value for D D0 S S0 and W
     :param X: training data with shape of [N, T]
@@ -172,7 +175,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
-    P = torch.ones(T, device=dev)/T
+    P = torch.ones(T, device=dev)/T  # shape of [T]
     # 'skc update will lead sc change'
     sck = sc[:, k, :]  # shape of [N, T]
     sck_old = sck.clone()
@@ -180,12 +183,11 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     yc_wkc = yc * wc[k]  #shape of [N]
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
-    term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  #shape of [T]
+    term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  # shape of [T]
     term2 = wkc ** 2 + yc_wkc * wkc  # scaler
     term3 = yc_wkc * wkc  # shape of [N]
-    # M is the diagonal of majorization matrix with shape of [N, T]
-    long = abs(term3 / PtSncWc**2 + term2 / (1-PtSncWc)**2)
-    M = term1 + long.unsqueeze(1) @ P.unsqueeze(0)  # shape of [N, T]
+    long = abs(term3 / PtSncWc**2 + term2 / (1-PtSncWc)**2) * opts.eta**2  # shape of [N]
+    M = term1 + long.unsqueeze(1) @ P.unsqueeze(0)  # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
 
     maxiter = 5  # for test, set it to a small number
@@ -840,7 +842,7 @@ def lossfunc(X, Y, D, D0, S, S0, W, opts):
     fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
-    label = -1 * opts.mu * (Y*Y_hat.log() + (1-Y)*(1-Y_hat).log()).sum()
+    label = -1 * opts.eta * (Y*Y_hat.log() + (1-Y)*(1-Y_hat).log()).sum()
     low_rank = opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost.cpu().item()

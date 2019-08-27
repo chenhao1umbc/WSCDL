@@ -7,7 +7,7 @@ from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT()
 X, Y = load_toy(opts)
-D, D0, S, S0, W = init(X, Y, opts)
+D, D0, S, S0, W = init(X, opts)
 loss = []
 for i in range(opts.maxiter):
     t = time.time()
