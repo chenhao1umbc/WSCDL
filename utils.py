@@ -7,15 +7,14 @@ import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 # from scipy.linalg import toeplitz   # This is too slow
-
 np.set_printoptions(linewidth=180)
 torch.set_printoptions(linewidth=180)
 torch.backends.cudnn.deterministic = True
 
-##
+
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
-    miu is the coeff of low-rank term, lamb is the coeff of sparsity """
+    mu is the coeff of low-rank term, lamb is the coeff of sparsity """
     def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, lamb=0.1, delta=0.9, maxiter=500):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.lamb, self.delta = mu, lamb, delta
@@ -27,7 +26,6 @@ class OPT:
         else:
             self.dev = 'cpu'
             print('\nGPU is not available and CPU will be used')
-
 
 
 def init(X, Y, opts):
@@ -829,14 +827,12 @@ def lossfunc(X, Y, D, D0, S, S0, W, opts):
     ycpDcconvSc = S[:, :, 0, :].clone()
     Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-    Crange = torch.tensor(range(C))
     for c in range(C):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
         DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
         ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]
         ycpDcconvSc[:, c, :] = (1-Y[:, c].reshape(N, 1)) * DconvS[:, c, :]
-
-    torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
     Y_hat = (S.sum(3) * W).sum(2)
@@ -845,7 +841,7 @@ def lossfunc(X, Y, D, D0, S, S0, W, opts):
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     label = -1 * opts.mu * (Y*Y_hat.log() + (1-Y)*(1-Y_hat).log()).sum()
-    low_rank = opts.nv * D0.norm(p='nuc')
+    low_rank = opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost.cpu().item()
 
