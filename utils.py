@@ -821,11 +821,31 @@ def lossfunc(X, Y, D, D0, S, S0, W, opts):
     :param opts: the hyper-parameters
     :return: cost, the value of loss function
     """
-    Y_hat = 0
-    fisher = 0
+    N, K0, T = S0.shape
+    M = D0.shape[1]
+    M_2 = int((M-1)/2)  # dictionary atom dimension
+    C, K, _ = D.shape
+    ycDcconvSc = S[:, :, 0, :].clone()
+    ycpDcconvSc = S[:, :, 0, :].clone()
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    Crange = torch.tensor(range(C))
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+        ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]
+        ycpDcconvSc[:, c, :] = (1-Y[:, c].reshape(N, 1)) * DconvS[:, c, :]
+
+    torch.cuda.empty_cache()
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+
+    Y_hat = (S.sum(3) * W).sum(2)
+    fisher1 = torch.norm(X - R - DconvS.sum(1))**2
+    fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
+    fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     label = -1 * opts.mu * (Y*Y_hat.log() + (1-Y)*(1-Y_hat).log()).sum()
     low_rank = opts.nv * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
-    return cost
+    return cost.cpu().item()
 

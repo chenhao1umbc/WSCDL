@@ -21,5 +21,5 @@ for i in range(opts.maxiter):
     print('pass S0, time is ', time.time() -t); t = time.time()
     W = updateW([S, W], Y, opts)
     print('pass W, time is ', time.time() -t)
-    loss.append(lossfunc(X, Y, D, D0, S, S0, W))
+    loss.append(lossfunc(X, Y, D, D0, S, S0, W, opts))
 
