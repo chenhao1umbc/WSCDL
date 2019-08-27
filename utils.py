@@ -232,9 +232,10 @@ def solv_wc(x, snc, yc, delta):
         wc_new, M_new = gradd(abs_pt_snc, pt_snc, yc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
-        if torch.norm(wc - wc_old) < 1e-4:
-            break
+        # if torch.norm(wc - wc_old) < 1e-5:
+        #     break
         torch.cuda.empty_cache()
+        print(loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
     return wc
 
 
@@ -258,10 +259,11 @@ def gradd(abs_pt_snc, pt_snc, yc, nu, init_wc):
         pt_snc_wc = pt_snc @ wc
         M = ((yc / pt_snc_wc** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * const).sum(0)  # shape of [K]
         lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
+        # print('loss func in gradiant descent :', lossfunc)
         lossfunc.backward()
         loss.append(lossfunc.detach().cpu().item())
-        if abs(wc.grad).sum() < 1e-4: break  # stop criteria
-        if i > 10 and abs(loss[i]-loss[i-1]) < 1e-4: break  # stop criteria
+        if abs(wc.grad).sum() < 1e-5: break  # stop criteria
+        if i > 10 and abs(loss[i]-loss[i-1]) < 1e-5: break  # stop criteria
         with torch.no_grad():
             wc = wc - lr*wc.grad
             wc.requires_grad_()
@@ -594,6 +596,9 @@ def loss_S(Tdck, b, sck, opts, wc):
     :param wc:
     :return:
     """
+    pass
+
+
 def updateW(SW, Y, opts):
     """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
@@ -873,7 +878,7 @@ def load_toy(opts):
     return X.to(opts.dev), Y.to(opts.dev)
 
 
-def lossfunc(X, Y, D, D0, S, S0, W, opts):
+def loss_fun(X, Y, D, D0, S, S0, W, opts):
     """
     This function will calculate the costfunction value
     :param X: the input data with shape of [N, T]

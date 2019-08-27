@@ -26,6 +26,6 @@ for i in range(opts.maxiter):
     W = updateW([S, W], Y, opts)
     # print('pass W ',torch.isnan(W).sum())
     # print('pass W, time is ', time.time() -t)
-    loss.append(lossfunc(X, Y, D, D0, S, S0, W, opts))
+    loss.append(loss_fun(X, Y, D, D0, S, S0, W, opts))
     print('loss function value is :', loss)
 
