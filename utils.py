@@ -522,8 +522,22 @@ def updateS0(DD0SS0, X, Y, opts):
         MS0_inv = (1/MS0_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
         torch.cuda.empty_cache()
+        # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
         S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, 2*Tdk0_t.t(), b, opts.lamb)
+        # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
+
+
+def loss_S0(_2Tdk0, snk0, b, lamb):
+    """
+    This function calculates the sub-loss function for S0
+    :param _2Tdk0: shape of [T, T]
+    :param snk0: shape of [N, T]
+    :param b: shape of [N, T]
+    :param lamb: scaler
+    :return: loss
+    """
+    return ((_2Tdk0 @ snk0.t() - b.t())**2).sum()/2 + lamb * abs(snk0).sum()
 
 
 def updateS(DD0SS0W, X, Y, opts):
@@ -570,6 +584,16 @@ def updateS(DD0SS0W, X, Y, opts):
     return S
 
 
+def loss_S(Tdck, b, sck, opts, wc):
+    """
+    This function calculates the loss func
+    :param Tdck:
+    :param b:
+    :param sck:
+    :param opts:
+    :param wc:
+    :return:
+    """
 def updateW(SW, Y, opts):
     """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
@@ -582,9 +606,24 @@ def updateW(SW, Y, opts):
     """
     S, W = SW
     N, C, K, T = S.shape
+    print(loss_W(S, W, Y))
     for c in range(C):
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
+    print(loss_W(S, W, Y))
     return W
+
+
+def loss_W(S, W, Y):
+    """
+    calculating the loss function value for subproblem of W
+    :param S: shape of [N, C, K, T]
+    :param W: shape of [C, K]
+    :param Y: shape of [N, C]
+    :return:
+    """
+    Y_hat = (S.mean(3) * W).sum(2)
+    loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat).log()).sum()
+    return loss
 
 
 def znorm(x):
@@ -863,7 +902,7 @@ def lossfunc(X, Y, D, D0, S, S0, W, opts):
         torch.cuda.empty_cache()
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
-    Y_hat = (S.sum(3) * W).sum(2)
+    Y_hat = (S.mean(3) * W).sum(2)
     fisher1 = torch.norm(X - R - DconvS.sum(1))**2
     fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
