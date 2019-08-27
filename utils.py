@@ -66,7 +66,6 @@ def acc_newton(P, q):
                     q = -(MD@nu + rho*Z + Y[:, k]), P = MD + rho*eye(M)
     """
     psi = 0
-    dim = P.shape[0]
     maxiter = 200
     for i in range(maxiter):
         f_grad = - 2 * ((P.diag()+psi)**(-3)*q*q).sum()
@@ -256,7 +255,7 @@ def gradd(abs_pt_snc, pt_snc, yc, nu, init_wc):
     loss = []
     for i in range(maxiter):
         pt_snc_wc = pt_snc @ wc
-        M = ((yc / (pt_snc_wc) ** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * const).sum(0)  # shape of [K]
+        M = ((yc / pt_snc_wc** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * const).sum(0)  # shape of [K]
         lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
         lossfunc.backward()
         loss.append(lossfunc.detach().cpu().item())
