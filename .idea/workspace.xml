@@ -159,14 +159,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/wscdl.py</url>
-          <line>13</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/wscdl.py</url>
-          <line>14</line>
-          <option name="timeStamp" value="10" />
+          <url>file://$PROJECT_DIR$/utils.py</url>
+          <line>471</line>
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

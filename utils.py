@@ -105,13 +105,13 @@ def solv_dck(x, M, Minv, Mw, Tsck_t, b):
     return d
 
 
-def solv_dck0(x, M, Minv, Mw, Tsck_t, b, D0, mu, k0):
+def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     """
     :param x: is the dck, shape of [M]
     :param M: is MD, the majorizer matrix with shape of [M, M], diagonal matrix
     :param Minv: is MD^(-1)
     :param Mw: is a number not diagonal matrix
-    :param Tsck_t: is truncated toeplitz matrix of sck with shape of [N, M, T], already *2
+    :param Tsck0_t: is truncated toeplitz matrix of sck with shape of [N, M, T], already *2
     :param b: bn with all N, with shape of [N, T]
     :param D0: is the shared dictionary
     :param mu: is the coefficient fo low-rank term, mu = N*mu
@@ -120,16 +120,17 @@ def solv_dck0(x, M, Minv, Mw, Tsck_t, b, D0, mu, k0):
     """
     maxiter = 500
     d_old, d = x.clone(), x.clone()
-    coef = Minv @ (Tsck_t @ Tsck_t.permute(0, 2, 1)).sum(0)
-    term = Minv @ (Tsck_t @ b.unsqueeze(2)).sum(0)
+    coef = Minv @ (Tsck0_t @ Tsck0_t.permute(0, 2, 1)).sum(0)
+    term = Minv @ (Tsck0_t @ b.unsqueeze(2)).sum(0)
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if torch.norm(d - d_old) < 1e-4:
+        if abs(d - d_old).sum() < 1e-5:
             break
         torch.cuda.empty_cache()
+        # print('loss D0 ', loss_D0(Tsck0_t, d, b, D0, mu))
     return d
 
 
@@ -293,7 +294,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
         dk0 = D0[k0, :] = acc_newton(P, q)
         cr.append(Z - D0)
         Y = Y + rho*cr[i]
-        if torch.norm(cr[i]) < 1e-4 : break
+        if torch.norm(cr[i]) < 1e-6 : break
         if i > 10:  # if not going anywhere
             if abs(cr[i] - cr[i-10]).sum() < 5e-5: break
     return dk0
@@ -467,9 +468,7 @@ def updateD0(DD0SS0, X, Y, opts):
         MD_inv = (1/MD_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
-        print(loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
         D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0copy, opts.mu*N, k0)
-        print(loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
     return D0
 
 
@@ -870,7 +869,7 @@ def lossfunc(X, Y, D, D0, S, S0, W, opts):
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     label = -1 * opts.eta * (Y*Y_hat.log() + (1-Y)*(1-Y_hat).log()).sum()
-    low_rank = opts.mu * D0.norm(p='nuc')
+    low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost.cpu().item()
 
