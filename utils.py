@@ -53,7 +53,7 @@ def init(X, opts):
     D0 = torch.rand(opts.K0, opts.M, device=opts.dev)
     S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.rand(N, opts.K0, T, device=opts.dev)
-    W = torch.rand(opts.C, opts.K, device=opts.dev)
+    W = torch.ones(opts.C, opts.K, device=opts.dev)
     return D, D0, S, S0, W
 
 
@@ -114,7 +114,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck_t, b, D0, mu, k0):
     :param Tsck_t: is truncated toeplitz matrix of sck with shape of [N, M, T], already *2
     :param b: bn with all N, with shape of [N, T]
     :param D0: is the shared dictionary
-    :param mu: is the coefficient fo low-rank term
+    :param mu: is the coefficient fo low-rank term, mu = N*mu
     :param k0: the current index of for loop of K0
     :return: dck0
     """
@@ -409,8 +409,21 @@ def updateD(DD0SS0, X, Y, opts):
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
         b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
         torch.cuda.empty_cache()
+        # print(loss_D(Tsck_t, D[c, k, :], b))
         D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
+        # print(loss_D(Tsck_t, D[c, k, :], b))
     return D
+
+
+def loss_D(Tsck_t, dck, b):
+    """
+    calculate the loss function value for updating D, sum( norm(Tsnck*dck - bn)**2 ) , s.t. norm(dck) <=1
+    :param Tsck_t: shape of [N, M, T],
+    :param dck: cth, kth, atom of D, shape of [M]
+    :param b: the definiation is long in the algorithm, shape of [N, T]
+    :return: loss fucntion value
+    """
+    return (((Tsck_t.permute(0, 2, 1)*dck).sum(2) - b)**2 ).sum()
 
 
 def updateD0(DD0SS0, X, Y, opts):
@@ -454,8 +467,23 @@ def updateD0(DD0SS0, X, Y, opts):
         MD_inv = (1/MD_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
-        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0copy, opts.mu, k0)
+        print(loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
+        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0copy, opts.mu*N, k0)
+        print(loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
     return D0
+
+
+def loss_D0(Tsnk0_t, dk0, b, D0, mu):
+    """
+    calculate the loss function value for updating D, sum( norm(Tsnck*dck - bn)**2 ) , s.t. norm(dck) <=1
+    :param Tsnk0_t: shape of [N, M, T],
+    :param dk0: kth atom of D0, shape of [M]
+    :param b: the definiation is long in the algorithm, shape of [N, T]
+    :param D0: supposed to be low_rank
+    :param mu: mu = mu*N
+    :return: loss fucntion value
+    """
+    return (((Tsnk0_t.permute(0, 2, 1)*dk0).sum(2) - b)**2 ).sum()/2 + mu*D0.norm(p='nuc')
 
 
 def updateS0(DD0SS0, X, Y, opts):
