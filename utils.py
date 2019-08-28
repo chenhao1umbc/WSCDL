@@ -235,7 +235,7 @@ def solv_wc(x, snc, yc, delta):
         # if torch.norm(wc - wc_old) < 1e-5:
         #     break
         torch.cuda.empty_cache()
-        print(loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
+        # print(loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
     return wc
 
 
@@ -247,11 +247,11 @@ def gradd(abs_pt_snc, pt_snc, yc, nu, init_wc):
     :param pt_snc: snc(mean(2) constant, shape of [N, K]
     :param yc: y_n^(c) constant, shape of [N]
     :param nu: constant, shape of [M]
-    :param init_wc: is a clone of wc for the initialization
+    :param init_wc: is a clone of wc for the initialization, shape of [K]
     :return:
     """
     wc = init_wc.requires_grad_()
-    lr = 0.005
+    lr = 0.1
     const = abs_pt_snc * abs_pt_snc.sum(1).unsqueeze(1)
     maxiter = 500
     loss = []
@@ -259,7 +259,7 @@ def gradd(abs_pt_snc, pt_snc, yc, nu, init_wc):
         pt_snc_wc = pt_snc @ wc
         M = ((yc / pt_snc_wc** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * const).sum(0)  # shape of [K]
         lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
-        # print('loss func in gradiant descent :', lossfunc)
+        print('loss func in gradiant descent :',i, 'iter ', lossfunc)
         lossfunc.backward()
         loss.append(lossfunc.detach().cpu().item())
         if abs(wc.grad).sum() < 1e-5: break  # stop criteria
