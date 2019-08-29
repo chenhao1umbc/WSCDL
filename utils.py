@@ -175,29 +175,30 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
-    P = torch.ones(T, device=dev)/T  # shape of [T]
+    P = torch.ones(1, T, device=dev)/T  # shape of [T]
     # 'skc update will lead sc change'
     sck = sc[:, k, :]  # shape of [N, T]
     sck_old = sck.clone()
-    PtSncWc = sc.mean(2) @ wc  # shape of [N]
-    yc_wkc = yc * wc[k]  #shape of [N]
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
+    eta_wkc_square = (opts.eta*wkc)**2
+    Tdckt_bt = Tdck.t() @ b.t()  # shape of [T, N]
+    exp_PtSncWc = (sc.mean(2) @ wc).exp()
+    term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
     term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    term2 = wkc ** 2 + yc_wkc * wkc  # scaler
-    term3 = yc_wkc * wkc  # shape of [N]
-    long = abs(term3 / PtSncWc**2 + term2 / (1-PtSncWc)**2) * opts.eta**2  # shape of [N]
-    M = term1 + long.unsqueeze(1) @ P.unsqueeze(0)  # M is the diagonal of majorization matrix, shape of [N, T]
+    term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N]
+    M = term1 + term2*eta_wkc_square  # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
 
-    maxiter = 5  # for test, set it to a small number
+    maxiter = 500
     for i in range(maxiter):
         Mw = delta * M**(-0.5) * M_old**0.5
-        sck_til = sck + Mw * (sck - sck_old)
-        PtSncWc = sc.mean(2) @ wc  # shape of [N]
-        long = abs(term3 / PtSncWc**2 + term2 / (1-PtSncWc)**2)
-        M_new = term1 + long.unsqueeze(1) @ P.unsqueeze(0)  # shape of [N, T]
-        nu = sck_til - (8*Tdck_t_Tdck @ (sck.t()-b.t())).t()/M  # shape of [N, T]
+        sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
+        exp_PtSncWc = (sc.mean(2) @ wc).exp()  # exp_PtSncWc should change due to sck changing
+        term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N]
+        M_new = term1 + term2*eta_wkc_square   # shape of [N, T]
+        term = term0 + (exp_PtSncWc / (1 + exp_PtSncWc) * opts.eta ).unsqueeze(1) @ P
+        nu = sck_til - (8*Tdck_t_Tdck@sck.t() - Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
         M, M_old = M_new, M
@@ -223,18 +224,20 @@ def solv_wc(x, snc, yc, delta):
     exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
     const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K, N]
     M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
-    one_ync = 1 - yc
+    one_min_ync = 1 - yc
     M_old = M.clone()
     for i in range(maxiter):
         Mw = delta * M**(-1/2) * M_old**(1/2)
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()
-        nu = wc_til + M**(-1) * ((one_ync- exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc).sum(0)  # nu is [K]
-        wc_new, M_new = gradd(const, pt_snc, yc, nu, wc.clone())  # gradient descend to get wc
+        exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
+        nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc).sum(0)  # nu is [K]
+        wc_new, M_new = gradd(const, pt_snc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
-        # if torch.norm(wc - wc_old) < 1e-5:
-        #     break
+        print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
+        if torch.norm(wc - wc_old) < 1e-5:
+            break
         torch.cuda.empty_cache()
         # print(loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
     return wc
@@ -251,19 +254,22 @@ def gradd(const, pt_snc, nu, init_wc):
     :return:
     """
     wc = init_wc.requires_grad_()
-    lr = 0.1
+    lr = 0.05
     maxiter = 500
+    print(pt_snc.max(), nu.max(), pt_snc.max())
     loss = []
     for i in range(maxiter):
         exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
         M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
         lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
-        print('loss func in gradiant descent :',i, 'iter ', lossfunc)
+        # print('loss func in gradient descent :',i, 'iter ', lossfunc)
         lossfunc.backward()
         loss.append(lossfunc.detach().cpu().item())
         if abs(wc.grad).sum() < 1e-5: break  # stop criteria
         if i > 10 and abs(loss[i]-loss[i-1]) < 1e-5: break  # stop criteria
         with torch.no_grad():
+            # print('loss func in gradient descent :',i, 'iter ', wc.grad)
+            if torch.isnan(wc.grad).item(): break  # because of too large number to calc
             wc = wc - lr*wc.grad
             wc.requires_grad_()
         torch.cuda.empty_cache()
@@ -610,10 +616,10 @@ def updateW(SW, Y, opts):
     """
     S, W = SW
     N, C, K, T = S.shape
-    print(loss_W(S, W, Y))
+    # print(loss_W(S, W, Y))
     for c in range(C):
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-    print(loss_W(S, W, Y))
+    # print(loss_W(S, W, Y))
     return W
 
 
