@@ -219,17 +219,18 @@ def solv_wc(x, snc, yc, delta):
     maxiter = 500
     wc_old, wc = x.clone(), x.clone()
     pt_snc = snc.mean(2)  # shape of [N, K]
-    abs_pt_snc = abs(pt_snc)
-    pt_snc_wc = pt_snc @ wc  # shape of [N]
-    M = ((yc / (pt_snc_wc) ** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * abs_pt_snc * (
-        abs_pt_snc.sum(1).unsqueeze(1))).sum(0)  # shape of [K]
+    abs_pt_snc = abs(pt_snc)  # shape of [N, K]
+    exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
+    const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K, N]
+    M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
+    one_ync = 1 - yc
     M_old = M.clone()
     for i in range(maxiter):
         Mw = delta * M**(-1/2) * M_old**(1/2)
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
-        pt_snc_wc_til = pt_snc @ wc_til
-        nu = wc_til + M**(-1) * ((yc/pt_snc_wc_til + (yc-1)/(1-pt_snc_wc_til)).unsqueeze(1)*pt_snc).sum(0)  # nu is [K]
-        wc_new, M_new = gradd(abs_pt_snc, pt_snc, yc, nu, wc.clone())  # gradient descend to get wc
+        exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()
+        nu = wc_til + M**(-1) * ((one_ync- exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc).sum(0)  # nu is [K]
+        wc_new, M_new = gradd(const, pt_snc, yc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
         # if torch.norm(wc - wc_old) < 1e-5:
@@ -239,25 +240,23 @@ def solv_wc(x, snc, yc, delta):
     return wc
 
 
-def gradd(abs_pt_snc, pt_snc, yc, nu, init_wc):
+def gradd(const, pt_snc, nu, init_wc):
     """
     This function is meant to solve 1/2||x-\nu||_M^2, where M is a function of x,
     This looks like a convex problem but it is not because M = f(x), x is part of demoninator
-    :param abs_pt_snc: abs(snc(mean(2)) constant, shape of [N, K]
+    :param const: abs_pt_snc.t()*abs_pt_snc.sum(1) , shape of [K, N]
     :param pt_snc: snc(mean(2) constant, shape of [N, K]
-    :param yc: y_n^(c) constant, shape of [N]
     :param nu: constant, shape of [M]
     :param init_wc: is a clone of wc for the initialization, shape of [K]
     :return:
     """
     wc = init_wc.requires_grad_()
     lr = 0.1
-    const = abs_pt_snc * abs_pt_snc.sum(1).unsqueeze(1)
     maxiter = 500
     loss = []
     for i in range(maxiter):
-        pt_snc_wc = pt_snc @ wc
-        M = ((yc / pt_snc_wc** 2 + (1 - yc) / (1 - pt_snc_wc) ** 2).unsqueeze(1) * const).sum(0)  # shape of [K]
+        exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
+        M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
         lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
         print('loss func in gradiant descent :',i, 'iter ', lossfunc)
         lossfunc.backward()
