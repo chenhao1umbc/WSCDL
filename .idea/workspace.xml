@@ -51,7 +51,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.plot_figures">
+  <component name="RunManager" selected="Python.wscdl">
     <configuration name="plot_figures" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -111,10 +111,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.wscdl" />
         <item itemvalue="Python.plot_figures" />
         <item itemvalue="Python.plot_figures" />
         <item itemvalue="Python.utils" />
-        <item itemvalue="Python.plot_figures" />
         <item itemvalue="Python.plot_figures" />
       </list>
     </recent_temporary>

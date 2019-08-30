@@ -235,7 +235,7 @@ def solv_wc(x, snc, yc, delta):
         wc_new, M_new = gradd(const, pt_snc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
-        print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
+        # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
         if torch.norm(wc - wc_old) < 1e-5:
             break
         torch.cuda.empty_cache()
@@ -256,7 +256,7 @@ def gradd(const, pt_snc, nu, init_wc):
     wc = init_wc.requires_grad_()
     lr = 0.05
     maxiter = 500
-    print(pt_snc.max(), nu.max(), pt_snc.max())
+    # print(pt_snc.max(), nu.max(), pt_snc.max())
     loss = []
     for i in range(maxiter):
         exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
@@ -616,7 +616,7 @@ def updateW(SW, Y, opts):
     """
     S, W = SW
     N, C, K, T = S.shape
-    # print(loss_W(S, W, Y))
+    print(loss_W(S, W, Y))
     for c in range(C):
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
     # print(loss_W(S, W, Y))
@@ -631,8 +631,10 @@ def loss_W(S, W, Y):
     :param Y: shape of [N, C]
     :return:
     """
-    Y_hat = (S.mean(3) * W).sum(2)
-    loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat).log()).sum()
+    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 3e38
+    Y_hat = 1/ (1+ exp_PtSnW)
+    loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
     return loss
 
 
@@ -980,12 +982,14 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
         torch.cuda.empty_cache()
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
-    Y_hat = (S.mean(3) * W).sum(2)
+    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 3e38
+    Y_hat = 1 / (1 + exp_PtSnW)
     fisher1 = torch.norm(X - R - DconvS.sum(1))**2
     fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
-    label = -1 * opts.eta * (Y*Y_hat.log() + (1-Y)*(1-Y_hat).log()).sum()
+    label = -1 * N * opts.eta * (Y*Y_hat.log() + (1-Y)*(1-Y_hat + 3e-38).log()).sum()
     low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost.cpu().item()
