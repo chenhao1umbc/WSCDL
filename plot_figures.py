@@ -1,4 +1,5 @@
 from utils import *
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 x = torch.arange(30).float()
 featurec = torch.sin(x * 2 * np.pi / 30)  # '''The common features'''
@@ -10,7 +11,9 @@ feature3 = feature3 + torch.sin(x * 2 * np.pi / 13)
 feature4 = torch.zeros(30)
 feature4[np.r_[np.arange(10), np.arange(20, 30)]] = 1
 feature4 = feature4 + torch.cos(x * np.pi / 6)
-X, Y = load_data()
+opts = OPT(lamb=10)
+opts.dev = 'cpu'
+X, Y = load_toy(opts)
 for i in range(4):
     plt.figure(i)
     plt.imshow(X[i*50:i*50+50,:], aspect='auto')
