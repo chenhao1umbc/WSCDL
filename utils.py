@@ -232,15 +232,15 @@ def solv_wc(x, snc, yc, delta):
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
         exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
-        nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc).sum(0)  # nu is [K]
+        nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc_new, M_new = gradd(const, pt_snc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
-        # if torch.norm(wc - wc_old) < 1e-5:
-        #     break
+        if torch.norm(wc - wc_old) < 1e-5:
+            break
         torch.cuda.empty_cache()
-        print('lossW in the bpgm :',loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
+        # print('lossW in the bpgm :',loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
     return wc
 
 
@@ -617,14 +617,14 @@ def updateW(SW, Y, opts):
     """
     S, W = SW
     N, C, K, T = S.shape
-    print('the loss_W for updating W :', loss_W(S, W, Y))
+    # print('the loss_W for updating W :', loss_W(S, W, Y))
     for c in range(C):
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-    print('the loss_W for updating W :', loss_W(S, W, Y))
+    # print('the loss_W for updating W :', loss_W(S, W, Y))
     return W
 
 
-def loss_W(S, W, Y):
+def loss_W(S, W, Y):s
     """
     calculating the loss function value for subproblem of W
     :param S: shape of [N, C, K, T]
