@@ -181,13 +181,14 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     sck_old = sck.clone()
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
-    eta_wkc_square = (opts.eta*wkc)**2
+    eta_wkc_square = (opts.eta*wkc)**2  # scaler
     Tdckt_bt = Tdck.t() @ b.t()  # shape of [T, N]
     exp_PtSncWc = (sc.mean(2) @ wc).exp()
     term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
     term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N]
+    term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N, T]
     M = term1 + term2*eta_wkc_square  # M is the diagonal of majorization matrix, shape of [N, T]
+    M = M + 1e-10  # make it robust for the inverse
     M_old = M.clone()
 
     maxiter = 500
@@ -409,6 +410,7 @@ def updateD(DD0SS0, X, Y, opts):
         abs_Tsck_t = abs(Tsck_t)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
         MD_diag = ((abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
+        MD_diag = MD_diag + 1e-10  # to make it robust for inverse
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
 
@@ -472,6 +474,7 @@ def updateD0(DD0SS0, X, Y, opts):
         abs_Tsnk0_t = abs(Tsnk0_t)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
         MD_diag = 4*((abs_Tsnk0_t @ abs_Tsnk0_t.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
+        MD_diag = MD_diag + 1e-10  # make it robust for the M^-1
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
@@ -527,6 +530,7 @@ def updateS0(DD0SS0, X, Y, opts):
         Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
         abs_Tdk0 = abs(Tdk0_t).t()
         MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
+        MS0_diag = MS0_diag + 1e-10  # make it robust for inverse
         MS0_inv = (1/MS0_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
         torch.cuda.empty_cache()
@@ -624,7 +628,7 @@ def updateW(SW, Y, opts):
     return W
 
 
-def loss_W(S, W, Y):s
+def loss_W(S, W, Y):
     """
     calculating the loss function value for subproblem of W
     :param S: shape of [N, C, K, T]
