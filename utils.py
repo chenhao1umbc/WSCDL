@@ -222,6 +222,7 @@ def solv_wc(x, snc, yc, delta):
     pt_snc = snc.mean(2)  # shape of [N, K]
     abs_pt_snc = abs(pt_snc)  # shape of [N, K]
     exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
+    exp_pt_snc_wc[torch.isinf(exp_pt_snc_wc)] = 1e38
     const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K, N]
     M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
     one_min_ync = 1 - yc
@@ -229,17 +230,17 @@ def solv_wc(x, snc, yc, delta):
     for i in range(maxiter):
         Mw = delta * M**(-1/2) * M_old**(1/2)
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
-        exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()
+        exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
         exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc).sum(0)  # nu is [K]
         wc_new, M_new = gradd(const, pt_snc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
-        if torch.norm(wc - wc_old) < 1e-5:
-            break
+        # if torch.norm(wc - wc_old) < 1e-5:
+        #     break
         torch.cuda.empty_cache()
-        # print(loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
+        print('lossW in the bpgm :',loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
     return wc
 
 
@@ -431,7 +432,7 @@ def loss_D(Tsck_t, dck, b):
     :param b: the definiation is long in the algorithm, shape of [N, T]
     :return: loss fucntion value
     """
-    return (((Tsck_t.permute(0, 2, 1)*dck).sum(2) - b)**2 ).sum()
+    return (((Tsck_t.permute(0, 2, 1)*dck).sum(2) - b)**2 ).sum().item()
 
 
 def updateD0(DD0SS0, X, Y, opts):
@@ -489,7 +490,7 @@ def loss_D0(Tsnk0_t, dk0, b, D0, mu):
     :param mu: mu = mu*N
     :return: loss fucntion value
     """
-    return (((Tsnk0_t.permute(0, 2, 1)*dk0).sum(2) - b)**2 ).sum()/2 + mu*D0.norm(p='nuc')
+    return ((((Tsnk0_t.permute(0, 2, 1)*dk0).sum(2) - b)**2 ).sum()/2 + mu*D0.norm(p='nuc')).item()
 
 
 def updateS0(DD0SS0, X, Y, opts):
@@ -616,10 +617,10 @@ def updateW(SW, Y, opts):
     """
     S, W = SW
     N, C, K, T = S.shape
-    print(loss_W(S, W, Y))
+    print('the loss_W for updating W :', loss_W(S, W, Y))
     for c in range(C):
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-    # print(loss_W(S, W, Y))
+    print('the loss_W for updating W :', loss_W(S, W, Y))
     return W
 
 
@@ -632,10 +633,10 @@ def loss_W(S, W, Y):
     :return:
     """
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
-    exp_PtSnW[torch.isinf(exp_PtSnW)] = 3e38
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1/ (1+ exp_PtSnW)
     loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
-    return loss
+    return loss.item()
 
 
 def znorm(x):
@@ -983,7 +984,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
-    exp_PtSnW[torch.isinf(exp_PtSnW)] = 3e38
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
     fisher1 = torch.norm(X - R - DconvS.sum(1))**2
     fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
