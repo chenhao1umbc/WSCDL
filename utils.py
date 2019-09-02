@@ -130,7 +130,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
         if abs(d - d_old).sum() < 1e-5:
             break
         torch.cuda.empty_cache()
-        # print('loss D0 ', loss_D0(Tsck0_t, d, b, D0, mu))
+        print('loss D0 in solve_d0 is %3.2e:' %loss_D0(Tsck0_t, d, b, D0, mu))
     return d
 
 
@@ -479,7 +479,9 @@ def updateD0(DD0SS0, X, Y, opts):
         MD_inv = (1/MD_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
+        print('D0 loss function value before update is %3.2e:' %loss_D0(Tsnk0_t, dk0, b, D0, opts.mu*N))
         D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0copy, opts.mu*N, k0)
+        print('D0 loss function value after update is %3.2e:' % loss_D0(Tsnk0_t, dk0, b, D0, opts.mu * N))
     return D0
 
 
