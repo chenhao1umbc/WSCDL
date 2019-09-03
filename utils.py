@@ -471,7 +471,7 @@ def updateD0(DD0SS0, X, Y, opts):
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
     alpha_plus_dk0 = DconvS.sum(1) + R
     beta_plus_dk0 = ycDcconvSc.sum(1) + R
-    # D0copy = D0.clone()  # should not us copy/clone
+    # D0copy = D0.clone()  # should not use copy/clone
 
     # '''update the current dk0'''
     for k0 in range(K0):
