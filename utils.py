@@ -261,6 +261,7 @@ def solv_wc(x, snc, yc, delta):
     M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
     one_min_ync = 1 - yc
     M_old = M.clone()
+    print('before bpgm lossW is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
     for i in range(maxiter):
         Mw = delta * M**(-1/2) * M_old**(1/2)
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
@@ -269,12 +270,12 @@ def solv_wc(x, snc, yc, delta):
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc_new, M_new = gradd(const, pt_snc, nu, wc.clone())  # gradient descend to get wc
         wc, wc_old = wc_new, wc
-        M, M_old = M_new, M
+        M, M_old = M_new+1e-10, M+1e-10  # make it robust by adding a small number
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
         if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
             break
         torch.cuda.empty_cache()
-        # print('lossW in the bpgm :',loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
+        print('lossW in the bpgm :%1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
     return wc
 
 
@@ -631,10 +632,11 @@ def updateW(SW, Y, opts):
     """
     S, W = SW
     N, C, K, T = S.shape
-    # print('the loss_W for updating W :', loss_W(S, W, Y))
+    print('the loss_W for updating W :', loss_W(S, W, Y))
     for c in range(C):
+        print('before bpgm lossW is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c]))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-    # print('the loss_W for updating W :', loss_W(S, W, Y))
+        print('the loss_W for updating W :', loss_W(S, W, Y))
     return W
 
 
