@@ -49,8 +49,8 @@ def init(X, opts):
     N, T = X.shape
     ind = list(range(N))
     np.random.shuffle(ind)
-    D = torch.rand(opts.C, opts.K, opts.M, device=opts.dev)
-    D0 = torch.rand(opts.K0, opts.M, device=opts.dev)
+    D = znorm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
+    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev))
     S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.rand(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K, device=opts.dev)
@@ -122,16 +122,49 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     d_old, d = x.clone(), x.clone()
     coef = Minv @ (Tsck0_t @ Tsck0_t.permute(0, 2, 1)).sum(0)
     term = Minv @ (Tsck0_t @ b.unsqueeze(2)).sum(0)
+    # print('before bpgm loop loss D0 in solve_d0 is %3.2e:' % loss_D0(Tsck0_t, d, b, D0, mu))
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if abs(d - d_old).sum() < 1e-5:
+        if (d - d_old).norm()/d_old.norm() < 0.01:
             break
         torch.cuda.empty_cache()
-        print('loss D0 in solve_d0 is %3.2e:' %loss_D0(Tsck0_t, d, b, D0, mu))
+        # print('loss D0 in solve_d0 is %3.2e:' %loss_D0(Tsck0_t, d, b, D0, mu))
+        # print('')
     return d
+
+
+def argmin_lowrank(M, nu, mu, D0, k0):
+    """
+    Solving the QCQP with low rank panelty term. This function is using ADMM to solve dck0
+    :param M: majorizer matrix
+    :param nu: make d close to ||d-nu||_M^2
+    :param mu: hyper-param of ||D0||_*
+    :param D0: common dict contains all the dk0, shape of [K0, M]
+    :return: dk0
+    """
+    K0, m = D0.shape
+    rho = 10 * mu  # agrangian coefficients
+    dev = D0.device
+    Z = torch.eye(K0, m, device=dev)
+    Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
+    P = M + rho*torch.eye(m, device=dev)
+    Mbynu = M @ nu
+    maxiter = 200
+    cr = []
+    # begin of ADMM
+    for i in range(maxiter):
+        Z = svt(D0-1/rho*Y, mu/rho)
+        q = -(Mbynu + rho * Z[k0, :] + Y[k0, :])
+        dk0 = D0[k0, :] = acc_newton(P, q)
+        cr.append(Z - D0)
+        Y = Y + rho*cr[i]
+        if torch.norm(cr[i]) < 1e-8 : break
+        if i > 10:  # if not going anywhere
+            if abs(cr[i] - cr[i-10]).sum() < 5e-8: break
+    return dk0
 
 
 def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
@@ -238,7 +271,7 @@ def solv_wc(x, snc, yc, delta):
         wc, wc_old = wc_new, wc
         M, M_old = M_new, M
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
-        if torch.norm(wc - wc_old) < 1e-5:
+        if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
             break
         torch.cuda.empty_cache()
         # print('lossW in the bpgm :',loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
@@ -276,37 +309,6 @@ def gradd(const, pt_snc, nu, init_wc):
             wc.requires_grad_()
         torch.cuda.empty_cache()
     return wc.detach().requires_grad_(False), M.detach().requires_grad_(False)
-
-
-def argmin_lowrank(M, nu, mu, D0, k0):
-    """
-    Solving the QCQP with low rank panelty term. This function is using ADMM to solve dck0
-    :param M: majorizer matrix
-    :param nu: make d close to ||d-nu||_M^2
-    :param mu: hyper-param of ||D0||_*
-    :param D0: common dict contains all the dk0, shape of [K0, M]
-    :return: dk0
-    """
-    K0, m = D0.shape
-    rho = 10 * mu  # agrangian coefficients
-    dev = D0.device
-    Z = torch.eye(K0, m, device=dev)
-    Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
-    P = M + rho*torch.eye(m, device=dev)
-    Mbynu = M @ nu
-    maxiter = 200
-    cr = []
-    # begin of ADMM
-    for i in range(maxiter):
-        Z = svt(D0-1/rho*Y, mu/rho)
-        q = -(Mbynu + rho * Z[k0, :] + Y[k0, :])
-        dk0 = D0[k0, :] = acc_newton(P, q)
-        cr.append(Z - D0)
-        Y = Y + rho*cr[i]
-        if torch.norm(cr[i]) < 1e-6 : break
-        if i > 10:  # if not going anywhere
-            if abs(cr[i] - cr[i-10]).sum() < 5e-5: break
-    return dk0
 
 
 def svt(L, tau):
@@ -365,7 +367,7 @@ def toeplitz(x, m=10, T=10):
     return tx.flip(1)
 
 
-def updateD(DD0SS0, X, Y, opts):
+def updateD(DD0SS0W, X, Y, opts):
     """this function is to update the distinctive D using BPG-M, updating each d_k^(c)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
@@ -387,23 +389,24 @@ def updateD(DD0SS0, X, Y, opts):
     'compare wth'
     print(F.conv1d(a, b.flip(1).unsqueeze(1), groups=k0))
     """
-    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
     N, K0, T = S0.shape
     M = D0.shape[1]
     M_2 = int((M-1)/2)  # dictionary atom dimension
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2+T]  # r is shape of [N, T)
     C, K, _ = D.shape
-    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
-    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-    Crange = torch.tensor(range(C))
-    for c in range(C):
-        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
-        # D*S, not the D'*S', And here D'*S' will not be updated for each d_c,k update
-        torch.cuda.empty_cache()
 
     # '''update the current d_c,k '''
     for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+        DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+        Crange = torch.tensor(range(C))
+        for c in range(C):
+            # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+            DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+            # D*S, not the D'*S', And here D'*S' will not be updated for each d_c,k update
+            torch.cuda.empty_cache()
+
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
         Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T],
@@ -414,15 +417,20 @@ def updateD(DD0SS0, X, Y, opts):
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
 
-        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
+        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
-        # the following line is to get the sum_c'(D^(c')*S^(c'))
-        DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
-        b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
+        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+        # term 1, 2, 3 should be in the shape of [N, T]
+        term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+        term2 = Y[:, c].reshape(N,1)*(X - R - Y[:, c].reshape(N,1)*Dcp_conv_Sncp - (Y[:, c_prime]*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        term3 = -(1-Y[:, c]).reshape(N,1)*((1-Y[:, c]).reshape(N,1)*Dcp_conv_Sncp + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
-        # print(loss_D(Tsck_t, D[c, k, :], b))
+        # print('before updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
+        # print('before updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
         D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
-        # print(loss_D(Tsck_t, D[c, k, :], b))
+        # print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
+        # print('after updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
     return D
 
 
@@ -463,7 +471,7 @@ def updateD0(DD0SS0, X, Y, opts):
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
     alpha_plus_dk0 = DconvS.sum(1) + R
     beta_plus_dk0 = ycDcconvSc.sum(1) + R
-    D0copy = D0.clone()
+    # D0copy = D0.clone()  # should not us copy/clone
 
     # '''update the current dk0'''
     for k0 in range(K0):
@@ -479,9 +487,9 @@ def updateD0(DD0SS0, X, Y, opts):
         MD_inv = (1/MD_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
-        print('D0 loss function value before update is %3.2e:' %loss_D0(Tsnk0_t, dk0, b, D0, opts.mu*N))
-        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0copy, opts.mu*N, k0)
-        print('D0 loss function value after update is %3.2e:' % loss_D0(Tsnk0_t, dk0, b, D0, opts.mu * N))
+        # print('D0 loss function value before update is %3.2e:' %loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
+        D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0, opts.mu*N, k0)
+        # print('D0 loss function value after update is %3.2e:' % loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
     return D0
 
 
@@ -587,7 +595,7 @@ def updateS(DD0SS0W, X, Y, opts):
         yc = Y[:, c]  # shape of [N]
         Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
-        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
+        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
         # the following line is to get the sum_c'(D^(c')*S^(c'))
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
@@ -647,14 +655,11 @@ def loss_W(S, W, Y):
 
 def znorm(x):
     """
-    This function will make the data with zero-mean, variance = 1
-    :param x: input tensor with shape of [N, T]
+    This function will make the data with zero-mean, variance = 1 for the last dimension
+    :param x: input tensor with shape of [N, ?...?, T]
     :return: x_z
     """
-    if x.dim() == 1:
-        x_z = (x-x.mean())/x.var().sqrt()
-    else:
-        x_z = (x-x.mean(1))/x.var(1).sqrt()
+    x_z = (x-x.mean(-1).unsqueeze(-1))/x.var(-1).sqrt().unsqueeze(-1)
     return x_z
 
 
@@ -977,8 +982,8 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     M = D0.shape[1]
     M_2 = int((M-1)/2)  # dictionary atom dimension
     C, K, _ = D.shape
-    ycDcconvSc = S[:, :, 0, :].clone()
-    ycpDcconvSc = S[:, :, 0, :].clone()
+    ycDcconvSc = S[:, :, 0, :].clone()  # initialization
+    ycpDcconvSc = S[:, :, 0, :].clone()  # initialization
     Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
     for c in range(C):

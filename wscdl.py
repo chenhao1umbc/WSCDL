@@ -13,7 +13,7 @@ loss.append(loss_fun(X, Y, D, D0, S, S0, W, opts))
 print('The initial loss function value is %3.4e:' %loss[-1])
 for i in range(opts.maxiter):
     t = time.time()
-    D = updateD([D, D0, S, S0], X, Y, opts)
+    D = updateD([D, D0, S, S0, W], X, Y, opts)
     # print('pass D, how mnay nan is ', torch.isnan(D).sum().item())
     print('pass D, time is %3.2f' % (time.time() -t) ); t = time.time()
     loss.append(loss_fun(X, Y, D, D0, S, S0, W, opts))
