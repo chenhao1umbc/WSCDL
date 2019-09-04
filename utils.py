@@ -261,7 +261,7 @@ def solv_wc(x, snc, yc, delta):
     M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
     one_min_ync = 1 - yc
     M_old = M.clone()
-    print('before bpgm lossW is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
+    # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
     for i in range(maxiter):
         Mw = delta * M**(-1/2) * M_old**(1/2)
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
@@ -275,7 +275,7 @@ def solv_wc(x, snc, yc, delta):
         if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
             break
         torch.cuda.empty_cache()
-        print('lossW in the bpgm :%1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc))
+        print('wc loss in the bpgm :%1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
     return wc
 
 
@@ -423,8 +423,10 @@ def updateD(DD0SS0W, X, Y, opts):
         Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
         # term 1, 2, 3 should be in the shape of [N, T]
         term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
-        term2 = Y[:, c].reshape(N,1)*(X - R - Y[:, c].reshape(N,1)*Dcp_conv_Sncp - (Y[:, c_prime]*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
-        term3 = -(1-Y[:, c]).reshape(N,1)*((1-Y[:, c]).reshape(N,1)*Dcp_conv_Sncp + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        term2 = Y[:, c].reshape(N,1)*(X - R - Y[:, c].reshape(N,1)*Dcp_conv_Sncp
+                - (Y[:, c_prime]*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        term3 = -(1-Y[:, c]).reshape(N,1)*((1-Y[:, c]).reshape(N,1)*Dcp_conv_Sncp
+                + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         # print('before updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
@@ -632,11 +634,12 @@ def updateW(SW, Y, opts):
     """
     S, W = SW
     N, C, K, T = S.shape
-    print('the loss_W for updating W :', loss_W(S, W, Y))
+    # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
-        print('before bpgm lossW is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c]))
+        print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-        print('the loss_W for updating W :', loss_W(S, W, Y))
+        print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     return W
 
 
