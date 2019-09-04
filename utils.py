@@ -259,6 +259,7 @@ def solv_wc(x, snc, yc, delta):
     exp_pt_snc_wc[torch.isinf(exp_pt_snc_wc)] = 1e38
     const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K, N]
     M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
+    M[M == 0] = 1e-38
     one_min_ync = 1 - yc
     M_old = M.clone()
     # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
@@ -269,13 +270,14 @@ def solv_wc(x, snc, yc, delta):
         exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc_new, M_new = gradd(const, pt_snc, nu, wc.clone())  # gradient descend to get wc
-        wc, wc_old = wc_new, wc
-        M, M_old = M_new+1e-10, M+1e-10  # make it robust by adding a small number
+        wc, wc_old = wc_new[:], wc[:]
+        M_new[M_new == 0] = 1e-38  # make it robust by adding a small number
+        M, M_old = M_new, M
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
         if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
             break
         torch.cuda.empty_cache()
-        print('wc loss in the bpgm :%1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
+        # print('wc loss in the bpgm :%1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
     return wc
 
 
@@ -290,19 +292,20 @@ def gradd(const, pt_snc, nu, init_wc):
     :return:
     """
     wc = init_wc.requires_grad_()
-    lr = 0.05
+    lr = 0.1
     maxiter = 500
     # print(pt_snc.max(), nu.max(), pt_snc.max())
     loss = []
     for i in range(maxiter):
         exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
+        if torch.isinf(exp_pt_snc_wc).sum().item() > 0 : print('inf problem happened in gradient descent \n')
         M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
         lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
         # print('loss func in gradient descent :',i, 'iter ', lossfunc)
         lossfunc.backward()
         loss.append(lossfunc.detach().cpu().item())
         if abs(wc.grad).sum() < 1e-5: break  # stop criteria
-        if i > 10 and abs(loss[i]-loss[i-1]) < 1e-5: break  # stop criteria
+        if i > 10 and abs(loss[i]-loss[i-1])/abs(loss[i]) < 1e-3: break  # stop criteria
         with torch.no_grad():
             # print('loss func in gradient descent :',i, 'iter ', wc.grad)
             if torch.isnan(wc.grad).item(): break  # because of too large number to calc
@@ -651,10 +654,15 @@ def loss_W(S, W, Y):
     :param Y: shape of [N, C]
     :return:
     """
-    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
-    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
-    Y_hat = 1/ (1+ exp_PtSnW)
-    loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
+    # using Y_hat is not stable because of log(), 1-Y_hat could be 0
+    # exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    # exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    # Y_hat = 1/ (1+ exp_PtSnW)
+    # loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
+
+    PtSnW = (S.mean(3) * W).sum(2)  # shape of [N, C]
+    exp_PtSnW = PtSnW.exp()  # shape of [N, C]
+    loss = (-1 *(1-Y)*PtSnW + (exp_PtSnW+1).log()).sum()
     return loss.item()
 
 
