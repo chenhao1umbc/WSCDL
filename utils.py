@@ -204,7 +204,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    delta = opts.delta
+    Mw = opts.delta
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
@@ -219,60 +219,48 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     exp_PtSncWc = (sc.mean(2) @ wc).exp()
     term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
     term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N, T]
-    M = term1 + term2*eta_wkc_square  # M is the diagonal of majorization matrix, shape of [N, T]
-    M = M + 1e-10  # make it robust for the inverse
+    # term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N, T]
+    M = term1 + P*eta_wkc_square/4 + 1e-38 # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
 
     maxiter = 500
     for i in range(maxiter):
-        Mw = delta * M**(-0.5) * M_old**0.5
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         exp_PtSncWc = (sc.mean(2) @ wc).exp()  # exp_PtSncWc should change due to sck changing
-        term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N]
-        M_new = term1 + term2*eta_wkc_square   # shape of [N, T]
         term = term0 + (exp_PtSncWc / (1 + exp_PtSncWc) * opts.eta ).unsqueeze(1) @ P
         nu = sck_til - (8*Tdck_t_Tdck@sck.t() - Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
-        M, M_old = M_new, M
         if torch.norm(sck - sck_old) < 1e-4:
             break
         torch.cuda.empty_cache()
     return sck
 
 
-def solv_wc(x, snc, yc, delta):
+def solv_wc(x, snc, yc, Mw):
     """
     This fuction is using bpgm to update wc
     :param x: shape of [K], init value of wc
     :param snc: shape of [N, K, T]
     :param yc: shape of [N]
-    :param delta: real number
+    :param Mw: real number, is delta
     :return: wc
     """
     maxiter = 500
     wc_old, wc = x.clone(), x.clone()
     pt_snc = snc.mean(2)  # shape of [N, K]
     abs_pt_snc = abs(pt_snc)  # shape of [N, K]
-    exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
-    exp_pt_snc_wc[torch.isinf(exp_pt_snc_wc)] = 1e38
     const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K, N]
-    M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
-    M[M == 0] = 1e-38
+    M = const.sum(1)/4 + 1e-38  # shape of [K], 1e-38 for robustness
     one_min_ync = 1 - yc
     M_old = M.clone()
     # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
     for i in range(maxiter):
-        Mw = delta * M**(-1/2) * M_old**(1/2)
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
         exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
-        wc_new, M_new = gradd(const, pt_snc, nu, wc.clone())  # gradient descend to get wc
-        wc, wc_old = wc_new[:], wc[:]
-        M_new[M_new == 0] = 1e-38  # make it robust by adding a small number
-        M, M_old = M_new, M
+        wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
         if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
             break
@@ -281,7 +269,7 @@ def solv_wc(x, snc, yc, delta):
     return wc
 
 
-def gradd(const, pt_snc, nu, init_wc):
+def gradd(const, pt_snc, nu, init_wc):  # this one id abandoned, beause math part did not need it
     """
     This function is meant to solve 1/2||x-\nu||_M^2, where M is a function of x,
     This looks like a convex problem but it is not because M = f(x), x is part of demoninator
@@ -341,12 +329,12 @@ def svt_s(M, nu, lamb):
     """
     This function is to implement the signular value thresholding, solving the following
     min_p lamb||p||_1 + 1/2||\nu-p||_M^2, p is a vector
-    :param M: is used for matrix norm, shape of [N, T]
+    :param M: is used for matrix norm, shape of [T]
     :param lamb: is coefficient of L-1 norm, scaler
     :param nu: the the matrix to be pruned, shape of [N, T]
     :return: P the matrix after singular value thresholding
     """
-    b = lamb / M  # shape of [N, T]
+    b = lamb / M  # shape of [T]
     P = torch.sign(nu) * F.relu(abs(nu) -b)
     return P
 
@@ -639,9 +627,9 @@ def updateW(SW, Y, opts):
     N, C, K, T = S.shape
     # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
-        print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-        print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     return W
 
@@ -658,7 +646,7 @@ def loss_W(S, W, Y):
     # exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     # exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     # Y_hat = 1/ (1+ exp_PtSnW)
-    # loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
+    # loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # 1e-38 for robustness
 
     PtSnW = (S.mean(3) * W).sum(2)  # shape of [N, C]
     exp_PtSnW = PtSnW.exp()  # shape of [N, C]
