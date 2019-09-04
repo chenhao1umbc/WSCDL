@@ -216,19 +216,18 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
     eta_wkc_square = (opts.eta*wkc)**2  # scaler
     Tdckt_bt = Tdck.t() @ b.t()  # shape of [T, N]
-    exp_PtSncWc = (sc.mean(2) @ wc).exp()
     term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
     term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    # term2 = (exp_PtSncWc / (1 + exp_PtSncWc)**2).unsqueeze(1) @ P  # shape of [N, T]
     M = term1 + P*eta_wkc_square/4 + 1e-38 # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
 
     maxiter = 500
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
-        exp_PtSncWc = (sc.mean(2) @ wc).exp()  # exp_PtSncWc should change due to sck changing
-        term = term0 + (exp_PtSncWc / (1 + exp_PtSncWc) * opts.eta ).unsqueeze(1) @ P
-        nu = sck_til - (8*Tdck_t_Tdck@sck.t() - Tdckt_bt + term.t()).t()/M  # shape of [N, T]
+        exp_PtSnc_tilWc = (sck_til.mean(2) @ wc).exp()  # exp_PtSnc_tilWc should change due to sck_til changing
+        exp_PtSnc_tilWc[torch.isinf(exp_PtSnc_tilWc)] = 1e38
+        term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc) * opts.eta ).unsqueeze(1) @ P
+        nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
         if torch.norm(sck - sck_old) < 1e-4:
@@ -425,6 +424,7 @@ def updateD(DD0SS0W, X, Y, opts):
         D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
         # print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
         # print('after updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
+        if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print(inf_nan_happenned)
     return D
 
 
@@ -484,6 +484,7 @@ def updateD0(DD0SS0, X, Y, opts):
         # print('D0 loss function value before update is %3.2e:' %loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
         D0[k0, :] = solv_dck0(dk0, MD, MD_inv, Mw, 2*Tsnk0_t, b, D0, opts.mu*N, k0)
         # print('D0 loss function value after update is %3.2e:' % loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
+        if torch.isnan(D0S).sum() + torch.isinf(D0).sum() > 0: print(inf_nan_happenned)
     return D0
 
 
@@ -632,6 +633,7 @@ def updateW(SW, Y, opts):
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
         # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
+    if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
     return W
 
 
@@ -651,6 +653,7 @@ def loss_W(S, W, Y):
 
     PtSnW = (S.mean(3) * W).sum(2)  # shape of [N, C]
     exp_PtSnW = PtSnW.exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     loss = (-1 *(1-Y)*PtSnW + (exp_PtSnW+1).log()).sum()
     return loss.item()
 
