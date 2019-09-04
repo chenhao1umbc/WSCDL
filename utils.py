@@ -231,8 +231,8 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc) * opts.eta ).unsqueeze(1) @ P
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
-        sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
-        if torch.norm(sck - sck_old) < 1e-4:
+        sck, sck_old = sck_new, sck  # make sure sc is updated in each loop
+        if torch.norm(sck - sck_old)/sck.norm() < 1e-4:
             break
         torch.cuda.empty_cache()
     return sck
@@ -598,7 +598,7 @@ def updateS(DD0SS0W, X, Y, opts):
         DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
         b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
         torch.cuda.empty_cache()
-        sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, so giving a clone here
+        sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, adding clone to prevent
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
