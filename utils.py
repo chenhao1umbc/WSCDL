@@ -597,6 +597,7 @@ def updateS(DD0SS0W, X, Y, opts):
         torch.cuda.empty_cache()
         sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, so giving a clone here
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
 
@@ -963,7 +964,7 @@ def load_toy(opts):
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[i * 50: (i + 1) * 50] = current_label
 
-    return X[:, :T].to(opts.dev), Y.to(opts.dev)
+    return X[:, :T].to(opts.dev), Y.to(opts.dev), [featurec, feature1, feature2, feature3, feature4]
 
 
 def loss_fun(X, Y, D, D0, S, S0, W, opts):
