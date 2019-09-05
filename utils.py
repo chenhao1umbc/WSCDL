@@ -221,9 +221,10 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     M = (term1 + P*eta_wkc_square/4 + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
     sc_til = sc.clone()  # shape of [N, K, T]
-    # print('sck loss Before bpgm :%1.3e' %loss_sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
+    # print('sck loss Before bpgm :%1.9e' %loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
 
     maxiter = 500
+    loss = torch.tensor([], device=opts.dev)
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -233,14 +234,15 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck, sck_old = sck_new, sck  # make sure sc is updated in each loop
-        # print('iter is ', i, ' sck loss in the bpgm :%1.3e' %loss_sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
+        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        # print('iter is ', i, ' sck loss in the bpgm :%1.7e' %loss[-1].item())
         if torch.norm(sck - sck_old)/sck.norm() < 1e-4:
             break
         torch.cuda.empty_cache()
-    return sck
+    return sck, loss, i
 
 
-def loss_sck(Tdck, b, sc, sck, wc, wck, yc, opts):
+def loss_Sck(Tdck, b, sc, sck, wc, wck, yc, opts):
     """
     This function calculates the loss func of sck
     :param Tdck: shape of [T, m=T]
@@ -291,7 +293,7 @@ def solv_wc(x, snc, yc, Mw):
         if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
             break
         torch.cuda.empty_cache()
-        # print('wc loss in the bpgm :%1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
+        # print('wc loss in the bpgm :%1.7e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
     return wc
 
 
@@ -601,9 +603,10 @@ def updateS(DD0SS0W, X, Y, opts):
     M = D0.shape[1]  # dictionary atom dimension
     M_2 = int((M-1)/2)
     C, K, _ = D.shape
-
+    sold = S.clone()
     # '''update the current s_n,k^(c) '''
     for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        Sold= S.clone()
         Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
         Crange = torch.tensor(range(C))
         DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
@@ -629,13 +632,18 @@ def updateS(DD0SS0W, X, Y, opts):
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, adding clone to prevent
-        print('Loss function value before updating sc %1.3e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
-        t1 = loss_fun(X, Y, D, D0, S, S0, W, opts)
-        S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
-        print('Loss function value after updating sc %1.3e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
-        t1 = loss_fun(X, Y, D, D0, S, S0, W, opts) -t1
-        if t1 > 0 : print(not_decrease)
-        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
+        # print('Loss function value before updating sc %1.3e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
+        # print('sck loss Before bpgm :%1.9e' % loss_Sck(Tdck, b, sc, sck, wc, W[c, k], yc, opts))
+        # t1 = loss_fun(X, Y, D, D0, S, S0, W, opts)
+        # t2 = loss_Sck(Tdck, b, S[:, c, :, :], S[:, c, k, :], wc, W[c, k], yc, opts)
+        S[:, c, k, :], loss_s, iters = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+        # print('sck loss After bpgm :%1.3e' % loss_Sck(Tdck, b, S[:, c, :, :], S[:, c, k, :], wc, W[c, k], yc, opts))
+        # print('Loss function value after updating sc %1.3e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
+        # t1 = loss_fun(X, Y, D, D0, S, S0, W, opts) -t1
+        # t2 = loss_Sck(Tdck, b, S[:, c, :, :], S[:, c, k, :], wc, W[c, k], yc, opts) - t2
+        # ll = loss_s[1:] - loss_s[:-1]
+        # if ll[ll>0].shape[0] > 0 : print(not_decrease)
+        # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
 
