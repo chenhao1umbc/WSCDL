@@ -208,7 +208,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
-    P = torch.ones(1, T, device=dev)/T  # shape of [T]
+    P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
     # 'skc update will lead sc change'
     sck = sc[:, k, :]  # shape of [N, T]
     sck_old = sck.clone()
@@ -218,9 +218,10 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     _8_Tdckt_bt = 8*Tdck.t() @ b.t()  # shape of [T, N]
     term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
     term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    M = term1 + P*eta_wkc_square/4 + 1e-38 # M is the diagonal of majorization matrix, shape of [N, T]
+    M = (term1 + P*eta_wkc_square/4 + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
     sc_til = sc.clone()  # shape of [N, K, T]
+    # print('sck loss Before bpgm :%1.3e' %loss_sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
 
     maxiter = 500
     for i in range(maxiter):
@@ -232,10 +233,34 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck, sck_old = sck_new, sck  # make sure sc is updated in each loop
+        # print('iter is ', i, ' sck loss in the bpgm :%1.3e' %loss_sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
         if torch.norm(sck - sck_old)/sck.norm() < 1e-4:
             break
         torch.cuda.empty_cache()
     return sck
+
+
+def loss_sck(Tdck, b, sc, sck, wc, wck, yc, opts):
+    """
+    This function calculates the loss func of sck
+    :param Tdck: shape of [T, m=T]
+    :param b: shape of [N, T]
+    :param sc: shape of [N, K, T]
+    :param sck: shape of [N, T]
+    :param wc: shape of [K]
+    :param wck: a scaler
+    :param yc: shape [N]
+    :param opts: for hyper parameters
+    :return:
+    """
+    epx_PtScWc = (sc.mean(2) @ wc).exp()  # shape of N
+    epx_PtScWc[torch.isinf(epx_PtScWc)] = 1e38
+    g_sck_wc = (-(1-yc)*(sck.mean(1)*wck) + (1+epx_PtScWc).log()).sum()
+    term1 = (2*Tdck@sck.t() -2*b.t()).norm()**2
+    term2 = opts.lamb * sck.abs().sum()
+    term3 = opts.eta * g_sck_wc
+    loss = term1 + term2 + term3
+    return loss
 
 
 def solv_wc(x, snc, yc, Mw):
@@ -604,22 +629,14 @@ def updateS(DD0SS0W, X, Y, opts):
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, adding clone to prevent
+        print('Loss function value before updating sc %1.3e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
+        t1 = loss_fun(X, Y, D, D0, S, S0, W, opts)
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+        print('Loss function value after updating sc %1.3e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
+        t1 = loss_fun(X, Y, D, D0, S, S0, W, opts) -t1
+        if t1 > 0 : print(not_decrease)
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
-
-
-def loss_S(Tdck, b, sck, opts, wc):
-    """
-    This function calculates the loss func
-    :param Tdck:
-    :param b:
-    :param sck:
-    :param opts:
-    :param wc:
-    :return:
-    """
-    pass
 
 
 def updateW(SW, Y, opts):
