@@ -102,8 +102,10 @@ def solv_dck(x, M, Minv, Mw, Tsck_t, b):
             d_new = acc_newton(M, -M@nu)  # QCQP(P, q)
         d, d_old = d_new, d
         if torch.norm(d - d_old).item() < 1e-4: break
-        loss = torch.cat((loss, loss_D(Tsck_t, D[c, k, :], b).reshape(1)))
+        loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         torch.cuda.empty_cache()
+    ll = loss[:-1] - loss[1:]
+    if ll[ll<0].shape[0] > 0: print(something_wrong)
     return d
 
 
@@ -429,9 +431,9 @@ def updateD(DD0SS0W, X, Y, opts):
         Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
         DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
         Crange = torch.tensor(range(C))
-        for c in range(C):
+        for cc in range(C):
             # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-            DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+            DconvS[:, cc, :] = F.conv1d(S[:, cc, :, :], Dcopy[cc, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
             # D*S, not the D'*S', And here D'*S' will not be updated for each d_c,k update
             torch.cuda.empty_cache()
 
@@ -458,7 +460,7 @@ def updateD(DD0SS0W, X, Y, opts):
         torch.cuda.empty_cache()
         # print('before updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
         # print('before updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
-        D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
+        # D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
         # print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
         # print('after updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
         if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print(inf_nan_happenned)
@@ -473,7 +475,7 @@ def loss_D(Tsck_t, dck, b):
     :param b: the definiation is long in the algorithm, shape of [N, T]
     :return: loss fucntion value
     """
-    return (((Tsck_t.permute(0, 2, 1)*dck).sum(2) - b)**2 ).sum().item()
+    return (((Tsck_t.permute(0, 2, 1)*dck).sum(2) - b)**2 ).sum()
 
 
 def updateD0(DD0SS0, X, Y, opts):
@@ -616,9 +618,9 @@ def updateS(DD0SS0W, X, Y, opts):
         Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
         Crange = torch.tensor(range(C))
         DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-        for c in range(C):
+        for cc in range(C):
             # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-            DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+            DconvS[:, cc, :] = F.conv1d(S[:, cc, :, :], Dcopy[cc, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
         R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
         dck = D[c, k, :]  # shape of [M]
