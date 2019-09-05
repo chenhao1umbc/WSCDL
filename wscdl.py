@@ -5,7 +5,7 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-opts = OPT(maxiter=30)
+opts = OPT(maxiter=10)
 opts.lamb = 10  # for sparsity penalty
 opts.eta = 10  # for label penalty
 opts.mu= 10  # for low rank penalty
@@ -52,10 +52,11 @@ exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
 exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
 Y_hat = 1/ (1+ exp_PtSnW)
 plt.figure();plt.plot(loss, '-x'); plt.title('Loss fucntion value')
-plt.figure();plt.plot(D0.squeeze().cpu().numpy()); plt.plot(ft[0], '-x'); plt.title('commom component')
-plt.figure();plt.plot(D[0, 0, :].cpu().numpy()); plt.plot(ft[1], '-x'); plt.title('feature 1')
-plt.figure();plt.plot(D[1, 0, :].cpu().numpy()); plt.plot(ft[2], '-x');plt.title('feature 2')
-plt.figure();plt.plot(D[2, 0, :].cpu().numpy()); plt.plot(ft[3], '-x');plt.title('feature 3')
-plt.figure();plt.plot(D[3, 0, :].cpu().numpy()); plt.plot(ft[4], '-x');plt.title('feature 4')
-plt.figure();plt.imshow(Y.cpu().numpy(), aspect='auto'); plt.title('True labels')
-plt.figure();plt.imshow(Y_hat.cpu().numpy(), aspect='auto'); plt.title('Estimated labels')
+# plt.figure();plt.plot(D0.squeeze().cpu().numpy()); plt.plot(ft[0], '-x'); plt.title('commom component')
+# plt.figure();plt.plot(D[0, 0, :].cpu().numpy()); plt.plot(ft[1], '-x'); plt.title('feature 1')
+# plt.figure();plt.plot(D[1, 0, :].cpu().numpy()); plt.plot(ft[2], '-x');plt.title('feature 2')
+# plt.figure();plt.plot(D[2, 0, :].cpu().numpy()); plt.plot(ft[3], '-x');plt.title('feature 3')
+# plt.figure();plt.plot(D[3, 0, :].cpu().numpy()); plt.plot(ft[4], '-x');plt.title('feature 4')
+# plt.figure();plt.imshow(Y.cpu().numpy(), aspect='auto'); plt.title('True labels')
+# plt.figure();plt.imshow(Y_hat.cpu().numpy(), aspect='auto'); plt.title('Estimated labels')
+
