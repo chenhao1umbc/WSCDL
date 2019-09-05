@@ -25,10 +25,10 @@ class OPT:
         self.dataset = 0
         if torch.cuda.is_available():
             self.dev = 'cuda'
-            print('\nGPU is available and GPU will be used')
+            print('\nRunning on GPU')
         else:
             self.dev = 'cpu'
-            print('\nGPU is not available and CPU will be used')
+            print('\nRunning on CPU')
 
 
 def init(X, opts):
@@ -576,16 +576,17 @@ def updateS(DD0SS0W, X, Y, opts):
     M = D0.shape[1]  # dictionary atom dimension
     M_2 = int((M-1)/2)
     C, K, _ = D.shape
-    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
-    Crange = torch.tensor(range(C))
-    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-    for c in range(C):
-        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
-    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
     # '''update the current s_n,k^(c) '''
     for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+        Crange = torch.tensor(range(C))
+        DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+        for c in range(C):
+            # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+            DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+        R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
         wc = W[c, :]  # shape of [K]
@@ -594,9 +595,13 @@ def updateS(DD0SS0W, X, Y, opts):
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
-        # the following line is to get the sum_c'(D^(c')*S^(c'))
-        DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
-        b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
+        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+        # term 1, 2, 3 should be in the shape of [N, T]
+        term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+        term2 = Y[:, c].reshape(N,1)*(X - R - Y[:, c].reshape(N,1)*Dcp_conv_Sncp - (Y[:, c_prime]*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        term3 = -(1-Y[:, c]).reshape(N,1)*((1-Y[:, c]).reshape(N,1)*Dcp_conv_Sncp
+                + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, adding clone to prevent
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
