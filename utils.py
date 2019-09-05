@@ -25,10 +25,10 @@ class OPT:
         self.dataset = 0
         if torch.cuda.is_available():
             self.dev = 'cuda'
-            print('\nGPU is available and GPU will be used')
+            print('\nRunning on GPU')
         else:
             self.dev = 'cpu'
-            print('\nGPU is not available and CPU will be used')
+            print('\nRunning on CPU')
 
 
 def init(X, opts):
@@ -184,14 +184,18 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
     snk0_old, snk0 = x.clone(), x.clone()
     coef = Minv @ Tdk0.t() @ Tdk0  # shape of [T, T]
     term = (Minv @ Tdk0.t() @b.t()).t()  # shape of [N, T]
+
+    loss = torch.tensor([], device=x.device)
     for i in range(maxiter):
         snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
         snk0_new = svt_s(M, nu, lamb)  # shape of [N, T]
         snk0, snk0_old = snk0_new, snk0
-        if torch.norm(snk0 - snk0_old) < 1e-4:
-            break
+        if torch.norm(snk0 - snk0_old) < 1e-4: break
+        loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
         torch.cuda.empty_cache()
+    ll = loss[:-1] - loss[1:]
+    if ll[ll<0].shape[0] > 0: print(something_wrong)
     return snk0
 
 
@@ -210,7 +214,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
-    P = torch.ones(1, T, device=dev)/T  # shape of [T]
+    P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
     # 'skc update will lead sc change'
     sck = sc[:, k, :]  # shape of [N, T]
     sck_old = sck.clone()
@@ -220,11 +224,13 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     _8_Tdckt_bt = 8*Tdck.t() @ b.t()  # shape of [T, N]
     term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
     term1 = (abs(8 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    M = term1 + P*eta_wkc_square/4 + 1e-38 # M is the diagonal of majorization matrix, shape of [N, T]
+    M = (term1 + P*eta_wkc_square/4 + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
     sc_til = sc.clone()  # shape of [N, K, T]
+    print('sck loss Before bpgm :%1.9e' %loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
 
     maxiter = 500
+    loss = torch.tensor([], device=opts.dev)
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -234,10 +240,37 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck, sck_old = sck_new, sck  # make sure sc is updated in each loop
+        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        # print('iter is ', i, ' sck loss in the bpgm :%1.7e' %loss[-1].item())
         if torch.norm(sck - sck_old)/sck.norm() < 1e-4:
             break
         torch.cuda.empty_cache()
+    ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return sck
+
+
+def loss_Sck(Tdck, b, sc, sck, wc, wck, yc, opts):
+    """
+    This function calculates the loss func of sck
+    :param Tdck: shape of [T, m=T]
+    :param b: shape of [N, T]
+    :param sc: shape of [N, K, T]
+    :param sck: shape of [N, T]
+    :param wc: shape of [K]
+    :param wck: a scaler
+    :param yc: shape [N]
+    :param opts: for hyper parameters
+    :return:
+    """
+    epx_PtScWc = (sc.mean(2) @ wc).exp()  # shape of N
+    epx_PtScWc[torch.isinf(epx_PtScWc)] = 1e38
+    g_sck_wc = (-(1-yc)*(sck.mean(1)*wck) + (1+epx_PtScWc).log()).sum()
+    term1 = (2*Tdck@sck.t() -2*b.t()).norm()**2
+    term2 = opts.lamb * sck.abs().sum()
+    term3 = opts.eta * g_sck_wc
+    loss = term1 + term2 + term3
+    return loss
 
 
 def solv_wc(x, snc, yc, Mw):
@@ -268,7 +301,7 @@ def solv_wc(x, snc, yc, Mw):
         if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
             break
         torch.cuda.empty_cache()
-        # print('wc loss in the bpgm :%1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
+        # print('wc loss in the bpgm :%1.7e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
     return wc
 
 
@@ -578,16 +611,16 @@ def updateS(DD0SS0W, X, Y, opts):
     M = D0.shape[1]  # dictionary atom dimension
     M_2 = int((M-1)/2)
     C, K, _ = D.shape
-    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
-    Crange = torch.tensor(range(C))
-    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-    for c in range(C):
-        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
-    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
-
     # '''update the current s_n,k^(c) '''
     for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+        Crange = torch.tensor(range(C))
+        DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+        for c in range(C):
+            # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+            DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+        R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
         wc = W[c, :]  # shape of [K]
@@ -596,27 +629,18 @@ def updateS(DD0SS0W, X, Y, opts):
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
-        # the following line is to get the sum_c'(D^(c')*S^(c'))
-        DpconvSp = ((1- Y[:, c_prime] - Y[:, c_prime]*Y[:, c].reshape(N, 1)).unsqueeze(2)*DconvS[:, c_prime, :]).sum(1)
-        b = (X - R - (DconvS.sum(1) - dck_conv_sck) - (DconvS[:, c, :] - dck_conv_sck) + DpconvSp)/2  # b is shape of [N, T]
+        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+        # term 1, 2, 3 should be in the shape of [N, T]
+        term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+        term2 = Y[:, c].reshape(N,1)*(X - R - Y[:, c].reshape(N,1)*Dcp_conv_Sncp - (Y[:, c_prime]*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        term3 = -(1-Y[:, c]).reshape(N,1)*((1-Y[:, c]).reshape(N,1)*Dcp_conv_Sncp
+                + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+        b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
-        sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, adding clone to prevent
+        sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
-        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
+        # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
-
-
-def loss_S(Tdck, b, sck, opts, wc):
-    """
-    This function calculates the loss func
-    :param Tdck:
-    :param b:
-    :param sck:
-    :param opts:
-    :param wc:
-    :return:
-    """
-    pass
 
 
 def updateW(SW, Y, opts):
