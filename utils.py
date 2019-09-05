@@ -91,6 +91,8 @@ def solv_dck(x, M, Minv, Mw, Tsck_t, b):
     d_old, d = x.clone(), x.clone()
     coef = Minv @ (Tsck_t@Tsck_t.permute(0, 2, 1)).sum(0)
     term = Minv @ (Tsck_t@b.unsqueeze(2)).sum(0)
+
+    loss = torch.tensor([], device=x.device)
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
@@ -99,8 +101,8 @@ def solv_dck(x, M, Minv, Mw, Tsck_t, b):
         else:
             d_new = acc_newton(M, -M@nu)  # QCQP(P, q)
         d, d_old = d_new, d
-        if torch.norm(d - d_old).item() < 1e-4:
-            break
+        if torch.norm(d - d_old).item() < 1e-4: break
+        loss = torch.cat((loss, loss_D(Tsck_t, D[c, k, :], b).reshape(1)))
         torch.cuda.empty_cache()
     return d
 
