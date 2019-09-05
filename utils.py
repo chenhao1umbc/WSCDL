@@ -101,11 +101,11 @@ def solv_dck(x, M, Minv, Mw, Tsck_t, b):
         else:
             d_new = acc_newton(M, -M@nu)  # QCQP(P, q)
         d, d_old = d_new, d
-        if torch.norm(d - d_old).item() < 1e-4: break
-        loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
+        if torch.norm(d - d_old).item() < 1e-3: break
         torch.cuda.empty_cache()
-    ll = loss[:-1] - loss[1:]
-    if ll[ll<0].shape[0] > 0: print(something_wrong)
+        loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
+    # ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return d
 
 
@@ -127,16 +127,20 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     coef = Minv @ (Tsck0_t @ Tsck0_t.permute(0, 2, 1)).sum(0)
     term = Minv @ (Tsck0_t @ b.unsqueeze(2)).sum(0)
     # print('before bpgm loop loss D0 in solve_d0 is %3.2e:' % loss_D0(Tsck0_t, d, b, D0, mu))
+
+    loss = torch.tensor([], device=x.device)
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if (d - d_old).norm()/d_old.norm() < 0.01:
+        if (d - d_old).norm()/d_old.norm() < 1e-3:
             break
         torch.cuda.empty_cache()
         # print('loss D0 in solve_d0 is %3.2e:' %loss_D0(Tsck0_t, d, b, D0, mu))
-        # print('')
+        loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
+    # ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return d
 
 
@@ -193,11 +197,11 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
         snk0_new = svt_s(M, nu, lamb)  # shape of [N, T]
         snk0, snk0_old = snk0_new, snk0
-        if torch.norm(snk0 - snk0_old) < 1e-4: break
-        loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
+        if torch.norm(snk0 - snk0_old)/snk0_old.norm() < 1e-3: break
         torch.cuda.empty_cache()
-    ll = loss[:-1] - loss[1:]
-    if ll[ll<0].shape[0] > 0: print(something_wrong)
+        loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
+    # ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return snk0
 
 
@@ -229,9 +233,9 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     M = (term1 + P*eta_wkc_square/4 + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
     sc_til = sc.clone()  # shape of [N, K, T]
-    print('sck loss Before bpgm :%1.9e' %loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
-
     maxiter = 500
+    # print('sck loss Before bpgm :%1.9e' %loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
+
     loss = torch.tensor([], device=opts.dev)
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
@@ -242,12 +246,11 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
         sck, sck_old = sck_new, sck  # make sure sc is updated in each loop
-        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
-        # print('iter is ', i, ' sck loss in the bpgm :%1.7e' %loss[-1].item())
-        if torch.norm(sck - sck_old)/sck.norm() < 1e-4:
-            break
+        if torch.norm(sck - sck_old)/sck.norm() < 1e-3: break
         torch.cuda.empty_cache()
-    ll = loss[:-1] - loss[1:]
+        # print('iter is ', i, ' sck loss in the bpgm :%1.7e' %loss[-1].item())
+        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return sck
 
@@ -293,6 +296,8 @@ def solv_wc(x, snc, yc, Mw):
     one_min_ync = 1 - yc
     M_old = M.clone()
     # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
+
+    loss = torch.tensor([], device=x.device)
     for i in range(maxiter):
         wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
@@ -300,45 +305,13 @@ def solv_wc(x, snc, yc, Mw):
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
-        if torch.norm(wc - wc_old)/wc.norm() < 1e-2:
-            break
+        if torch.norm(wc - wc_old)/wc.norm() < 1e-3: break
         torch.cuda.empty_cache()
         # print('wc loss in the bpgm :%1.7e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
+        loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
+    # ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return wc
-
-
-def gradd(const, pt_snc, nu, init_wc):  # this one id abandoned, beause math part did not need it
-    """
-    This function is meant to solve 1/2||x-\nu||_M^2, where M is a function of x,
-    This looks like a convex problem but it is not because M = f(x), x is part of demoninator
-    :param const: abs_pt_snc.t()*abs_pt_snc.sum(1) , shape of [K, N]
-    :param pt_snc: snc(mean(2) constant, shape of [N, K]
-    :param nu: constant, shape of [M]
-    :param init_wc: is a clone of wc for the initialization, shape of [K]
-    :return:
-    """
-    wc = init_wc.requires_grad_()
-    lr = 0.1
-    maxiter = 500
-    # print(pt_snc.max(), nu.max(), pt_snc.max())
-    loss = []
-    for i in range(maxiter):
-        exp_pt_snc_wc = (pt_snc @ wc).exp()  # shape of [N]
-        if torch.isinf(exp_pt_snc_wc).sum().item() > 0 : print('inf problem happened in gradient descent \n')
-        M = (exp_pt_snc_wc/(1 + exp_pt_snc_wc)**2 * const).sum(1)  # shape of [K]
-        lossfunc = 1/2*((wc-nu) * M * M * (wc-nu)).sum()
-        # print('loss func in gradient descent :',i, 'iter ', lossfunc)
-        lossfunc.backward()
-        loss.append(lossfunc.detach().cpu().item())
-        if abs(wc.grad).sum() < 1e-5: break  # stop criteria
-        if i > 10 and abs(loss[i]-loss[i-1])/abs(loss[i]) < 1e-3: break  # stop criteria
-        with torch.no_grad():
-            # print('loss func in gradient descent :',i, 'iter ', wc.grad)
-            if torch.isnan(wc.grad).item(): break  # because of too large number to calc
-            wc = wc - lr*wc.grad
-            wc.requires_grad_()
-        torch.cuda.empty_cache()
-    return wc.detach().requires_grad_(False), M.detach().requires_grad_(False)
 
 
 def svt(L, tau):
@@ -460,7 +433,7 @@ def updateD(DD0SS0W, X, Y, opts):
         torch.cuda.empty_cache()
         # print('before updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
         # print('before updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
-        # D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
+        D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
         # print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
         # print('after updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
         if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print(inf_nan_happenned)
@@ -537,7 +510,7 @@ def loss_D0(Tsnk0_t, dk0, b, D0, mu):
     :param mu: mu = mu*N
     :return: loss fucntion value
     """
-    return ((((Tsnk0_t.permute(0, 2, 1)*dk0).sum(2) - b)**2 ).sum()/2 + mu*D0.norm(p='nuc')).item()
+    return ((((Tsnk0_t.permute(0, 2, 1)*dk0).sum(2) - b)**2 ).sum()/2 + mu*D0.norm(p='nuc'))
 
 
 def updateS0(DD0SS0, X, Y, opts):
@@ -685,7 +658,7 @@ def loss_W(S, W, Y):
     exp_PtSnW = PtSnW.exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     loss = (-1 *(1-Y)*PtSnW + (exp_PtSnW+1).log()).sum()
-    return loss.item()
+    return loss
 
 
 def znorm(x):
