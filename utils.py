@@ -195,9 +195,9 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
     for i in range(maxiter):
         snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
-        snk0_new = svt_s(M, nu, lamb)  # shape of [N, T]
+        snk0_new = shrink(M, nu, lamb)  # shape of [N, T]
         snk0, snk0_old = snk0_new, snk0
-        if torch.norm(snk0 - snk0_old)/snk0_old.norm() < 1e-3: break
+        if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < 1e-3: break
         torch.cuda.empty_cache()
         loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
     # ll = loss[:-1] - loss[1:]
@@ -216,6 +216,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
+    maxiter = 500
     Mw = opts.delta
     lamb = opts.lamb
     dev = opts.dev
@@ -233,7 +234,6 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     M = (term1 + P*eta_wkc_square/4 + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
     sc_til = sc.clone()  # shape of [N, K, T]
-    maxiter = 500
     # print('sck loss Before bpgm :%1.9e' %loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
 
     loss = torch.tensor([], device=opts.dev)
@@ -244,9 +244,10 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         exp_PtSnc_tilWc[torch.isinf(exp_PtSnc_tilWc)] = 1e38
         term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc) * opts.eta ).unsqueeze(1) @ P
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
-        sck_new = svt_s(M, nu, lamb)  # shape of [N, T]
+        sck_new = shrink(M, nu, lamb)  # shape of [N, T]
         sck, sck_old = sck_new, sck  # make sure sc is updated in each loop
-        if torch.norm(sck - sck_old)/sck.norm() < 1e-3: break
+        if torch.norm(sck - sck_old)/(sck.norm()+1e-38) < 1e-3: break
+        # if i >2  and abs((loss[-1] - loss[-2]) / loss[-1]) < 1e-3: break
         torch.cuda.empty_cache()
         # print('iter is ', i, ' sck loss in the bpgm :%1.7e' %loss[-1].item())
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
@@ -336,9 +337,9 @@ def svt(L, tau):
     return P.to(dev)
 
 
-def svt_s(M, nu, lamb):
+def shrink(M, nu, lamb):
     """
-    This function is to implement the signular value thresholding, solving the following
+    This function is to implement the shrinkage operator, solving the following
     min_p lamb||p||_1 + 1/2||\nu-p||_M^2, p is a vector
     :param M: is used for matrix norm, shape of [T]
     :param lamb: is coefficient of L-1 norm, scaler
@@ -1012,5 +1013,5 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     label = -1 * N * opts.eta * (Y*Y_hat.log() + (1-Y)*(1-Y_hat + 3e-38).log()).sum()
     low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
-    return cost.cpu().item()
+    return cost
 
