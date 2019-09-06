@@ -5,7 +5,7 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-opts = OPT(maxiter=50)
+opts = OPT(maxiter=100)
 opts.lamb = 1  # for sparsity penalty
 opts.eta = 1  # for label penalty
 opts.mu= 1  # for low rank penalty
@@ -44,19 +44,22 @@ for i in range(opts.maxiter):
     print('loss function value is %3.4e:' %loss[-1])
 
     # if i > 10 and abs((loss[-1]-loss[-6])/loss[i-5]) < 5e-4 : break
-    print('One epoch training time is :%3.2f' % (time.time() -t0) )
+    print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() -t0) )
 
 print('After %1.0f epochs, the loss function value is %3.4e:' %(i, loss[-1]))
 print('All done, the total running time is :%3.2f \n' % (time.time() -t))
 exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
 exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
 Y_hat = 1/ (1+ exp_PtSnW)
-plt.figure();plt.plot(loss.cpu().numpy(), '-x'); plt.title('Loss fucntion value')
-# plt.figure();plt.plot(D0.squeeze().cpu().numpy()); plt.plot(ft[0], '-x'); plt.title('commom component')
-# plt.figure();plt.plot(D[0, 0, :].cpu().numpy()); plt.plot(ft[1], '-x'); plt.title('feature 1')
-# plt.figure();plt.plot(D[1, 0, :].cpu().numpy()); plt.plot(ft[2], '-x');plt.title('feature 2')
-# plt.figure();plt.plot(D[2, 0, :].cpu().numpy()); plt.plot(ft[3], '-x');plt.title('feature 3')
-# plt.figure();plt.plot(D[3, 0, :].cpu().numpy()); plt.plot(ft[4], '-x');plt.title('feature 4')
-# plt.figure();plt.imshow(Y.cpu().numpy(), aspect='auto'); plt.title('True labels')
-# plt.figure();plt.imshow(Y_hat.cpu().numpy(), aspect='auto'); plt.title('Estimated labels')
-
+plt.figure();plt.plot(loss.cpu().numpy(), '-x'); plt.title('Loss function value')
+plt.xlabel('Epoch index'); plt.ylabel('Magnitude')
+plt.figure();plt.plot(D0.squeeze().cpu().numpy()); plt.plot(ft[0]/ft[0].norm(), '-x'); plt.title('commom component')
+plt.legend(['Learned feature', 'Ground true']); plt.xlabel('Time index'); plt.ylabel('Magnitude')
+for i in range(4):
+    plt.figure();plt.plot(D[i, 0, :].cpu().numpy()); plt.plot(ft[i+1]/ft[i+1].norm(), '-x')
+    plt.title('Feature '+ str(i+1)); plt.legend(['Learned feature', 'Ground true'])
+    plt.xlabel('Time index'); plt.ylabel('Magnitude')
+plt.figure();plt.imshow(Y.cpu().numpy(), aspect='auto'); plt.title('True labels')
+plt.ylabel('Training example index'); plt.xlabel('Label index')
+plt.figure();plt.imshow(Y_hat.cpu().numpy(), aspect='auto'); plt.title('Reconstructed labels')
+plt.ylabel('Training example index'); plt.xlabel('Label index')

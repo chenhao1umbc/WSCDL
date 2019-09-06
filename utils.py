@@ -245,7 +245,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc) * opts.eta ).unsqueeze(1) @ P
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = shrink(M, nu, lamb)  # shape of [N, T]
-        sck, sck_old = sck_new, sck  # make sure sc is updated in each loop
+        sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
         if torch.norm(sck - sck_old)/(sck.norm()+1e-38) < 1e-3: break
         # if i >2  and abs((loss[-1] - loss[-2]) / loss[-1]) < 1e-3: break
         torch.cuda.empty_cache()
@@ -344,7 +344,7 @@ def shrink(M, nu, lamb):
     :param M: is used for matrix norm, shape of [T]
     :param lamb: is coefficient of L-1 norm, scaler
     :param nu: the the matrix to be pruned, shape of [N, T]
-    :return: P the matrix after singular value thresholding
+    :return: P the matrix after thresholding
     """
     b = lamb / M  # shape of [T]
     P = torch.sign(nu) * F.relu(abs(nu) -b)
@@ -649,16 +649,14 @@ def loss_W(S, W, Y):
     :param Y: shape of [N, C]
     :return:
     """
-    # using Y_hat is not stable because of log(), 1-Y_hat could be 0
-    # exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
-    # exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
-    # Y_hat = 1/ (1+ exp_PtSnW)
-    # loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # 1e-38 for robustness
-
-    PtSnW = (S.mean(3) * W).sum(2)  # shape of [N, C]
-    exp_PtSnW = PtSnW.exp()  # shape of [N, C]
+    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
-    loss = (-1 *(1-Y)*PtSnW + (exp_PtSnW+1).log()).sum()
+    Y_hat = 1/ (1+ exp_PtSnW)
+    loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # 1e-38 for robustness
+
+    # this one is not stable due inf by setting the threshold 1e38, which means
+    # if PtSnW = 40, then exp_PtSnW = inf, but set to exp_PtSnW = 1e38, log(exp_PtSnW) = 38, not 40
+    # loss = (-1 *(1-Y)*PtSnW + (exp_PtSnW+1).log()).sum()
     return loss
 
 
@@ -1003,14 +1001,15 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
         torch.cuda.empty_cache()
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
-    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    # using Y_hat is not stable because of log(), 1-Y_hat could be 0
+    exp_PtSnW = (S.mean(3) * W).sum(2).exp()   # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
     fisher1 = torch.norm(X - R - DconvS.sum(1))**2
     fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
-    label = -1 * N * opts.eta * (Y*Y_hat.log() + (1-Y)*(1-Y_hat + 3e-38).log()).sum()
+    label = -1 * N * opts.eta * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
     low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost
