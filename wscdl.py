@@ -48,6 +48,8 @@ for i in range(opts.maxiter):
 
 print('After %1.0f epochs, the loss function value is %3.4e:' %(i, loss[-1]))
 print('All done, the total running time is :%3.2f \n' % (time.time() -t))
+torch.save([D, D0, S, S0, W, opts, loss], 'DD0SS0Woptsloss.pt')
+# D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
 exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
 Y_hat = 1/ (1+ exp_PtSnW)
