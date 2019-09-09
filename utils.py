@@ -252,7 +252,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    if maker == 1 : print('inf to 1e38 happend within the loop')
+    if marker == 1 : print('--inf to 1e38 happend within the loop')
     print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
     if (loss[0] - loss[-1]) < 0 :
         wait = input("PRESS ENTER TO CONTINUE.")
