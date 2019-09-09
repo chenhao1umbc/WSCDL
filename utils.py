@@ -223,7 +223,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     T = b.shape[1]
     P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
     # 'skc update will lead sc change'
-    sck = sc[:, k, :].clone()  # shape of [N, T]
+    sck = sc[:, k, :]  # shape of [N, T]
     sck_old = sck.clone()
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
@@ -235,7 +235,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     M_old = M.clone()
     sc_til = sc.clone()  # shape of [N, K, T]
     # print('sck loss Before bpgm :%1.9e' %loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
-    f0, s0, l0 = loss_Sc_special(Tdck, b, sc, sck, wc, wkc, yc, opts)
+    # f0, s0, l0 = loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts)
 
     loss = torch.tensor([], device=opts.dev)
     for i in range(maxiter):
@@ -246,7 +246,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc) * opts.eta ).unsqueeze(1) @ P
         nu = sck_til - (4*Tdck_t_Tdck@sck_til.t() - _4_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = shrink(M, nu, lamb)  # shape of [N, T]
-        sck_old, sck = sck, sck_new  # make sure sc is updated in each loop
+        sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if torch.norm(sck - sck_old)/(sck.norm()+1e-38) < 1e-3: break
         # if i >2  and abs((loss[-1] - loss[-2]) / loss[-1]) < 1e-3: break
         torch.cuda.empty_cache()
@@ -254,8 +254,9 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
-    f1, s1, l1 = loss_Sc_special(Tdck, b, sc, sck, wc, wkc, yc, opts)
-    print('Local loss: ', f0-f1, s0-s1, l0-l1)
+    # f1, s1, l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts)
+    # print('Local loss: ', f0-f1, s0-s1, l0-l1)
+    # print('should not be negative, l0, l1', l0, l1)
     return sck
 
 
@@ -274,7 +275,9 @@ def loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts):
     """
     epx_PtScWc = (sc.mean(2) @ wc).exp()  # shape of N
     epx_PtScWc[torch.isinf(epx_PtScWc)] = 1e38
-    g_sck_wc = (-(1-yc)*(sck.mean(1)*wkc) + (1+epx_PtScWc).log()).sum()
+    epx_PtSckWck = (sck.mean(1) * wkc).exp()
+    epx_PtSckWck[torch.isinf(epx_PtSckWck)] = 1e38
+    g_sck_wc = (-(1-yc)*((epx_PtSckWck+1e-38).log()) + (1+epx_PtScWc).log()).sum()
     term1 = 2*(Tdck@sck.t() -b.t()).norm()**2
     term2 = opts.lamb * sck.abs().sum()
     term3 = opts.eta * g_sck_wc
@@ -440,7 +443,7 @@ def updateD(DD0SS0W, X, Y, opts):
         D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
         # print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
         # print('after updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
-        if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print(inf_nan_happenned)
+        if torch.isnan(D).sum() + torch.isinf(D).sum() > 0: print(inf_nan_happenned)
     return D
 
 
@@ -617,10 +620,10 @@ def updateS(DD0SS0W, X, Y, opts):
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
-        fisher0, sparse0, label0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # fisher0, sparse0, label0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
-        fisher1, sparse1, label1 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        print(' Main loss: ', fisher0-fisher1, sparse0-sparse1, label0-label1)
+        # fisher1, sparse1, label1 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # print(' Main loss: ', fisher0-fisher1, sparse0-sparse1, label0-label1)
         # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
@@ -1016,7 +1019,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     # label = -1 * N * opts.eta * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
-    label = (-1 * (1 - Y) * (S.mean(3) * W).sum(2) + (exp_PtSnW + 1).log()).sum()
+    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum()
     low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost
@@ -1059,13 +1062,13 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     # label = -1 * N * opts.eta * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
-    label = (-1 * (1 - Y) * (S.mean(3) * W).sum(2) + (exp_PtSnW + 1).log()).sum()
+    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum()
     low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return fisher, sparse, label
 
 
-def loss_Sc_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
+def loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
     """
     This function calculates the loss func of sck
     :param Tdck: shape of [T, m=T]
@@ -1080,8 +1083,11 @@ def loss_Sc_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
     """
     epx_PtScWc = (sc.mean(2) @ wc).exp()  # shape of N
     epx_PtScWc[torch.isinf(epx_PtScWc)] = 1e38
-    g_sck_wc = (-(1-yc)*(sck.mean(1)*wkc) + (1+epx_PtScWc).log()).sum()
+    epx_PtSckWck = (sck.mean(1) * wkc).exp()
+    epx_PtSckWck[torch.isinf(epx_PtSckWck)] = 1e38
+    g_sck_wc = (-(1-yc)*((epx_PtSckWck+1e-38).log()) + (1+epx_PtScWc).log()).sum()
     fisher = 2*(Tdck@sck.t() - b.t()).norm()**2
     sparse = opts.lamb * sck.abs().sum()
     label = opts.eta * g_sck_wc
+    if label <0 :print(stop)
     return fisher, sparse, label
