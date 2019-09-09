@@ -54,7 +54,7 @@ exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
 exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
 Y_hat = 1/ (1+ exp_PtSnW)
 plt.figure();plt.plot(loss.cpu().numpy(), '-x'); plt.title('Loss function value')
-plt.xlabel('Epoch index'); plt.ylabel('Magnitude')
+plt.xlabel('Epoch index'); plt.ylabel('Magnitude'); plt.grid()
 plt.figure();plt.plot(D0.squeeze().cpu().numpy()); plt.plot(ft[0]/ft[0].norm(), '-x'); plt.title('commom component')
 plt.legend(['Learned feature', 'Ground true']); plt.xlabel('Time index'); plt.ylabel('Magnitude')
 for i in range(4):
