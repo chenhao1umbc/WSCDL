@@ -223,7 +223,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     T = b.shape[1]
     P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
     # 'skc update will lead sc change'
-    sck = sc[:, k, :]  # shape of [N, T]
+    sck = sc[:, k, :].clone()  # shape of [N, T]
     sck_old = sck.clone()
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
@@ -241,11 +241,12 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
         exp_PtSnc_tilWc = (sc_til.mean(2) @ wc).exp()  # exp_PtSnc_tilWc should change due to sck_til changing
+        no_inf_exchange = False if torch.isinf(exp_PtSnc_tilWc).sum() == 0 else True
         exp_PtSnc_tilWc[torch.isinf(exp_PtSnc_tilWc)] = 1e38
         term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc) * opts.eta ).unsqueeze(1) @ P
         nu = sck_til - (8*Tdck_t_Tdck@sck_til.t() - _8_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = shrink(M, nu, lamb)  # shape of [N, T]
-        sck[:], sck_old[:] = sck_new[:], sck[:]  # make sure sc is updated in each loop
+        sck_old, sck = sck, sck_new  # make sure sc is updated in each loop
         if torch.norm(sck - sck_old)/(sck.norm()+1e-38) < 1e-3: break
         # if i >2  and abs((loss[-1] - loss[-2]) / loss[-1]) < 1e-3: break
         torch.cuda.empty_cache()
@@ -253,6 +254,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
+    if no_inf_exchange : print('inf to 1e38 happened')
     return sck
 
 
