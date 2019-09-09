@@ -234,10 +234,9 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     M = (term1 + P*eta_wkc_square/4 + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [N, T]
     M_old = M.clone()
     sc_til = sc.clone()  # shape of [N, K, T]
-    # print('sck loss Before bpgm :%1.9e' %loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts))
-    # f0, s0, l0 = loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts)
+    sc_old = sc.clone(); marker = 0
 
-    loss = torch.tensor([], device=opts.dev)
+    loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -250,13 +249,14 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         if torch.norm(sck - sck_old)/(sck.norm()+1e-38) < 1e-3: break
         # if i >2  and abs((loss[-1] - loss[-2]) / loss[-1]) < 1e-3: break
         torch.cuda.empty_cache()
-        # print('iter is ', i, ' sck loss in the bpgm :%1.7e' %loss[-1].item())
+        if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
-    # ll = loss[:-1] - loss[1:]
-    # if ll[ll<0].shape[0] > 0: print(something_wrong)
-    # f1, s1, l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts)
-    # print('Local loss: ', f0-f1, s0-s1, l0-l1)
-    # print('should not be negative, l0, l1', l0, l1)
+    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    if maker == 1 : print('inf to 1e38 happend within the loop')
+    print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
+    if (loss[0] - loss[-1]) < 0 :
+        wait = input("PRESS ENTER TO CONTINUE.")
+    # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
     return sck
 
 
@@ -620,10 +620,9 @@ def updateS(DD0SS0W, X, Y, opts):
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
-        # fisher0, sparse0, label0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # l0 = loss_fun(X, Y, D, D0, S, S0, W, opts)
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
-        # fisher1, sparse1, label1 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        # print(' Main loss: ', fisher0-fisher1, sparse0-sparse1, label0-label1)
+        # print('Main loss after bpgm the diff is: %1.9e' %(l0 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
         # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
