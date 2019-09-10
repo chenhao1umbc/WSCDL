@@ -14,21 +14,21 @@
     <favorites_list name="WSCDL" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="false">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wscdl.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="36" column="12" selection-start-line="36" selection-start-column="12" selection-end-line="36" selection-end-column="12" />
+            <state relative-caret-position="336">
+              <caret line="49" selection-start-line="49" selection-end-line="68" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="335">
-              <caret line="243" column="60" lean-forward="true" selection-start-line="243" selection-start-column="60" selection-end-line="243" selection-end-column="60" />
+            <state relative-caret-position="482">
+              <caret line="165" column="28" lean-forward="true" selection-start-line="165" selection-start-column="28" selection-end-line="165" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -42,6 +42,14 @@
       </list>
     </option>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>1e-3</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>1e-4</replace>
+    </replaceStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -52,12 +60,13 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/utils.py" />
+        <option value="$PROJECT_DIR$/wscdl.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="407" />
-    <option name="y" value="75" />
+    <option name="x" value="144" />
+    <option name="y" value="76" />
     <option name="width" value="1459" />
     <option name="height" value="937" />
   </component>
@@ -184,14 +193,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="407" y="75" width="1459" height="937" extended-state="0" />
-    <editor active="true" />
+    <frame x="144" y="76" width="1459" height="937" extended-state="0" />
     <layout>
       <window_info anchor="bottom" content_ui="combo" id="Project" order="0" weight="0.24942264" />
       <window_info anchor="bottom" id="Version Control" order="1" show_stripe_button="false" weight="0.3290993" />
-      <window_info anchor="bottom" id="Python Console" order="2" weight="0.3290993" />
+      <window_info anchor="bottom" auto_hide="true" id="Python Console" order="2" weight="0.7009238" />
       <window_info anchor="bottom" id="Terminal" order="3" show_stripe_button="false" weight="0.3290993" />
-      <window_info anchor="bottom" auto_hide="true" id="Structure" order="4" side_tool="true" weight="0.48498845" />
+      <window_info anchor="bottom" auto_hide="true" id="Structure" order="4" side_tool="true" weight="0.7182448" />
       <window_info anchor="bottom" id="Message" order="5" />
       <window_info anchor="bottom" id="Find" order="6" />
       <window_info anchor="bottom" id="Run" order="7" />
@@ -200,7 +208,7 @@
       <window_info anchor="bottom" id="Favorites" order="10" side_tool="true" weight="0.50461894" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" weight="0.6200924" />
       <window_info anchor="bottom" id="TODO" order="12" show_stripe_button="false" weight="0.49769053" />
-      <window_info anchor="bottom" x="436" y="138" width="1383" height="797" id="Debug" order="13" type="WINDOWED" weight="0.3995381" />
+      <window_info active="true" anchor="bottom" x="436" y="138" width="1383" height="797" id="Debug" order="13" type="WINDOWED" visible="true" weight="0.3995381" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -243,21 +251,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils.py</url>
-          <line>323</line>
-          <option name="timeStamp" value="1" />
+          <url>file://$PROJECT_DIR$/wscdl.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/wscdl.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="36" column="12" selection-start-line="36" selection-start-column="12" selection-end-line="36" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="669">
@@ -267,8 +268,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="335">
-          <caret line="243" column="60" lean-forward="true" selection-start-line="243" selection-start-column="60" selection-end-line="243" selection-end-column="60" />
+        <state relative-caret-position="482">
+          <caret line="165" column="28" lean-forward="true" selection-start-line="165" selection-start-column="28" selection-end-line="165" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wscdl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="49" selection-start-line="49" selection-end-line="68" />
         </state>
       </provider>
     </entry>

@@ -101,7 +101,7 @@ def solv_dck(x, M, Minv, Mw, Tsck_t, b):
         else:
             d_new = acc_newton(M, -M@nu)  # QCQP(P, q)
         d, d_old = d_new, d
-        if torch.norm(d - d_old).item() < 1e-3: break
+        if (d - d_old).norm()/d_old.norm() < 1e-4: break
         torch.cuda.empty_cache()
         loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
     # ll = loss[:-1] - loss[1:]
@@ -134,7 +134,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
         nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if (d - d_old).norm()/d_old.norm() < 1e-3:
+        if (d - d_old).norm()/d_old.norm() < 1e-4:
             break
         torch.cuda.empty_cache()
         # print('loss D0 in solve_d0 is %3.2e:' %loss_D0(Tsck0_t, d, b, D0, mu))
@@ -160,7 +160,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
     P = M + rho*torch.eye(m, device=dev)
     Mbynu = M @ nu
-    maxiter = 200
+    maxiter = 500
     cr = []
     # begin of ADMM
     for i in range(maxiter):
@@ -197,7 +197,7 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
         snk0_new = shrink(M, nu, lamb)  # shape of [N, T]
         snk0, snk0_old = snk0_new, snk0
-        if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < 1e-3: break
+        if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < 1e-4: break
         torch.cuda.empty_cache()
         loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
     # ll = loss[:-1] - loss[1:]
@@ -233,10 +233,10 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     term1 = (abs(4 * Tdck_t_Tdck)).sum(1)  # shape of [T]
     M = (term1 + P*eta_wkc_square + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [T]
     sc_til = sc.clone()  # shape of [N, K, T]
-    sc_old = sc.clone(); marker = 0
+    # sc_old = sc.clone(); marker = 0
 
     loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
-    lss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
+    # lss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -247,17 +247,17 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         sck_new = shrink(M, nu, lamb)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
-        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-3: break
-        lss = torch.cat((lss, loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
+        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
+        # lss = torch.cat((lss, loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
         torch.cuda.empty_cache()
-    print('M max', M.max())
-    if marker == 1 :
-        print('--inf to 1e38 happend within the loop')
-        plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-        print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
-    if (loss[0] - loss[-1]) < 0 :
-        wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
+    # print('M max', M.max())
+    # if marker == 1 :
+    #     print('--inf to 1e38 happend within the loop')
+    #     plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    #     print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
+    # if (loss[0] - loss[-1]) < 0 :
+    #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
     return sck
 
@@ -314,7 +314,7 @@ def solv_wc(x, snc, yc, Mw):
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
-        if torch.norm(wc - wc_old)/wc.norm() < 1e-3: break
+        if torch.norm(wc - wc_old)/wc.norm() < 1e-4: break
         torch.cuda.empty_cache()
         # print('wc loss in the bpgm :%1.7e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
         loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
