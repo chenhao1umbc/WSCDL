@@ -231,31 +231,33 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     _4_Tdckt_bt = 4*Tdck.t() @ b.t()  # shape of [T, N]
     term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
     term1 = (abs(4 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    M = (term1 + P*eta_wkc_square/4 + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [N, T]
-    M_old = M.clone()
+    M = (term1 + P*eta_wkc_square + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [T]
     sc_til = sc.clone()  # shape of [N, K, T]
     sc_old = sc.clone(); marker = 0
 
     loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    lss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
         exp_PtSnc_tilWc = (sc_til.mean(2) @ wc).exp()  # exp_PtSnc_tilWc should change due to sck_til changing
         exp_PtSnc_tilWc[torch.isinf(exp_PtSnc_tilWc)] = 1e38
-        term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc) * opts.eta ).unsqueeze(1) @ P
+        term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc)*opts.eta*wkc ).unsqueeze(1) @ P
         nu = sck_til - (4*Tdck_t_Tdck@sck_til.t() - _4_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
         sck_new = shrink(M, nu, lamb)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
-        if torch.norm(sck - sck_old)/(sck.norm()+1e-38) < 1e-3: break
-        # if i >2  and abs((loss[-1] - loss[-2]) / loss[-1]) < 1e-3: break
-        torch.cuda.empty_cache()
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
+        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-3: break
+        lss = torch.cat((lss, loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
-    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    if marker == 1 : print('--inf to 1e38 happend within the loop')
-    print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
+        torch.cuda.empty_cache()
+    print('M max', M.max())
+    if marker == 1 :
+        print('--inf to 1e38 happend within the loop')
+        plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+        print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
     if (loss[0] - loss[-1]) < 0 :
-        wait = input("PRESS ENTER TO CONTINUE.")
+        wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
     return sck
 
