@@ -57,54 +57,55 @@ def init(X, opts):
     return D, D0, S, S0, W
 
 
-def acc_newton(P, q):
-    """proximal operator for majorized form using Accelorated Newton's method
+def acc_newton(P, q):  # both shape of [M]
+    """
+    proximal operator for majorized form using Accelorated Newton's method
     follow the solutions of `convex optimization` by boyd, exercise 4.22, solving QCQP
     where P is a square diagonal matrix, q is a vector
-    for update D  q = -MD@nu, P = MD
-    for update D0,  q = -(MD@nu + rho*Zk0 + Yk0), P = Mdk0 + rho*eye(M)
+    :param P: for update D, P = MD          for update D0, P = Mdk0 + rho*eye(M)
+    :param q: for update D, q = -MD@nu,     for update D0, q = -(MD@nu + rho*Zk0 + Yk0),
+    :return: dck or dck0
     """
     psi = 0
     maxiter = 200
+    qq = q*q
     for i in range(maxiter):
-        f_grad = - 2 * ((P.diag()+psi)**(-3)*q*q).sum()
-        f = ((P.diag()+psi)**(-2)*q*q).sum()
+        f_grad = - 2 * ((P+psi)**(-3)*qq).sum()
+        f = ((P+psi)**(-2)*qq).sum()
         psi_new = psi - 2 * f/f_grad * (f.sqrt() - 1)
         if (psi_new - psi).item() < 1e-5:  # psi_new should always larger than psi
             break
         else:
             psi = psi_new.clone()
-    dck = -((P.diag() + psi_new)**(-1)).diag() @ q
+    dck = -((P + psi_new)**(-1)) * q
     return dck
 
 
-def solv_dck(x, M, Minv, Mw, Tsck_t, b):
+def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
     """x, is the dck, shape of [M]
-        M, is MD, with shape of [M, M], diagonal matrix
-        Minv, is MD^(-1)
-        Mw, is a number not diagonal matrix
+        M is with shape of [M], diagonal of the majorized matrix
+        Minv, is Md^(-1), shape of [M]
+        Mw, is a number, == opts.delta
         Tsck_t, is truncated toeplitz matrix of sck with shape of [N, M, T]
         b is bn with all N, with shape of [N, T]
         """
     maxiter = 500
     d_old, d = x.clone(), x.clone()
-    coef = Minv @ (Tsck_t@Tsck_t.permute(0, 2, 1)).sum(0)
-    term = Minv @ (Tsck_t@b.unsqueeze(2)).sum(0)
+    coef = Tsck_t@Tsck_t.permute(0, 2, 1)
+    term = (Tsck_t@b.unsqueeze(2)).sum(0).squeeze()  # shape of [M]
 
     loss = torch.tensor([], device=x.device)
     for i in range(maxiter):
-        d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
-        nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
+        d_til = d + Mw*(d - d_old)  # shape of [M]
+        nu = d_til - Md_inv*((coef@d_til).sum(0) + term) # shape of [M]
         if torch.norm(nu).item()**2 <= 1:
             d_new = nu
         else:
-            d_new = acc_newton(M, -M@nu)  # QCQP(P, q)
+            d_new = acc_newton(Md, -Md*nu)  # QCQP(P, q)
         d, d_old = d_new, d
-        if (d - d_old).norm()/d_old.norm() < 1e-4: break
         torch.cuda.empty_cache()
         loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
-    # ll = loss[:-1] - loss[1:]
-    # if ll[ll<0].shape[0] > 0: print(something_wrong)
+        if (d - d_old).norm() / d_old.norm() < 1e-4: break
     return d
 
 
@@ -421,11 +422,8 @@ def updateD(DD0SS0W, X, Y, opts):
         sck = S[:, c, k, :]  # shape of [N, T]
         Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T],
         abs_Tsck_t = abs(Tsck_t)
-        Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD_diag = (abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1) @ torch.ones(M, 1, device=opts.dev)).sum(0).squeeze()  # shape of [M]
-        MD_diag = MD_diag + 1e-10  # to make it robust for inverse
-        MD = MD_diag.diag()
-        MD_inv = (1/MD_diag).diag()
+        Md = (abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0) # shape of [M]
+        Md_inv = (Md + 1e-38)**(-1)
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
@@ -439,9 +437,9 @@ def updateD(DD0SS0W, X, Y, opts):
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         # print('before updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
-        # print('before updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
-        D[c, k, :] = solv_dck(dck, MD, MD_inv, Mw, Tsck_t, b)
-        # print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
+        print('before updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
+        D[c, k, :] = solv_dck(dck, Md, Md_inv, opts.delta, Tsck_t, b)
+        print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
         # print('after updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
         if torch.isnan(D).sum() + torch.isinf(D).sum() > 0: print(inf_nan_happenned)
     return D
@@ -455,7 +453,7 @@ def loss_D(Tsck_t, dck, b):
     :param b: the definiation is long in the algorithm, shape of [N, T]
     :return: loss fucntion value
     """
-    return (((Tsck_t.permute(0, 2, 1)*dck).sum(2) - b)**2 ).sum()
+    return ((Tsck_t.permute(0, 2, 1)@dck - b)**2 ).sum()
 
 
 def updateD0(DD0SS0, X, Y, opts):
