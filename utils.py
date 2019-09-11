@@ -61,9 +61,8 @@ def acc_newton(P, q):
     """proximal operator for majorized form using Accelorated Newton's method
     follow the solutions of `convex optimization` by boyd, exercise 4.22, solving QCQP
     where P is a square diagonal matrix, q is a vector
-    for update D  q = -M_D \nu = -MD@nu, P = M_D = MD
-    for update D0, q = -(M_D \nu + \rho z_k + Y_k), P = M_D + \rho I
-                    q = -(MD@nu + rho*Z + Y[:, k]), P = MD + rho*eye(M)
+    for update D  q = -MD@nu, P = MD
+    for update D0,  q = -(MD@nu + rho*Zk0 + Yk0), P = Mdk0 + rho*eye(M)
     """
     psi = 0
     maxiter = 200
@@ -160,18 +159,17 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
     P = M + rho*torch.eye(m, device=dev)
     Mbynu = M @ nu
-    maxiter = 500
-    cr = []
+    maxiter = 200
+    cr = torch.tensor([], device=dev)
     # begin of ADMM
     for i in range(maxiter):
         Z = svt(D0-1/rho*Y, mu/rho)
         q = -(Mbynu + rho * Z[k0, :] + Y[k0, :])
         dk0 = D0[k0, :] = acc_newton(P, q)
-        cr.append(Z - D0)
-        Y = Y + rho*cr[i]
-        if torch.norm(cr[i]) < 1e-8 : break
-        if i > 10:  # if not going anywhere
-            if abs(cr[i] - cr[i-10]).sum() < 5e-8: break
+        Z_minus_D0 = Z- D0
+        Y = Y + rho*Z_minus_D0
+        cr = torch.cat((cr, Z_minus_D0.norm().reshape(1)))
+        if i>10 and abs(cr[i] - cr[i-1])/cr[i-1] < 1e-4: break
     return dk0
 
 
@@ -424,7 +422,7 @@ def updateD(DD0SS0W, X, Y, opts):
         Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T],
         abs_Tsck_t = abs(Tsck_t)
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD_diag = ((abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
+        MD_diag = (abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1) @ torch.ones(M, 1, device=opts.dev)).sum(0).squeeze()  # shape of [M]
         MD_diag = MD_diag + 1e-10  # to make it robust for inverse
         MD = MD_diag.diag()
         MD_inv = (1/MD_diag).diag()
@@ -643,9 +641,9 @@ def updateW(SW, Y, opts):
     N, C, K, T = S.shape
     # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
-        # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-        # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
     return W
