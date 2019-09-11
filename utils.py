@@ -312,10 +312,9 @@ def solv_wc(x, snc, yc, Mw):
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
         # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
+        loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
         if torch.norm(wc - wc_old)/wc.norm() < 1e-4: break
         torch.cuda.empty_cache()
-        # print('wc loss in the bpgm :%1.7e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
-        loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return wc
@@ -632,9 +631,9 @@ def updateW(SW, Y, opts):
     N, C, K, T = S.shape
     # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
-        # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-        # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
     return W
@@ -651,11 +650,11 @@ def loss_W(S, W, Y):
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1/ (1+ exp_PtSnW)
-    loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # 1e-38 for robustness
+    # loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # 1e-38 for robustness
 
     # this one is not stable due inf by setting the threshold 1e38, which means
     # if PtSnW = 40, then exp_PtSnW = inf, but set to exp_PtSnW = 1e38, log(exp_PtSnW) = 38, not 40
-    # loss = (-1 *(1-Y)*PtSnW + (exp_PtSnW+1).log()).sum()
+    loss = (-1 *(1-Y)*(exp_PtSnW+ 1e-38).log() + (exp_PtSnW+1).log()).sum()
     return loss
 
 
