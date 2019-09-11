@@ -545,7 +545,7 @@ def updateS0(DD0SS0, X, Y, opts):
         Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
         abs_Tdk0 = abs(Tdk0_t).t()
         MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
-        MS0_diag = MS0_diag + 1e-10  # make it robust for inverse
+        MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
         MS0_inv = (1/MS0_diag).diag()
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0
         torch.cuda.empty_cache()
