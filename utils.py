@@ -113,8 +113,8 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
 def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     """
     :param x: is the dck, shape of [M]
-    :param M: is MD, the majorizer matrix with shape of [M, M], diagonal matrix
-    :param Minv: is MD^(-1)
+    :param M: is MD, the majorizer matrix with shape of [M], diagonal matrix
+    :param Minv: is MD^(-1), shape of [M]
     :param Mw: is a number not diagonal matrix
     :param Tsck0_t: is truncated toeplitz matrix of sck with shape of [N, M, T], already *2
     :param b: bn with all N, with shape of [N, T]
@@ -125,20 +125,18 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     """
     maxiter = 500
     d_old, d = x.clone(), x.clone()
-    coef = Minv @ (Tsck0_t @ Tsck0_t.permute(0, 2, 1)).sum(0)
-    term = Minv @ (Tsck0_t @ b.unsqueeze(2)).sum(0)
+    coef = Tsck0_t@Tsck0_t.permute(0, 2, 1)  # shaoe of [N, M, M]
+    term = (Tsck0_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
     # print('before bpgm loop loss D0 in solve_d0 is %3.2e:' % loss_D0(Tsck0_t, d, b, D0, mu))
 
-    loss = torch.tensor([], device=x.device)
+    loss = torch.cat((torch.tensor([], device=x.device), loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
-        nu = d_til - (coef@d_til).squeeze() + term.squeeze()  # nu is 1-d tensor
+        nu = d_til - (coef@d_til - term).sum(0) * Minv  # shape of [M]
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if (d - d_old).norm()/d_old.norm() < 1e-4:
-            break
+        if (d - d_old).norm()/d_old.norm() < 1e-4:break
         torch.cuda.empty_cache()
-        # print('loss D0 in solve_d0 is %3.2e:' %loss_D0(Tsck0_t, d, b, D0, mu))
         loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
@@ -159,8 +157,8 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     dev = D0.device
     Z = torch.eye(K0, m, device=dev)
     Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
-    P = M + rho*torch.eye(m, device=dev)
-    Mbynu = M @ nu
+    P = M + rho
+    Mbynu = M * nu
     maxiter = 200
     cr = torch.tensor([], device=dev)
     # begin of ADMM
@@ -487,12 +485,10 @@ def updateD0(DD0SS0, X, Y, opts):
         snk0 = S0[:, k0, :]  # shape of [N, T]
         dk0convsnk0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0,  M_2:M_2 + T]
         Tsnk0_t = toeplitz(snk0, M, T)  # shape of [N, M, T]
-        abs_Tsnk0_t = abs(Tsnk0_t)
+        abs_Tsnk0_t = abs(Tsnk0_t)   # shape of [N, M, T]
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD_diag = 4*((abs_Tsnk0_t @ abs_Tsnk0_t.permute(0, 2, 1)).sum(0) @ torch.ones(M, 1, device=opts.dev)).squeeze()  # shape of [M]
-        MD_diag = MD_diag + 1e-10  # make it robust for the M^-1
-        MD = MD_diag.diag()
-        MD_inv = (1/MD_diag).diag()
+        MD = 4*(abs_Tsnk0_t @ abs_Tsnk0_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0)   # shape of [M]
+        MD_inv = 1/(1e-38+MD)  #shape of [M]
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
         # print('D0 loss function value before update is %3.2e:' %loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
@@ -512,7 +508,7 @@ def loss_D0(Tsnk0_t, dk0, b, D0, mu):
     :param mu: mu = mu*N
     :return: loss fucntion value
     """
-    return ((((Tsnk0_t.permute(0, 2, 1)*dk0).sum(2) - b)**2 ).sum()/2 + mu*D0.norm(p='nuc'))
+    return (((Tsnk0_t.permute(0, 2, 1)@dk0 - b)**2 ).sum()/2 + mu*D0.norm(p='nuc'))
 
 
 def updateS0(DD0SS0, X, Y, opts):
