@@ -1092,3 +1092,40 @@ def loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
     label = opts.eta * g_sck_wc
     if label <0 :print(stop)
     return fisher, sparse, label
+
+
+def plot_result(X, Y, D, D0, S, S0, W, ft, opts):
+    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    Y_hat = 1 / (1 + exp_PtSnW)
+    plt.figure()
+    plt.plot(loss.cpu().numpy(), '-x')
+    plt.title('Loss function value')
+    plt.xlabel('Epoch index')
+    plt.ylabel('Magnitude')
+    plt.grid()
+    plt.figure()
+    plt.plot(D0.squeeze().cpu().numpy())
+    plt.plot(ft[0] / ft[0].norm(), '-x')
+    plt.title('commom component')
+    plt.legend(['Learned feature', 'Ground true'])
+    plt.xlabel('Time index')
+    plt.ylabel('Magnitude')
+    for i in range(4):
+        plt.figure()
+        plt.plot(D[i, 0, :].cpu().numpy())
+        plt.plot(ft[i + 1] / ft[i + 1].norm(), '-x')
+        plt.title('Feature ' + str(i + 1))
+        plt.legend(['Learned feature', 'Ground true'])
+        plt.xlabel('Time index')
+        plt.ylabel('Magnitude')
+    plt.figure()
+    plt.imshow(Y.cpu().numpy(), aspect='auto')
+    plt.title('True labels')
+    plt.ylabel('Training example index')
+    plt.xlabel('Label index')
+    plt.figure()
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
+    plt.title('Reconstructed labels')
+    plt.ylabel('Training example index')
+    plt.xlabel('Label index')
