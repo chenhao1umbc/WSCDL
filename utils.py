@@ -70,7 +70,7 @@ def acc_newton(P, q):  # both shape of [M]
     maxiter = 200
     qq = q*q
     for i in range(maxiter):
-        f_grad = - 2 * ((P+psi)**(-3)*qq).sum()
+        f_grad = -2 * ((P+psi)**(-3) * qq).sum()
         f = ((P+psi)**(-2)*qq).sum()
         psi_new = psi - 2 * f/f_grad * (f.sqrt() - 1)
         if (psi_new - psi).item() < 1e-5:  # psi_new should always larger than psi
@@ -90,15 +90,15 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         b is bn with all N, with shape of [N, T]
         """
     maxiter = 500
-    d_old, d = x.clone(), x.clone()
-    coef = Tsck_t@Tsck_t.permute(0, 2, 1)
-    term = (Tsck_t@b.unsqueeze(2)).sum(0).squeeze()  # shape of [M]
+    d_til, d_old, d = x.clone(), x.clone(), x.clone()
+    coef = Tsck_t@Tsck_t.permute(0, 2, 1)  # shaoe of [N, M, M]
+    term = (Tsck_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
 
-    loss = torch.tensor([], device=x.device)
+    loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
     for i in range(maxiter):
         d_til = d + Mw*(d - d_old)  # shape of [M]
-        nu = d_til - Md_inv*((coef@d_til).sum(0) + term) # shape of [M]
-        if torch.norm(nu).item()**2 <= 1:
+        nu = d_til - (coef@d_til - term).sum(0) * Md_inv  # shape of [M]
+        if torch.norm(nu) <= 1:
             d_new = nu
         else:
             d_new = acc_newton(Md, -Md*nu)  # QCQP(P, q)
@@ -106,6 +106,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         torch.cuda.empty_cache()
         loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         if (d - d_old).norm() / d_old.norm() < 1e-4: break
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d
 
 
@@ -436,11 +437,7 @@ def updateD(DD0SS0W, X, Y, opts):
                 + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
-        # print('before updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
-        print('before updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
         D[c, k, :] = solv_dck(dck, Md, Md_inv, opts.delta, Tsck_t, b)
-        print('after updata dck : %1.5e' %loss_fun(X, Y, D, D0, S, S0, W, opts))
-        # print('after updata dck : %3.2e' %loss_D(Tsck_t, D[c, k, :], b))
         if torch.isnan(D).sum() + torch.isinf(D).sum() > 0: print(inf_nan_happenned)
     return D
 
@@ -453,7 +450,7 @@ def loss_D(Tsck_t, dck, b):
     :param b: the definiation is long in the algorithm, shape of [N, T]
     :return: loss fucntion value
     """
-    return ((Tsck_t.permute(0, 2, 1)@dck - b)**2 ).sum()
+    return 2*((Tsck_t.permute(0, 2, 1)@dck - b)**2 ).sum()
 
 
 def updateD0(DD0SS0, X, Y, opts):
@@ -639,9 +636,9 @@ def updateW(SW, Y, opts):
     N, C, K, T = S.shape
     # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
-        print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-        print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
     return W
@@ -1090,7 +1087,7 @@ def loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
     return fisher, sparse, label
 
 
-def plot_result(X, Y, D, D0, S, S0, W, ft, opts):
+def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)

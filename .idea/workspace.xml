@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/wscdl.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="19" column="11" lean-forward="true" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+            <state relative-caret-position="588">
+              <caret line="40" column="11" selection-start-line="40" selection-start-column="11" selection-end-line="40" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -27,8 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="422" column="14" selection-start-line="422" selection-start-column="8" selection-end-line="422" selection-end-column="14" />
+            <state relative-caret-position="356">
+              <caret line="628" column="30" lean-forward="true" selection-start-line="628" selection-start-column="30" selection-end-line="628" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -49,6 +49,8 @@
       <find>torch.cat</find>
       <find>maxiter = 500</find>
       <find>M*M</find>
+      <find>/M</find>
+      <find>Md_inv</find>
     </findStrings>
     <replaceStrings>
       <replace>1e-4</replace>
@@ -69,9 +71,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="108" />
-    <option name="y" value="60" />
-    <option name="width" value="1459" />
+    <option name="x" value="425" />
+    <option name="y" value="77" />
+    <option name="width" value="1458" />
     <option name="height" value="937" />
   </component>
   <component name="ProjectId" id="1Pw552t485gB4fbJm3VSds9rOyG" />
@@ -125,6 +127,9 @@
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -197,7 +202,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="108" y="60" width="1459" height="937" extended-state="0" />
+    <frame x="425" y="77" width="1458" height="937" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" content_ui="combo" id="Project" order="0" weight="0.24942264" />
       <window_info anchor="bottom" id="Version Control" order="1" show_stripe_button="false" weight="0.3290993" />
@@ -212,7 +218,7 @@
       <window_info anchor="bottom" id="Favorites" order="10" side_tool="true" weight="0.50461894" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" weight="0.6200924" />
       <window_info anchor="bottom" id="TODO" order="12" show_stripe_button="false" weight="0.49769053" />
-      <window_info active="true" anchor="bottom" x="418" y="85" width="1383" height="797" id="Debug" order="13" type="WINDOWED" visible="true" weight="0.3995381" />
+      <window_info active="true" anchor="bottom" x="417" y="92" width="1383" height="797" id="Debug" order="13" type="WINDOWED" visible="true" weight="0.3995381" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -251,22 +257,6 @@
       </map>
     </option>
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils.py</url>
-          <line>646</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils.py</url>
-          <line>108</line>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="editorHistoryManager">
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -277,15 +267,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/wscdl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="19" column="11" lean-forward="true" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+        <state relative-caret-position="588">
+          <caret line="40" column="11" selection-start-line="40" selection-start-column="11" selection-end-line="40" selection-end-column="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="422" column="14" selection-start-line="422" selection-start-column="8" selection-end-line="422" selection-end-column="14" />
+        <state relative-caret-position="356">
+          <caret line="628" column="30" lean-forward="true" selection-start-line="628" selection-start-column="30" selection-end-line="628" selection-end-column="30" />
         </state>
       </provider>
     </entry>
