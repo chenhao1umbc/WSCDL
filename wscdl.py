@@ -50,6 +50,6 @@ ll = loss[:-1]-loss[1:]
 if ll[ll<0].shape[0] >0 : print('****This result is not trustworthy because loss is not monotonically decreasing****')
 print('After %1.0f epochs, the loss function value is %3.4e:' %(i, loss[-1]))
 print('All done, the total running time is :%3.2f \n' % (time.time() -t))
-# torch.save([D, D0, S, S0, W, opts, loss], 'DD0SS0Woptsloss.pt')
+torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 plot_result(X, Y, D, D0, S, S0, W, ft,loss, opts)

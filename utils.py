@@ -1,12 +1,14 @@
 ##
 # """This file constains all the necessary classes and functions"""
 import os
+import datetime
 import time
 import torch
 import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
-# from scipy.linalg import toeplitz   # This is too slow
+tt = datetime.datetime.now
+torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=180)
 torch.set_printoptions(linewidth=180)
 torch.backends.cudnn.deterministic = True
@@ -688,7 +690,7 @@ def load_toy(opts):
     """
     '''Generate toy data'''
     T = 1200
-    x = torch.arange(30).float()
+    x = torch.arange(30).float()  # x.sin() only works for float32...
     featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
     feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
