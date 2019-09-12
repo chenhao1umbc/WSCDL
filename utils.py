@@ -94,7 +94,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
     coef = Tsck_t@Tsck_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
 
-    loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
     for i in range(maxiter):
         d_til = d + correction*Mw*(d - d_old)  # shape of [M]
         nu = d_til - (coef@d_til - term).sum(0) * Md_inv  # shape of [M]
@@ -104,7 +104,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
             d_new = acc_newton(Md, -Md*nu)  # QCQP(P, q)
         d, d_old = d_new, d
         torch.cuda.empty_cache()
-        loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
+        # loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         if (d - d_old).norm() / d_old.norm() < 1e-4: break
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d
@@ -128,7 +128,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     coef = Tsck0_t@Tsck0_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck0_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
 
-    loss = torch.cat((torch.tensor([], device=x.device), loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     for i in range(maxiter):
         d_til = d + correction*Mw*(d - d_old)  # shape of [M],  Mw is just a number for calc purpose
         nu = d_til - (coef@d_til - term).sum(0) * Minv  # shape of [M]
@@ -136,7 +136,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
         d, d_old = d_new, d
         if (d - d_old).norm()/d_old.norm() < 1e-4:break
         torch.cuda.empty_cache()
-        loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
+        # loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
@@ -189,7 +189,7 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
     coef = Minv @ Tdk0.t() @ Tdk0  # shape of [T, T]
     term = (Minv @ Tdk0.t() @b.t()).t()  # shape of [N, T]
 
-    loss = torch.tensor([], device=x.device)
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
     for i in range(maxiter):
         snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
@@ -197,7 +197,7 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
         snk0, snk0_old = snk0_new, snk0
         if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < 1e-4: break
         torch.cuda.empty_cache()
-        loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
+        # loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return snk0
@@ -234,7 +234,6 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     # sc_old = sc.clone(); marker = 0
 
     loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
-    # lss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -246,7 +245,6 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
-        # lss = torch.cat((lss, loss_Sck(Tdck, b, sck.unsqueeze(1), sck, wc, wkc, yc, opts).reshape(1)))
         loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
         torch.cuda.empty_cache()
     # print('M max', M.max())
@@ -257,7 +255,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     # if (loss[0] - loss[-1]) < 0 :
     #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
-    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return sck
 
 
@@ -305,14 +303,13 @@ def solv_wc(x, snc, yc, Mw):
     M_old = M.clone()
     # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
 
-    loss = torch.tensor([], device=x.device)
+    loss = torch.cat((torch.tensor([], device=x.device), loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
     for i in range(maxiter):
         wc_til = wc + correction*Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
         exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
-        # print('torch.norm(wc - wc_old)', torch.norm(wc - wc_old).item())
         loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
         if torch.norm(wc - wc_old)/wc.norm() < 1e-4: break
         torch.cuda.empty_cache()
@@ -633,9 +630,9 @@ def updateW(SW, Y, opts):
     N, C, K, T = S.shape
     # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
-        print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :, :], Y[:, c], opts.delta)
-        print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
     return W

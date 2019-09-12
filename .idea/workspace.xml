@@ -18,7 +18,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wscdl.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="123">
+            <state relative-caret-position="249">
               <caret line="24" selection-start-line="24" selection-end-line="27" selection-end-column="52" />
             </state>
           </provider>
@@ -27,8 +27,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="368">
-              <caret line="620" lean-forward="true" selection-start-line="620" selection-end-line="620" />
+            <state relative-caret-position="95">
+              <caret line="235" column="13" lean-forward="true" selection-start-line="235" selection-start-column="13" selection-end-line="235" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -53,6 +53,7 @@
       <find>Md_inv</find>
       <find>) ); t = time.time()</find>
       <find>correction</find>
+      <find>plt.figure();</find>
     </findStrings>
     <replaceStrings>
       <replace>1e-4</replace>
@@ -130,6 +131,9 @@
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -274,14 +278,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="368">
-          <caret line="620" lean-forward="true" selection-start-line="620" selection-end-line="620" />
+        <state relative-caret-position="95">
+          <caret line="235" column="13" lean-forward="true" selection-start-line="235" selection-start-column="13" selection-end-line="235" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/wscdl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="123">
+        <state relative-caret-position="249">
           <caret line="24" selection-start-line="24" selection-end-line="27" selection-end-column="52" />
         </state>
       </provider>
