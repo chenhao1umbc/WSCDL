@@ -89,14 +89,14 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         Tsck_t, is truncated toeplitz matrix of sck with shape of [N, M, T]
         b is bn with all N, with shape of [N, T]
         """
-    maxiter = 500
+    maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.clone(), x.clone(), x.clone()
     coef = Tsck_t@Tsck_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
 
     loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
     for i in range(maxiter):
-        d_til = d + Mw*(d - d_old)  # shape of [M]
+        d_til = d + correction*Mw*(d - d_old)  # shape of [M]
         nu = d_til - (coef@d_til - term).sum(0) * Md_inv  # shape of [M]
         if torch.norm(nu) <= 1:
             d_new = nu
@@ -106,7 +106,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         torch.cuda.empty_cache()
         loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         if (d - d_old).norm() / d_old.norm() < 1e-4: break
-    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d
 
 
@@ -123,7 +123,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     :param k0: the current index of for loop of K0
     :return: dck0
     """
-    maxiter = 500
+    maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
     d_old, d = x.clone(), x.clone()
     coef = Tsck0_t@Tsck0_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck0_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
