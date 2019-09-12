@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 tt = datetime.datetime.now
-torch.set_default_dtype(torch.double)
+# torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=180)
 torch.set_printoptions(linewidth=180)
 torch.manual_seed(1)
