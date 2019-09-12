@@ -233,7 +233,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     sc_til = sc.clone()  # shape of [N, K, T]
     # sc_old = sc.clone(); marker = 0
 
-    loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -245,7 +245,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
-        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
         torch.cuda.empty_cache()
     # print('M max', M.max())
     # if marker == 1 :
@@ -303,14 +303,14 @@ def solv_wc(x, snc, yc, Mw):
     M_old = M.clone()
     # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
 
-    loss = torch.cat((torch.tensor([], device=x.device), loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
     for i in range(maxiter):
         wc_til = wc + correction*Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
         exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
-        loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
+        # loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
         if torch.norm(wc - wc_old)/wc.norm() < 1e-4: break
         torch.cuda.empty_cache()
     # ll = loss[:-1] - loss[1:]
