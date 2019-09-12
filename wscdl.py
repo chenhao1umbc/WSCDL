@@ -5,9 +5,9 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-opts = OPT(maxiter=100)
-opts.lamb = 1  # for sparsity penalty
-opts.eta = 1  # for label penalty
+opts = OPT()
+opts.lamb = 0.1  # for sparsity penalty
+opts.eta = 10  # for label penalty
 opts.mu = 1  # for low rank penalty
 X, Y, ft = load_toy(opts)
 D, D0, S, S0, W = init(X, opts)
@@ -43,7 +43,7 @@ for i in range(opts.maxiter):
     # print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
     # print('loss function value is %3.4e:' %loss[-1])
 
-    if i > 10 and abs((loss[-1]-loss[-2])/loss[-2]) < 1e-6 : break
+    if i > 10 and abs((loss[-1]-loss[-2])/loss[-2]) < 1e-4 : break
     print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
 
 # ll = loss[:-1]-loss[1:]
@@ -52,4 +52,4 @@ print('After %1.0f epochs, the loss function value is %3.4e:' %(i, loss[-1]))
 print('All done, the total running time is :%3.2f \n' % (time.time() -t))
 torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
-plot_result(X, Y, D, D0, S, S0, W, ft,loss, opts)
+plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts)

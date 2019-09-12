@@ -11,9 +11,10 @@ tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=180)
 torch.set_printoptions(linewidth=180)
-torch.manual_seed(1)
-torch.cuda.manual_seed(1)
-torch.cuda.manual_seed_all(1)
+seed = 1
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
 torch.backends.cudnn.deterministic = True
 
 
@@ -23,7 +24,7 @@ class OPT:
     lamb is the coeff of sparsity
      nu is the coeff of cross-entropy loss
      """
-    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500):
+    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=100):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot = maxiter, False
@@ -55,7 +56,7 @@ def init(X, opts):
     ind = list(range(N))
     np.random.shuffle(ind)
     D = znorm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
-    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev))
+    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev))*0.0
     S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.rand(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K, device=opts.dev)
@@ -694,7 +695,7 @@ def load_toy(opts):
     '''Generate toy data'''
     T = 1200
     x = torch.arange(30).float()  # x.sin() only works for float32...
-    featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
+    featurec = torch.sin(x*2*np.pi/30)*0.0  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
     feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
     feature3 = torch.zeros(30).float()
