@@ -22,10 +22,10 @@ for i in range(opts.maxiter):
     # print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
     # print('loss function value is %3.4e:' %loss[-1])
 
-    D0 = updateD0([D, D0, S, S0], X, Y, opts)
-    # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-    # print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
-    # print('loss function value is %3.4e:' %loss[-1])
+    # D0 = updateD0([D, D0, S, S0], X, Y, opts)
+    # # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+    # # print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
+    # # print('loss function value is %3.4e:' %loss[-1])
 
     S = updateS([D, D0, S, S0, W], X, Y, opts)
     # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
@@ -43,7 +43,7 @@ for i in range(opts.maxiter):
     # print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
     # print('loss function value is %3.4e:' %loss[-1])
 
-    if i > 10 and abs((loss[-1]-loss[-6])/loss[i-5]) < 1e-6 : break
+    if i > 10 and abs((loss[-1]-loss[-6])/loss[-6]) < 1e-6 : break
     print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
 
 # ll = loss[:-1]-loss[1:]
