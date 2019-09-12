@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wscdl.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="39">
-              <caret line="14" column="74" lean-forward="true" selection-start-line="14" selection-start-column="74" selection-end-line="14" selection-end-column="74" />
+            <state relative-caret-position="312">
+              <caret line="27" column="56" lean-forward="true" selection-start-line="27" selection-start-column="56" selection-end-line="27" selection-end-column="56" />
             </state>
           </provider>
         </entry>
@@ -206,8 +206,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="235" y="58" width="1458" height="937" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" anchor="bottom" x="515" y="236" width="1367" height="756" id="Debug" order="0" type="WINDOWED" visible="true" weight="0.3995381" />
+      <window_info active="true" anchor="bottom" x="710" y="140" width="1367" height="756" id="Debug" order="0" type="WINDOWED" visible="true" weight="0.3995381" />
       <window_info anchor="bottom" content_ui="combo" id="Project" order="1" weight="0.24942264" />
       <window_info anchor="bottom" id="Version Control" order="2" show_stripe_button="false" weight="0.3290993" />
       <window_info anchor="bottom" id="Terminal" order="3" show_stripe_button="false" weight="0.3290993" />
@@ -286,8 +287,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/wscdl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39">
-          <caret line="14" column="74" lean-forward="true" selection-start-line="14" selection-start-column="74" selection-end-line="14" selection-end-column="74" />
+        <state relative-caret-position="312">
+          <caret line="27" column="56" lean-forward="true" selection-start-line="27" selection-start-column="56" selection-end-line="27" selection-end-column="56" />
         </state>
       </provider>
     </entry>
