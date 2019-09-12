@@ -106,7 +106,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         torch.cuda.empty_cache()
         loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         if (d - d_old).norm() / d_old.norm() < 1e-4: break
-    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d
 
 
@@ -124,14 +124,13 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     :return: dck0
     """
     maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
-    d_old, d = x.clone(), x.clone()
+    d_til, d_old, d = x.clone(), x.clone(), x.clone()
     coef = Tsck0_t@Tsck0_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck0_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
-    # print('before bpgm loop loss D0 in solve_d0 is %3.2e:' % loss_D0(Tsck0_t, d, b, D0, mu))
 
     loss = torch.cat((torch.tensor([], device=x.device), loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     for i in range(maxiter):
-        d_til = d + Mw*(d - d_old)  # Mw is just a number for calc purpose
+        d_til = d + correction*Mw*(d - d_old)  # shape of [M],  Mw is just a number for calc purpose
         nu = d_til - (coef@d_til - term).sum(0) * Minv  # shape of [M]
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
@@ -140,6 +139,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
         loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d
 
 
@@ -221,7 +221,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     T = b.shape[1]
     P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
     # 'skc update will lead sc change'
-    sck = sc[:, k, :]  # shape of [N, T]
+    sck = sc[:, k, :].clone()  # shape of [N, T]
     sck_old = sck.clone()
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
@@ -257,6 +257,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     # if (loss[0] - loss[-1]) < 0 :
     #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
+    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return sck
 
 
@@ -294,8 +295,8 @@ def solv_wc(x, snc, yc, Mw):
     :param Mw: real number, is delta
     :return: wc
     """
-    maxiter = 500
-    wc_old, wc = x.clone(), x.clone()
+    maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
+    wc_old, wc, wc_til = x.clone(), x.clone(), x.clone()
     pt_snc = snc.mean(2)  # shape of [N, K]
     abs_pt_snc = abs(pt_snc)  # shape of [N, K]
     const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K, N]
@@ -306,7 +307,7 @@ def solv_wc(x, snc, yc, Mw):
 
     loss = torch.tensor([], device=x.device)
     for i in range(maxiter):
-        wc_til = wc + Mw*(wc - wc_old)  # Mw is just a number for calc purpose
+        wc_til = wc + correction*Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
         exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
@@ -317,6 +318,7 @@ def solv_wc(x, snc, yc, Mw):
         torch.cuda.empty_cache()
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return wc
 
 
@@ -650,11 +652,13 @@ def loss_W(S, W, Y):
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1/ (1+ exp_PtSnW)
-    # loss = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # 1e-38 for robustness
+    # loss0 = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # the same as below
+    loss = (-1 * (1 - Y) * (exp_PtSnW + 1e-38).log() + (exp_PtSnW + 1).log()).sum()
 
+    # loss = (-1 * (1 - Y) * PtSnW + (exp_PtSnW + 1).log()).sum()
     # this one is not stable due inf by setting the threshold 1e38, which means
     # if PtSnW = 40, then exp_PtSnW = inf, but set to exp_PtSnW = 1e38, log(exp_PtSnW) = 38, not 40
-    loss = (-1 *(1-Y)*(exp_PtSnW+ 1e-38).log() + (exp_PtSnW+1).log()).sum()
+
     return loss
 
 
