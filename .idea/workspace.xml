@@ -27,8 +27,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/beta.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="15" column="21" lean-forward="true" selection-start-line="15" selection-start-column="21" selection-end-line="15" selection-end-column="21" />
+            <state relative-caret-position="567">
+              <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -36,8 +36,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="629">
-              <caret line="178" selection-start-line="178" selection-end-line="178" />
+            <state relative-caret-position="608">
+              <caret line="207" column="31" lean-forward="true" selection-start-line="207" selection-start-column="31" selection-end-line="207" selection-end-column="31" />
               <folding>
                 <element signature="e#71#80#0" expanded="true" />
               </folding>
@@ -67,8 +67,8 @@
       <find>correction</find>
       <find>plt.figure();</find>
       <find>loss =</find>
-      <find>1e-4</find>
       <find>znorm</find>
+      <find>1e-4</find>
     </findStrings>
     <replaceStrings>
       <replace>1e-4</replace>
@@ -87,8 +87,8 @@
         <option value="$PROJECT_DIR$/demo.py" />
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/wscdl.py" />
-        <option value="$PROJECT_DIR$/beta.py" />
         <option value="$PROJECT_DIR$/utils.py" />
+        <option value="$PROJECT_DIR$/beta.py" />
       </list>
     </option>
   </component>
@@ -131,7 +131,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.beta">
+  <component name="RunManager" selected="Python.utils">
     <configuration name="beta" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -157,9 +157,6 @@
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -197,11 +194,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.utils" />
+        <item itemvalue="Python.utils" />
         <item itemvalue="Python.beta" />
+        <item itemvalue="Python.utils" />
         <item itemvalue="Python.wscdl" />
-        <item itemvalue="Python.utils" />
-        <item itemvalue="Python.utils" />
-        <item itemvalue="Python.utils" />
       </list>
     </recent_temporary>
   </component>
@@ -233,8 +230,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="190" y="56" width="1458" height="938" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" anchor="bottom" x="549" y="201" width="1367" height="756" id="Debug" order="0" type="WINDOWED" visible="true" weight="0.3995381" />
+      <window_info anchor="bottom" x="389" y="131" width="1367" height="756" id="Debug" order="0" type="WINDOWED" weight="0.3995381" />
       <window_info anchor="bottom" content_ui="combo" id="Project" order="1" weight="0.24942264" />
       <window_info anchor="bottom" id="Version Control" order="2" show_stripe_button="false" weight="0.3290993" />
       <window_info anchor="bottom" id="Terminal" order="3" show_stripe_button="false" weight="0.3290993" />
@@ -286,22 +284,6 @@
       </map>
     </option>
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/beta.py</url>
-          <line>33</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils.py</url>
-          <line>178</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="editorHistoryManager">
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -340,15 +322,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/beta.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="15" column="21" lean-forward="true" selection-start-line="15" selection-start-column="21" selection-end-line="15" selection-end-column="21" />
+        <state relative-caret-position="567">
+          <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="178" selection-start-line="178" selection-end-line="178" />
+        <state relative-caret-position="608">
+          <caret line="207" column="31" lean-forward="true" selection-start-line="207" selection-start-column="31" selection-end-line="207" selection-end-column="31" />
           <folding>
             <element signature="e#71#80#0" expanded="true" />
           </folding>

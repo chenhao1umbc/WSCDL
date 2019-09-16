@@ -6,9 +6,9 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1,3"
 opts = OPT()
-opts.lamb = 0.1 # for sparsity penalty
-opts.eta = 10 # for label penalty
-opts.mu = 1  # for low rank penalty
+opts.lamb = 1  # for sparsity penalty
+opts.eta = 10  # for label penalty
+opts.mu = 100  # for low rank penalty
 
 # training section
 X, Y, ft = load_toy(opts)
@@ -30,5 +30,4 @@ else:
 print('the test data accuracy is : ', acc)
 plot_result(X_test, Y_test, D, D0, S, S0, W, ft, loss, opts)
 plt.show()
-
 print('done')
