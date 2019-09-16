@@ -34,7 +34,7 @@ print('All done, the total running time is :%3.2f \n' % (time.time() -t))
 # testing section
 X_test, Y_test, ft = load_toy(opts)
 _, _, S, S0, _ = init(X, opts)
-acc, y_hat = test_wscdl(D, D0, S, S0, W, X_test, Y_test, opts)
+acc, y_hat = test(D, D0, S, S0, W, X_test, Y_test, opts)
 print('the test data accuracy is : ', acc)
 plot_result(X_test, Y_test, D, D0, S, S0, W, ft, loss, opts)
 plt.show()
