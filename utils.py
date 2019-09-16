@@ -1124,3 +1124,67 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('Reconstructed labels')
     plt.ylabel('Training example index')
     plt.xlabel('Label index')
+
+
+def test_wscdl(D, D0, S, S0, W, X, Y, opts):
+    """
+    This function is made to see the test accuracy by checking the reconstrunction label
+    :param D: The pre-trained D, shape of [C, K, M]
+    :param D0: pre-trained D0,  shape of [C0, K0, M]
+    :param S: initial value, shape of [N,C,K,T]
+    :param S0: initial value, shape of [N,K0,T]
+    :param W: The pre-trained projection, shape of [C, K]
+    :param X: testing data, shape of [N, T]
+    :param Y: testing Lable, ground truth, shape of [N, C]
+    :param opts: options of hyper-parameters
+    :return: acc, Y_hat
+    """
+    loss = torch.tensor([], device=opts.dev)
+    for i in range(opts.maxiter):
+        t0 = time.time()
+        S = updateS([D, D0, S, S0, W], X, Y, opts)
+        S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        print('In the %1.0f epoch, the sparse coding time is :%3.2f' % (i, time.time() - t0))
+        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 1e-4: break
+    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    y_hat = 1 / (1 + exp_PtSnW)
+    y_hat[y_hat > 0.5] = 1
+    y_hat[y_hat < 0.5] = 0
+    label_diff = Y - y_hat
+    acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
+    return acc, 1/(1+exp_PtSnW)
+
+
+def train_wscdl(D, D0, S, S0, W, X, Y, opts):
+    """
+    This function is the main training body of the algorithm
+    :param D: The pre-trained D, shape of [C, K, M]
+    :param D0: pre-trained D0,  shape of [C0, K0, M]
+    :param S: initial value, shape of [N,C,K,T]
+    :param S0: initial value, shape of [N,K0,T]
+    :param W: The pre-trained projection, shape of [C, K]
+    :param X: testing data, shape of [N, T]
+    :param Y: testing Lable, ground truth, shape of [N, C]
+    :param opts: options of hyper-parameters
+    :return: acc, Y_hat
+    """
+    loss = torch.tensor([], device=opts.dev)
+    loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+    print('The initial loss function value is %3.4e:' % loss[-1])
+    t = time.time()
+    for i in range(opts.maxiter):
+        t0 = time.time()
+        D = updateD([D, D0, S, S0, W], X, Y, opts)
+        D0 = updateD0([D, D0, S, S0], X, Y, opts)
+        S = updateS([D, D0, S, S0, W], X, Y, opts)
+        S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        W = updateW([S, W], Y, opts)
+        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 1e-4: break
+        print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
+
+    print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
+    print('All done, the total running time is :%3.2f \n' % (time.time() - t))
+    return D, D0, S, S0, W
