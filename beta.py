@@ -6,33 +6,29 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1,3"
 opts = OPT()
-opts.lamb = 0.01  # for sparsity penalty
-opts.eta = 1 # for label penalty
+opts.lamb = 0.1 # for sparsity penalty
+opts.eta = 10 # for label penalty
 opts.mu = 1  # for low rank penalty
-opts.save_results = False  # for low rank penalty
 
 # training section
-for opts.lamb in [2**i for i in range(0, 4)]:
-    X, Y, ft = load_toy(opts)
-    D, D0, S, S0, W = init(X, opts)
-    if opts.show_details:
-        D, D0, S, S0, W, loss = train_details(D, D0, S, S0, W, X, Y, opts)
-    else:
-        D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
-    if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
-    # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
-    plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts)
-    plt.show()
+X, Y, ft = load_toy(opts)
+D, D0, S, S0, W = init(X, opts)
+if opts.show_details:
+    D, D0, S, S0, W, loss = train_details(D, D0, S, S0, W, X, Y, opts)
+else:
+    D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
+if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
+# D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
-
-    # testing section
-    X_test, Y_test, _ = load_toy(opts)
-    _, _, S, S0, _ = init(X_test, opts)
-    if opts.show_details:
-        acc, y_hat = test_details(D, D0, S, S0, W, X_test, Y_test, opts)
-    else:
-        acc, y_hat = test(D, D0, S, S0, W, X_test, Y_test, opts)
-    print('the test data accuracy is : ', acc)
-    # plot_result(X_test, Y_test, D, D0, S, S0, W, ft, loss, opts)
+# testing section
+X_test, Y_test, _ = load_toy(opts)
+_, _, S, S0, _ = init(X_test, opts)
+if opts.show_details:
+    acc, y_hat = test_details(D, D0, S, S0, W, X_test, Y_test, opts)
+else:
+    acc, y_hat = test(D, D0, S, S0, W, X_test, Y_test, opts)
+print('the test data accuracy is : ', acc)
+plot_result(X_test, Y_test, D, D0, S, S0, W, ft, loss, opts)
+plt.show()
 
 print('done')

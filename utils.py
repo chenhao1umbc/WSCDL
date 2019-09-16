@@ -11,7 +11,7 @@ tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=180)
 torch.set_printoptions(linewidth=180)
-seed = 200
+seed = 0
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
@@ -56,7 +56,7 @@ def init(X, opts):
     ind = list(range(N))
     np.random.shuffle(ind)
     D = znorm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
-    D0 = 0.0 * znorm(torch.rand(opts.K0, opts.M, device=opts.dev))
+    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev))
     S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.rand(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K, device=opts.dev)
@@ -140,7 +140,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
         nu = d_til - (coef@d_til - term).sum(0) * Minv  # shape of [M]
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if (d - d_old).norm()/d_old.norm() < 1e-4:break
+        if (d - d_old).norm()/d_old.norm() < 1e-3:break
         torch.cuda.empty_cache()
         # loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     # ll = loss[:-1] - loss[1:]
@@ -175,7 +175,8 @@ def argmin_lowrank(M, nu, mu, D0, k0):
         Z_minus_D0 = Z- D0
         Y = Y + rho*Z_minus_D0
         cr = torch.cat((cr, Z_minus_D0.norm().reshape(1)))
-        if i>10 and abs(cr[i] - cr[i-1])/cr[i-1] < 1e-4: break
+        if i>10 and abs(cr[-1] - cr[-2])/cr[i-1] < 5e-4: break
+        if cr[-1] <1e-6 : break
     return dk0
 
 
@@ -695,7 +696,7 @@ def load_toy(opts):
     '''Generate toy data'''
     T = 1200
     x = torch.arange(30).float()  # x.sin() only works for float32...
-    featurec = 0.0 * torch.sin(x*2*np.pi/30)  # '''The common features'''
+    featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
     feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
     feature3 = torch.zeros(30).float()
@@ -1254,10 +1255,10 @@ def train_details(D, D0, S, S0, W, X, Y, opts):
         # print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
         # print('loss function value is %3.4e:' %loss[-1])
 
-        # D0 = updateD0([D, D0, S, S0], X, Y, opts)
-        # # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        # # print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
-        # # print('loss function value is %3.4e:' %loss[-1])
+        D0 = updateD0([D, D0, S, S0], X, Y, opts)
+        # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        # print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
+        # print('loss function value is %3.4e:' %loss[-1])
 
         S = updateS([D, D0, S, S0, W], X, Y, opts)
         # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
