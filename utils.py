@@ -28,7 +28,7 @@ class OPT:
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot = maxiter, False
-        self.dataset = 0
+        self.dataset, self.show_details, self.save_results = 0, True, True
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -56,7 +56,7 @@ def init(X, opts):
     ind = list(range(N))
     np.random.shuffle(ind)
     D = znorm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
-    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev))*0.0
+    D0 = 0.0 * znorm(torch.rand(opts.K0, opts.M, device=opts.dev))
     S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.rand(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K, device=opts.dev)
@@ -671,7 +671,7 @@ def znorm(x):
     :param x: input tensor with shape of [N, ?...?, T]
     :return: x_z
     """
-    x_z = (x-x.mean(-1).unsqueeze(-1))/x.var(-1).sqrt().unsqueeze(-1)
+    x_z = (x-x.mean(-1).unsqueeze(-1))/(x.var(-1)+1e-38).sqrt().unsqueeze(-1)
     return x_z
 
 
@@ -695,7 +695,7 @@ def load_toy(opts):
     '''Generate toy data'''
     T = 1200
     x = torch.arange(30).float()  # x.sin() only works for float32...
-    featurec = torch.sin(x*2*np.pi/30)*0.0  # '''The common features'''
+    featurec = 0.0 * torch.sin(x*2*np.pi/30)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
     feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
     feature3 = torch.zeros(30).float()
@@ -955,7 +955,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point + gap[i]: end_point] = current_feature
             start_point = end_point
-
+    # generate labels
     Y = torch.zeros(750, 4)
     for i in range(4):
         current_label = torch.tensor([1, 0, 0, 0]).float()
@@ -974,11 +974,12 @@ def load_toy(opts):
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[i * 50: (i + 1) * 50] = current_label
 
+    X = X[:, :T]  #truncation step
     # # z-norm, the standardization, 0-mean, var-1
-    # X = znorm(X)
+    X = znorm(X)
     # unit norm, norm(x) = 1
-    X = X/(X**2).sum(-1).sqrt().unsqueeze(-1)
-    return X[:, :T].to(opts.dev), Y.to(opts.dev), [featurec, feature1, feature2, feature3, feature4]
+    # X = X/(X**2).sum(-1).sqrt().unsqueeze(-1)
+    return X.to(opts.dev), Y.to(opts.dev), [featurec, feature1, feature2, feature3, feature4]
 
 
 def loss_fun(X, Y, D, D0, S, S0, W, opts):
