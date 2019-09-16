@@ -18,20 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/wscdl.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="691">
-              <caret line="39" selection-start-line="39" selection-end-line="39" selection-end-column="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/utils.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="397">
-              <caret line="1196" column="15" lean-forward="true" selection-start-line="1196" selection-start-column="15" selection-end-line="1196" selection-end-column="26" />
-              <folding>
-                <element signature="e#71#80#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="166">
+              <caret line="11" column="17" lean-forward="true" selection-start-line="11" selection-start-column="17" selection-end-line="11" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -39,8 +27,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/beta.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="24" column="10" lean-forward="true" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
+            <state relative-caret-position="126">
+              <caret line="6" column="10" lean-forward="true" selection-start-line="6" selection-start-column="10" selection-end-line="6" selection-end-column="10" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="189">
+              <caret line="9" column="26" lean-forward="true" selection-start-line="9" selection-start-column="26" selection-end-line="9" selection-end-column="26" />
+              <folding>
+                <element signature="e#71#80#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -68,6 +68,7 @@
       <find>plt.figure();</find>
       <find>loss =</find>
       <find>1e-4</find>
+      <find>znorm</find>
     </findStrings>
     <replaceStrings>
       <replace>1e-4</replace>
@@ -234,7 +235,7 @@
     <frame x="116" y="101" width="1458" height="938" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" anchor="bottom" x="418" y="200" width="1367" height="756" id="Debug" order="0" type="WINDOWED" visible="true" weight="0.3995381" />
+      <window_info active="true" anchor="bottom" x="314" y="123" width="1367" height="756" id="Debug" order="0" type="WINDOWED" visible="true" weight="0.3995381" />
       <window_info anchor="bottom" content_ui="combo" id="Project" order="1" weight="0.24942264" />
       <window_info anchor="bottom" id="Version Control" order="2" show_stripe_button="false" weight="0.3290993" />
       <window_info anchor="bottom" id="Terminal" order="3" show_stripe_button="false" weight="0.3290993" />
@@ -286,6 +287,17 @@
       </map>
     </option>
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/beta.py</url>
+          <line>24</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="editorHistoryManager">
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -308,24 +320,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/HCenv/lib/python3.7/site-packages/matplotlib/backends/backend_qt5.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="406">
+          <caret line="297" column="13" lean-forward="true" selection-start-line="297" selection-start-column="13" selection-end-line="297" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/wscdl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="691">
-          <caret line="39" selection-start-line="39" selection-end-line="39" selection-end-column="10" />
+        <state relative-caret-position="166">
+          <caret line="11" column="17" lean-forward="true" selection-start-line="11" selection-start-column="17" selection-end-line="11" selection-end-column="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/beta.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="24" column="10" lean-forward="true" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
+        <state relative-caret-position="126">
+          <caret line="6" column="10" lean-forward="true" selection-start-line="6" selection-start-column="10" selection-end-line="6" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="397">
-          <caret line="1196" column="15" lean-forward="true" selection-start-line="1196" selection-start-column="15" selection-end-line="1196" selection-end-column="26" />
+        <state relative-caret-position="189">
+          <caret line="9" column="26" lean-forward="true" selection-start-line="9" selection-start-column="26" selection-end-line="9" selection-end-column="26" />
           <folding>
             <element signature="e#71#80#0" expanded="true" />
           </folding>

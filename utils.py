@@ -24,7 +24,7 @@ class OPT:
     lamb is the coeff of sparsity
      nu is the coeff of cross-entropy loss
      """
-    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=100):
+    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=200):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot = maxiter, False
@@ -974,6 +974,10 @@ def load_toy(opts):
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[i * 50: (i + 1) * 50] = current_label
 
+    # # z-norm, the standardization, 0-mean, var-1
+    # X = znorm(X)
+    # unit norm, norm(x) = 1
+    X = X/(X**2).sum(-1).sqrt().unsqueeze(-1)
     return X[:, :T].to(opts.dev), Y.to(opts.dev), [featurec, feature1, feature2, feature3, feature4]
 
 
