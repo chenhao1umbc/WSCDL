@@ -1105,7 +1105,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.grid()
     plt.figure()
     plt.plot(D0.squeeze().cpu().numpy())
-    plt.plot(ft[0] / ft[0].norm(), '-x')
+    plt.plot(ft[0] / (ft[0].norm()+1e-38), '-x')
     plt.title('commom component')
     plt.legend(['Learned feature', 'Ground true'])
     plt.xlabel('Time index')
@@ -1131,37 +1131,6 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
 
 
 def test(D, D0, S, S0, W, X, Y, opts):
-    """
-    This function is made to see the test accuracy by checking the reconstrunction label
-    :param D: The pre-trained D, shape of [C, K, M]
-    :param D0: pre-trained D0,  shape of [C0, K0, M]
-    :param S: initial value, shape of [N,C,K,T]
-    :param S0: initial value, shape of [N,K0,T]
-    :param W: The pre-trained projection, shape of [C, K]
-    :param X: testing data, shape of [N, T]
-    :param Y: testing Lable, ground truth, shape of [N, C]
-    :param opts: options of hyper-parameters
-    :return: acc, Y_hat
-    """
-    loss = torch.tensor([], device=opts.dev)
-    for i in range(opts.maxiter):
-        t0 = time.time()
-        S = updateS([D, D0, S, S0, W], X, Y, opts)
-        S0 = updateS0([D, D0, S, S0], X, Y, opts)
-        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        print('In the %1.0f epoch, the sparse coding time is :%3.2f' % (i, time.time() - t0))
-        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 1e-4: break
-    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
-    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
-    y_hat = 1 / (1 + exp_PtSnW)
-    y_hat[y_hat > 0.5] = 1
-    y_hat[y_hat < 0.5] = 0
-    label_diff = Y - y_hat
-    acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
-    return acc, 1/(1+exp_PtSnW)
-
-
-def test_details(D, D0, S, S0, W, X, Y, opts):
     """
     This function is made to see the test accuracy by checking the reconstrunction label
     :param D: The pre-trained D, shape of [C, K, M]
@@ -1225,9 +1194,44 @@ def train(D, D0, S, S0, W, X, Y, opts):
     return D, D0, S, S0, W, loss
 
 
+def test_details(D, D0, S, S0, W, X, Y, opts):
+    """
+    This function is made to see the test accuracy by checking the reconstrunction label, with details
+    :param D: The pre-trained D, shape of [C, K, M]
+    :param D0: pre-trained D0,  shape of [C0, K0, M]
+    :param S: initial value, shape of [N,C,K,T]
+    :param S0: initial value, shape of [N,K0,T]
+    :param W: The pre-trained projection, shape of [C, K]
+    :param X: testing data, shape of [N, T]
+    :param Y: testing Lable, ground truth, shape of [N, C]
+    :param opts: options of hyper-parameters
+    :return: acc, Y_hat
+    """
+    loss = torch.tensor([], device=opts.dev)
+    loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+    print('The initial loss function value is %3.4e:' % loss[-1])
+    for i in range(opts.maxiter):
+        t0 = time.time()
+        S = updateS([D, D0, S, S0, W], X, Y, opts)
+        S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
+        print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'
+              % (i, time.time() - t0, loss[-1]))
+        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 1e-4: break
+    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    y_hat = 1 / (1 + exp_PtSnW)
+    y_hat[y_hat > 0.5] = 1
+    y_hat[y_hat < 0.5] = 0
+    label_diff = Y - y_hat
+    acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
+    return acc, 1/(1+exp_PtSnW)
+
+
 def train_details(D, D0, S, S0, W, X, Y, opts):
     """
-    This function is the main training body of the algorithm
+    This function is the main training body of the algorithm, with showing a lot of details
     :param D: initial value, D, shape of [C, K, M]
     :param D0: pre-trained D0,  shape of [C0, K0, M]
     :param S: initial value, shape of [N,C,K,T]
@@ -1278,5 +1282,5 @@ def train_details(D, D0, S, S0, W, X, Y, opts):
     return D, D0, S, S0, W, loss
 
 
-def save_results():
+def save_results(D, D0, S, S0, W, opts, loss):
     torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
