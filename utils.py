@@ -11,7 +11,7 @@ tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=180)
 torch.set_printoptions(linewidth=180)
-seed = 0
+seed = 100
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
@@ -56,9 +56,9 @@ def init(X, opts):
     ind = list(range(N))
     np.random.shuffle(ind)
     D = znorm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
-    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev))
+    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev)) *0
     S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
-    S0 = torch.rand(N, opts.K0, T, device=opts.dev)
+    S0 = torch.rand(N, opts.K0, T, device=opts.dev) * 0
     W = torch.ones(opts.C, opts.K, device=opts.dev)
     return D, D0, S, S0, W
 
@@ -696,7 +696,7 @@ def load_toy(opts):
     '''Generate toy data'''
     T = 1200
     x = torch.arange(30).float()  # x.sin() only works for float32...
-    featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
+    featurec = torch.sin(x*2*np.pi/30) *0.0 # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
     feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
     feature3 = torch.zeros(30).float()
@@ -1152,7 +1152,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
         S0 = updateS0([D, D0, S, S0], X, Y, opts)
         loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
         print('In the %1.0f epoch, the sparse coding time is :%3.2f' % (i, time.time() - t0))
-        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 1e-4: break
+        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     y_hat = 1 / (1 + exp_PtSnW)
@@ -1187,7 +1187,7 @@ def test_details(D, D0, S, S0, W, X, Y, opts):
         print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
         print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'
               % (i, time.time() - t0, loss[-1]))
-        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 1e-4: break
+        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     y_hat = 1 / (1 + exp_PtSnW)
@@ -1255,7 +1255,7 @@ def train_details(D, D0, S, S0, W, X, Y, opts):
         # print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
         # print('loss function value is %3.4e:' %loss[-1])
 
-        D0 = updateD0([D, D0, S, S0], X, Y, opts)
+        # D0 = updateD0([D, D0, S, S0], X, Y, opts)
         # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
         # print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
         # print('loss function value is %3.4e:' %loss[-1])
@@ -1266,7 +1266,7 @@ def train_details(D, D0, S, S0, W, X, Y, opts):
         # print('loss function value is %3.4e:' %loss[-1])
         print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
 
-        S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        # S0 = updateS0([D, D0, S, S0], X, Y, opts)
         # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
         # print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
         # print('loss function value is %3.4e:' %loss[-1])
