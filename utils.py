@@ -53,13 +53,12 @@ def init(X, opts):
     :return: D, D0, S, S0, W
     """
     N, T = X.shape
-    ind = list(range(N))
-    np.random.shuffle(ind)
-    D = znorm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
-    D0 = znorm(torch.rand(opts.K0, opts.M, device=opts.dev)) *0
+    D = l2norm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
+    D0 = l2norm(torch.rand(opts.K0, opts.M, device=opts.dev))
     S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
-    S0 = torch.rand(N, opts.K0, T, device=opts.dev) * 0
+    S0 = torch.rand(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K, device=opts.dev)
+
     return D, D0, S, S0, W
 
 
@@ -676,6 +675,16 @@ def znorm(x):
     return x_z
 
 
+def l2norm(x):
+    """
+    This function will make the data with zero-mean, variance = 1 for the last dimension
+    :param x: input tensor with shape of [N, ?...?, T]
+    :return: x_z
+    """
+    x_z = x/(x*x).sum(-1).sqrt().unsqueeze(-1)
+    return x_z
+
+
 def load_data(opts=0):
     """
     :param opts:
@@ -977,7 +986,7 @@ def load_toy(opts):
 
     X = X[:, :T]  #truncation step
     # # z-norm, the standardization, 0-mean, var-1
-    X = znorm(X)
+    # X = znorm(X)
     # unit norm, norm(x) = 1
     # X = X/(X**2).sum(-1).sqrt().unsqueeze(-1)
     return X.to(opts.dev), Y.to(opts.dev), [featurec, feature1, feature2, feature3, feature4]
@@ -1099,6 +1108,40 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
+
+    # reconstruction of input signal
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    K , M = D.shape[1:]
+    T, M_2 =  S.shape[-1], int((M-1)/2)
+    for c in range(Y.shape[1]):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=D0.shape[0], padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    plt.figure()
+    plt.subplot(121)
+    plt.imshow((R + DconvS.sum(1)).cpu().numpy())
+    plt.title('Reconstrution of data')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+    plt.subplot(122)
+    plt.imshow(X.cpu().numpy())
+    plt.title('Training of data')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+
+    plt.figure()
+    plt.subplot(121)
+    plt.imshow((R + DconvS.sum(1))[100:200, 100:200].cpu().numpy())
+    plt.title('Reconstrution of data, zoomed-in')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+    plt.subplot(122)
+    plt.imshow(X[100:200, 100:200].cpu().numpy())
+    plt.title('Training of data, zoomed-in')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+
     plt.figure()
     plt.plot(loss.cpu().numpy(), '-x')
     plt.title('Loss function value')
@@ -1247,40 +1290,41 @@ def train_details(D, D0, S, S0, W, X, Y, opts):
     loss = torch.tensor([], device=opts.dev)
     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
-    t = time.time()
+    t, t1 = time.time(), time.time()
     for i in range(opts.maxiter):
         t0 = time.time()
         D = updateD([D, D0, S, S0, W], X, Y, opts)
-        # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        # print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
-        # print('loss function value is %3.4e:' %loss[-1])
+        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
+        print('loss function value is %3.4e:' %loss[-1])
 
         D0 = updateD0([D, D0, S, S0], X, Y, opts)
-        # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        # print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
-        # print('loss function value is %3.4e:' %loss[-1])
+        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
+        print('loss function value is %3.4e:' %loss[-1])
 
         S = updateS([D, D0, S, S0, W], X, Y, opts)
-        # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        # print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
-        # print('loss function value is %3.4e:' %loss[-1])
+        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
+        print('loss function value is %3.4e:' %loss[-1])
         print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
 
         S0 = updateS0([D, D0, S, S0], X, Y, opts)
-        # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        # print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
-        # print('loss function value is %3.4e:' %loss[-1])
+        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
+        print('loss function value is %3.4e:' %loss[-1])
+        print('check sparsity, None-zero percentage is : %1.3f' % (1 - S0[S0 == 0].shape[0] / S0.numel()))
 
         W = updateW([S, W], Y, opts)
         loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        # print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
-        # print('loss function value is %3.4e:' %loss[-1])
+        print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
+        print('loss function value is %3.4e:' %loss[-1])
 
-        if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
+        if i > 10 and abs((loss[-1] - loss[-6]) / loss[-6]) < 5e-4: break
         print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
 
     print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
-    print('All done, the total running time is :%3.2f \n' % (time.time() - t))
+    print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
     return D, D0, S, S0, W, loss
 
 
