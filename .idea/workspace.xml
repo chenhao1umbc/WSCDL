@@ -24,20 +24,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/beta.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="651">
-              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" selection-end-column="64" />
+            <state relative-caret-position="420">
+              <caret line="20" column="5" lean-forward="true" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="502">
-              <caret line="1322" column="9" lean-forward="true" selection-start-line="1322" selection-start-column="9" selection-end-line="1322" selection-end-column="9" />
+            <state relative-caret-position="704">
+              <caret line="1145" column="31" lean-forward="true" selection-start-line="1145" selection-start-column="31" selection-end-line="1145" selection-end-column="31" />
               <folding>
                 <element signature="e#71#80#0" expanded="true" />
               </folding>
@@ -70,6 +70,7 @@
       <find>znorm</find>
       <find>1e-4</find>
       <find>M_2</find>
+      <find>reshape</find>
     </findStrings>
     <replaceStrings>
       <replace>1e-4</replace>
@@ -236,7 +237,7 @@
     <frame x="212" y="114" width="1458" height="938" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" anchor="bottom" x="472" y="92" width="1367" height="756" id="Debug" order="0" type="WINDOWED" visible="true" weight="0.3995381" />
+      <window_info anchor="bottom" x="472" y="92" width="1367" height="756" id="Debug" order="0" type="WINDOWED" weight="0.3995381" />
       <window_info anchor="bottom" content_ui="combo" id="Project" order="1" weight="0.24942264" />
       <window_info anchor="bottom" id="Version Control" order="2" show_stripe_button="false" weight="0.3290993" />
       <window_info anchor="bottom" id="Terminal" order="3" show_stripe_button="false" weight="0.3290993" />
@@ -294,12 +295,12 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/beta.py</url>
           <line>32</line>
-          <option name="timeStamp" value="14" />
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/beta.py</url>
           <line>24</line>
-          <option name="timeStamp" value="17" />
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -340,20 +341,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils.py">
+    <entry file="file://$PROJECT_DIR$/beta.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="502">
-          <caret line="1322" column="9" lean-forward="true" selection-start-line="1322" selection-start-column="9" selection-end-line="1322" selection-end-column="9" />
-          <folding>
-            <element signature="e#71#80#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="420">
+          <caret line="20" column="5" lean-forward="true" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/beta.py">
+    <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="651">
-          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" selection-end-column="64" />
+        <state relative-caret-position="704">
+          <caret line="1145" column="31" lean-forward="true" selection-start-line="1145" selection-start-column="31" selection-end-line="1145" selection-end-column="31" />
+          <folding>
+            <element signature="e#71#80#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

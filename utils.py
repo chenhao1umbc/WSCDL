@@ -1118,6 +1118,33 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
         DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=D0.shape[0], padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+
+    plt.figure()
+    ss = S.clone().reshape(S.shape[0], -1)
+    plt.imshow(ss.abs().cpu().numpy(), aspect='auto')
+    plt.title('Absolute value of sparse coefficients')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+    ss[ss!=0] = 1
+    plt.figure()
+    plt.imshow(ss.cpu().numpy(), aspect='auto')
+    plt.title('None zeros of sparse coefficients')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+
+    plt.figure()
+    s0 = S0.clone().reshape(S0.shape[0], -1)
+    plt.imshow(s0.abs().cpu().numpy(), aspect='auto')
+    plt.title('Absolute value of sparse coefficients - common part')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+    s0[s0!=0] = 1
+    plt.figure()
+    plt.imshow(s0.cpu().numpy(), aspect='auto')
+    plt.title('None zeros of sparse coefficients - common part')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+
     plt.figure()
     plt.subplot(121)
     plt.imshow((R + DconvS.sum(1)).cpu().numpy())
