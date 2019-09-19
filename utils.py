@@ -1201,8 +1201,8 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('Reconstructed labels')
     plt.ylabel('Training example index')
     plt.xlabel('Label index')
-    # pickle.dump(ax, open('testplot.pkl', 'wb'))
-    # pickle.load(open('testplot.pkl', 'rb'))
+    # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)
+    # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up new figure
 
 
 def test(D, D0, S, S0, W, X, Y, opts):
