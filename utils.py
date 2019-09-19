@@ -7,6 +7,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=180)
@@ -1200,6 +1201,8 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('Reconstructed labels')
     plt.ylabel('Training example index')
     plt.xlabel('Label index')
+    # pickle.dump(ax, open('testplot.pkl', 'wb'))
+    # pickle.load(open('testplot.pkl', 'rb'))
 
 
 def test(D, D0, S, S0, W, X, Y, opts):
