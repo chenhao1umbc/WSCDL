@@ -28,7 +28,7 @@ class OPT:
     def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=200):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
-        self.maxiter, self.plot = maxiter, False
+        self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
         if torch.cuda.is_available():
             self.dev = 'cuda'
@@ -985,7 +985,7 @@ def load_toy(opts):
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[i * 50: (i + 1) * 50] = current_label
 
-    X = X[:, :T]  #truncation step
+    X = awgn(X[:, :T], opts.snr)  #truncation step & adding noise
     # # z-norm, the standardization, 0-mean, var-1
     # X = znorm(X)
     # unit norm, norm(x) = 1
@@ -1121,26 +1121,28 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=D0.shape[0], padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
     plt.figure()
+    plt.subplot(211)
     ss = S.clone().reshape(S.shape[0], -1)
     plt.imshow(ss.abs().cpu().numpy(), aspect='auto')
     plt.title('Absolute value of sparse coefficients')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     ss[ss!=0] = 1
-    plt.figure()
+    plt.subplot(212)
     plt.imshow(ss.cpu().numpy(), aspect='auto')
     plt.title('None zeros of sparse coefficients')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
 
     plt.figure()
+    plt.subplot(211)
     s0 = S0.clone().reshape(S0.shape[0], -1)
     plt.imshow(s0.abs().cpu().numpy(), aspect='auto')
     plt.title('Absolute value of sparse coefficients - common part')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     s0[s0!=0] = 1
-    plt.figure()
+    plt.subplot(212)
     plt.imshow(s0.cpu().numpy(), aspect='auto')
     plt.title('None zeros of sparse coefficients - common part')
     plt.xlabel('Time index')
@@ -1149,24 +1151,24 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.figure()
     plt.subplot(121)
     plt.imshow((R + DconvS.sum(1)).cpu().numpy())
-    plt.title('Reconstrution of data')
+    plt.title('Reconstruted data')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.subplot(122)
     plt.imshow(X.cpu().numpy())
-    plt.title('Training of data')
+    plt.title('Given data')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
 
     plt.figure()
     plt.subplot(121)
     plt.imshow((R + DconvS.sum(1))[100:200, 100:200].cpu().numpy())
-    plt.title('Reconstrution of data, zoomed-in')
+    plt.title('Reconstruted data, zoomed-in')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.subplot(122)
     plt.imshow(X[100:200, 100:200].cpu().numpy())
-    plt.title('Training of data, zoomed-in')
+    plt.title('Given data, zoomed-in')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
 
@@ -1176,6 +1178,14 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Epoch index')
     plt.ylabel('Magnitude')
     plt.grid()
+    if opts.show_details:
+        l = loss.clone()
+        l[:]= torch.log(torch.tensor(-1.0))
+        l[::5] = loss[::5]
+        plt.plot(l.cpu().numpy(), 'o')
+        plt.xlabel('Indexed when each variable is updated')
+        plt.legend(['Loss details', 'Loss after each epoch'])
+
     plt.figure()
     plt.plot(D0.squeeze().cpu().numpy())
     plt.plot(ft[0] / (ft[0].norm()+1e-38), '-x')
@@ -1202,7 +1212,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.ylabel('Training example index')
     plt.xlabel('Label index')
     # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)
-    # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up new figure
+    # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up in a new figure
 
 
 def test(D, D0, S, S0, W, X, Y, opts):
@@ -1360,3 +1370,16 @@ def train_details(D, D0, S, S0, W, X, Y, opts):
 
 def save_results(D, D0, S, S0, W, opts, loss):
     torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
+
+
+def awgn(x, snr):
+    """
+    This function is adding white guassian noise to the given signal
+    :param x: the given signal with shape of [N, T]
+    :param snr: a float number
+    :return:
+    """
+    variance = 10 ** (-snr / 10.0)
+    noise = torch.tensor(np.sqrt(variance) * np.random.normal(0, 1, x.shape), device=x.device)
+
+    return x+noise.to(x.dtype)
