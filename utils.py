@@ -12,11 +12,12 @@ tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=180)
 torch.set_printoptions(linewidth=180)
+torch.backends.cudnn.deterministic = True
 seed = 100
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
-torch.backends.cudnn.deterministic = True
+
 
 
 class OPT:
@@ -30,6 +31,7 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
+        self.seed = 100
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -974,16 +976,16 @@ def load_toy(opts):
         Y[i*50 : (i+1)*50] = current_label
     from itertools import combinations
     comb = list(combinations([0, 1, 2, 3], 2))  # this will give a list of tuples
-    for i in range(5, 11):
+    for i in range(4, 10):
         current_label = torch.zeros(4)
         current_label[list(comb[i-5])] = 1.0  # make tuple into list for indexing
         Y[i*50 : (i+1)*50] = current_label
-    for i in range(11, 15):
+    for i in range(10, 14):
         current_label = torch.tensor([1, 1, 1, 0]).float()
         current_label = torch.cat((current_label[-(i - 11):], current_label[:-(i - 11)]))
         Y[i*50 : (i+1)*50] = current_label
     current_label = torch.tensor([1, 1, 1, 1]).float()
-    Y[i * 50: (i + 1) * 50] = current_label
+    Y[(i+1) * 50: (i + 2) * 50] = current_label
 
     X = awgn(X[:, :T], opts.snr)  #truncation step & adding noise
     # # z-norm, the standardization, 0-mean, var-1
