@@ -10,7 +10,6 @@ opts.snr = 100
 opts.lamb = 5 # for sparsity penalty
 opts.eta = 10  # for label penalty
 opts.mu = 1  # for low rank penalty
-opts.show_details = False
 
 # training section
 X, Y, ft = load_toy(opts)
@@ -31,5 +30,5 @@ if opts.show_details:  # default True
 else:
     acc, y_hat = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('The test data accuracy is : ', acc)
-plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft, loss, opts)
+plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss, opts=opts)
 print('done')
