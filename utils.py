@@ -674,7 +674,9 @@ def znorm(x):
     :param x: input tensor with shape of [N, ?...?, T]
     :return: x_z
     """
-    x_z = (x-x.mean(-1).unsqueeze(-1))/(x.var(-1)+1e-38).sqrt().unsqueeze(-1)
+    x_z = (x-x.mean())/(x.var(-1)+1e-38).sqrt().unsqueeze(-1)
+    # x_z = (x-x.mean(-1).unsqueeze(-1))/(x.var(-1)+1e-38).sqrt().unsqueeze(-1)
+    # x_z = (x - x.mean()) / x.var().sqrt()
     return x_z
 
 
@@ -989,7 +991,7 @@ def load_toy(opts):
 
     X = awgn(X[:, :T], opts.snr)  #truncation step & adding noise
     # # z-norm, the standardization, 0-mean, var-1
-    # X = znorm(X)
+    X = znorm(X)
     # unit norm, norm(x) = 1
     # X = X/(X**2).sum(-1).sqrt().unsqueeze(-1)
     return X.to(opts.dev), Y.to(opts.dev), [featurec, feature1, feature2, feature3, feature4]
