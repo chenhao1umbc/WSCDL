@@ -161,7 +161,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     :return: dk0
     """
     K0, m = D0.shape
-    rho = 10 * mu  # agrangian coefficients
+    rho = 10 * mu +1e-38 # agrangian coefficients
     dev = D0.device
     Z = torch.eye(K0, m, device=dev)
     Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
