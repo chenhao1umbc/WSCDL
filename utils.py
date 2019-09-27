@@ -268,6 +268,61 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     return sck
 
 
+def solv_sck_test(sc, wc, Tdck, b, k, opts):
+    """
+    This function solves snck for all N, using BPGM
+    :param sc: shape of [N, K, T]
+    :param wc: shape of [K]
+    :param Tdck: shape of [T, m=T]
+    :param b: shape of [N, T]
+    :param k: integer, which atom to update
+    :return: sck
+    """
+    maxiter = 500
+    Mw = opts.delta
+    lamb = opts.lamb
+    dev = opts.dev
+    T = b.shape[1]
+    P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
+    # 'skc update will lead sc change'
+    sck = sc[:, k, :].clone()  # shape of [N, T]
+    sck_old = sck.clone()
+    wkc = wc[k]  # scaler
+    Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
+    eta_wkc_square = opts.eta * wkc**2  # scaler
+    _4_Tdckt_bt = 4*Tdck.t() @ b.t()  # shape of [T, N]
+    term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
+    term1 = (abs(4 * Tdck_t_Tdck)).sum(1)  # shape of [T]
+    M = (term1 + P*eta_wkc_square + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [T]
+    sc_til = sc.clone()  # shape of [N, K, T]
+    # sc_old = sc.clone(); marker = 0
+
+    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    for i in range(maxiter):
+        sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
+        sc_til[:, k, :] = sck_til
+        exp_PtSnc_tilWc = (sc_til.mean(2) @ wc).exp()  # exp_PtSnc_tilWc should change due to sck_til changing
+        exp_PtSnc_tilWc[torch.isinf(exp_PtSnc_tilWc)] = 1e38
+        term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc)*opts.eta*wkc ).unsqueeze(1) @ P
+        nu = sck_til - (4*Tdck_t_Tdck@sck_til.t() - _4_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
+        sck_new = shrink(M, nu, lamb)  # shape of [N, T]
+        sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
+        if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
+        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
+        # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        torch.cuda.empty_cache()
+    # print('M max', M.max())
+    # if marker == 1 :
+    #     print('--inf to 1e38 happend within the loop')
+    #     plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    #     print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
+    # if (loss[0] - loss[-1]) < 0 :
+    #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
+    # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    return sck
+
+
 def loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts):
     """
     This function calculates the loss func of sck
@@ -562,6 +617,47 @@ def updateS0(DD0SS0, X, Y, opts):
     return S0
 
 
+def updateS0_test(DD0SS0, X, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        X is a matrix [N, T], training Data
+        Y is not given
+    """
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    N, K0, T = S0.shape
+    C, K, _ = D.shape
+    M = D0.shape[1]
+    M_2 = int((M-1)/2)  # dictionary atom dimension
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    alpha_plus_dk0 = DconvS.sum(1) + R
+
+    for k0 in range(K0):
+        dk0 = D0[k0, :]
+        snk0 = S0[:, k0, :]  # shape of [N, T]
+        dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
+        Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
+        abs_Tdk0 = abs(Tdk0_t).t()
+        MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
+        MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
+        MS0_inv = (1/MS0_diag).diag()
+        b = 2*X - alpha_plus_dk0 + 2*dk0convsck0
+        torch.cuda.empty_cache()
+        # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
+        S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, 2*Tdk0_t.t(), b, opts.lamb)
+        # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
+    return S0
+
+
 def loss_S0(_2Tdk0, snk0, b, lamb):
     """
     This function calculates the sub-loss function for S0
@@ -620,6 +716,52 @@ def updateS(DD0SS0W, X, Y, opts):
         sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
         # l0 = loss_fun(X, Y, D, D0, S, S0, W, opts)
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+        # print('Main loss after bpgm the diff is: %1.9e' %(l0 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
+        # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
+    return S
+
+
+def updateS_test(DD0SS0W, X, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        W is a matrix [C, K], where K is per-class atoms
+        X is a matrix [N, T], training Data
+        Y are the labels, not given
+    """
+    D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
+    N, K0, T = S0.shape
+    M = D0.shape[1]  # dictionary atom dimension
+    M_2 = int((M-1)/2)
+    C, K, _ = D.shape
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    # '''update the current s_n,k^(c) '''
+    for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+        Crange = torch.tensor(range(C))
+        DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+        for cc in range(C):
+            # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+            DconvS[:, cc, :] = F.conv1d(S[:, cc, :, :], Dcopy[cc, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+
+        dck = D[c, k, :]  # shape of [M]
+        sck = S[:, c, k, :]  # shape of [N, T]
+        wc = W[c, :]  # shape of [K]
+        Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
+
+        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
+        c_prime = Crange[Crange != c]  # c_prime contains all the indexes
+        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+        # term 1, 2, 3 should be in the shape of [N, T]
+        b = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+        torch.cuda.empty_cache()
+        sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
+        # l0 = loss_fun(X, Y, D, D0, S, S0, W, opts)
+        S[:, c, k, :] = solv_sck_test(sc, wc, Tdck, b, k, opts)
         # print('Main loss after bpgm the diff is: %1.9e' %(l0 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
         # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
@@ -1269,8 +1411,8 @@ def test_details(D, D0, S, S0, W, X, Y, opts):
     print('The initial loss function value is %3.4e:' % loss[-1])
     for i in range(opts.maxiter):
         t0 = time.time()
-        S = updateS([D, D0, S, S0, W], X, Y, opts)
-        S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        S = updateS_test([D, D0, S, S0, W], X, opts)
+        S0 = updateS0_test([D, D0, S, S0], X, opts)
         loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
         print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
         print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'
