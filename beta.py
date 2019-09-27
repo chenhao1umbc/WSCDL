@@ -6,7 +6,7 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
 opts = OPT()
-opts.snr = 100
+opts.snr = -100
 opts.lamb = 5 # for sparsity penalty
 opts.eta = 10  # for label penalty
 opts.mu = 1  # for low rank penalty
@@ -29,6 +29,6 @@ if opts.show_details:  # default True
     acc, y_hat = test_details(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 else:
     acc, y_hat = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
-print('The test data accuracy is : ', acc)
+print('\nThe test data accuracy is : ', acc)
 plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss, opts=opts)
 print('done')

@@ -58,8 +58,8 @@ def init(X, opts):
     N, T = X.shape
     D = l2norm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
     D0 = l2norm(torch.rand(opts.K0, opts.M, device=opts.dev))
-    S = torch.rand(N, opts.C, opts.K, T, device=opts.dev)
-    S0 = torch.rand(N, opts.K0, T, device=opts.dev)
+    S = torch.zeros(N, opts.C, opts.K, T, device=opts.dev)
+    S0 = torch.zeros(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K, device=opts.dev)
 
     return D, D0, S, S0, W
@@ -1211,11 +1211,11 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
         plt.title('True labels')
         plt.ylabel('Training example index')
         plt.xlabel('Label index')
-        plt.figure()
-        plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
-        plt.title('Reconstructed labels')
-        plt.ylabel('Training example index')
-        plt.xlabel('Label index')
+    plt.figure()
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
+    plt.title('Reconstructed labels')
+    plt.ylabel('Training example index')
+    plt.xlabel('Label index')
     # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)
     # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up in a new figure
 
