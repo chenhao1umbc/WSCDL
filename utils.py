@@ -234,10 +234,11 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     sck_old = sck.clone()
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
+    abs_Tdck = abs(Tdck)
     eta_wkc_square = opts.eta * wkc**2  # scaler
     _4_Tdckt_bt = 4*Tdck.t() @ b.t()  # shape of [T, N]
     term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
-    term1 = (abs(4 * Tdck_t_Tdck)).sum(1)  # shape of [T]
+    term1 = (4 * abs_Tdck.t()@abs_Tdck).sum(1)  # shape of [T]
     M = (term1 + P*eta_wkc_square + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [T]
     sc_til = sc.clone()  # shape of [N, K, T]
     # sc_old = sc.clone(); marker = 0
@@ -287,13 +288,10 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     # 'skc update will lead sc change'
     sck = sc[:, k, :].clone()  # shape of [N, T]
     sck_old = sck.clone()
-    wkc = wc[k]  # scaler
-    Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
-    eta_wkc_square = opts.eta * wkc**2  # scaler
-    _4_Tdckt_bt = 4*Tdck.t() @ b.t()  # shape of [T, N]
-    term0 = (yc-1).unsqueeze(1) @ P * wkc * opts.eta  # shape of [N, T]
-    term1 = (abs(4 * Tdck_t_Tdck)).sum(1)  # shape of [T]
-    M = (term1 + P*eta_wkc_square + 1e-38).squeeze() # M is the diagonal of majorization matrix, shape of [T]
+    abs_Tdck = abs(Tdck)
+    _2_Tdck_t_Tdck = 2*Tdck.t() @ Tdck  # shape of [T, T]
+    _2_Tdckt_bt = 2*Tdck.t() @ b.t()  # shape of [T, N]
+    M = (2*abs_Tdck.t()@abs_Tdck + 1e-38).sum(1) # M is the diagonal of majorization matrix, shape of [T]
     sc_til = sc.clone()  # shape of [N, K, T]
     # sc_old = sc.clone(); marker = 0
 
@@ -301,13 +299,9 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
-        exp_PtSnc_tilWc = (sc_til.mean(2) @ wc).exp()  # exp_PtSnc_tilWc should change due to sck_til changing
-        exp_PtSnc_tilWc[torch.isinf(exp_PtSnc_tilWc)] = 1e38
-        term = term0 + (exp_PtSnc_tilWc / (1 + exp_PtSnc_tilWc)*opts.eta*wkc ).unsqueeze(1) @ P
-        nu = sck_til - (4*Tdck_t_Tdck@sck_til.t() - _4_Tdckt_bt + term.t()).t()/M  # shape of [N, T]
-        sck_new = shrink(M, nu, lamb)  # shape of [N, T]
+        nu = sck_til - (_2_Tdck_t_Tdck@sck_til.t() - _2_Tdckt_bt).t()/M  # shape of [N, T]
+        sck_new = shrink(2*M, nu, lamb)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
-        if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
         # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
         torch.cuda.empty_cache()
@@ -1182,6 +1176,36 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     cost = fisher + sparse + label + low_rank
     return cost
 
+
+def loss_fun_test(X, D, D0, S, S0, opts):
+    """
+    This function will calculate the costfunction value
+    :param X: the input data with shape of [N, T]
+    :param D: the discriminative dictionary, [C,K,M]
+    :param D0: the common dictionary, [K0,M]
+    :param S: the sparse coefficients, shape of [N,C,K,T] [samples, classes, num of atoms, time series,]
+    :param S0: the common coefficients, 3-d tensor [N, K0, T]
+    :param opts: the hyper-parameters
+    :return: cost, the value of loss function
+    """
+    N, K0, T = S0.shape
+    M = D0.shape[1]
+    M_2 = int((M-1)/2)  # dictionary atom dimension
+    C, K, _ = D.shape
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+        torch.cuda.empty_cache()
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+
+    fisher = torch.norm(X - R - DconvS.sum(1))**2
+    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
+    cost = fisher + sparse
+    return cost
+
+
 def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     """
     This function will calculate the costfunction value
@@ -1378,9 +1402,9 @@ def test(D, D0, S, S0, W, X, Y, opts):
     loss = torch.tensor([], device=opts.dev)
     for i in range(opts.maxiter):
         t0 = time.time()
-        S = updateS([D, D0, S, S0, W], X, Y, opts)
-        S0 = updateS0([D, D0, S, S0], X, Y, opts)
-        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        S = updateS_test([D, D0, S, S0, W], X, opts)
+        S0 = updateS0_test([D, D0, S, S0], X, opts)
+        loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         print('In the %1.0f epoch, the sparse coding time is :%3.2f' % (i, time.time() - t0))
         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
@@ -1407,13 +1431,13 @@ def test_details(D, D0, S, S0, W, X, Y, opts):
     :return: acc, Y_hat
     """
     loss = torch.tensor([], device=opts.dev)
-    loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+    loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
     for i in range(opts.maxiter):
         t0 = time.time()
         S = updateS_test([D, D0, S, S0, W], X, opts)
         S0 = updateS0_test([D, D0, S, S0], X, opts)
-        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
         print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'
               % (i, time.time() - t0, loss[-1]))
