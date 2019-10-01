@@ -1515,8 +1515,8 @@ def test(D, D0, S, S0, W, X, Y, opts):
     for i in range(opts.maxiter):
         t0 = time.time()
         S = updateS_test([D, D0, S, S0, W], X, opts)
+        loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         if opts.show_details:
-            loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
             print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
             print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
             t0 = time.time()

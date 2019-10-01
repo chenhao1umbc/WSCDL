@@ -8,9 +8,9 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
 opts = OPT()
 opts.snr = 20
 opts.lamb = 6 # for sparsity penalty
-opts.eta = 1 # for label penalty
+opts.eta = 100 # for label penalty
 opts.mu = 0  # for low rank penalty
-opts.show_details = False  # default as true
+# opts.show_details = False  # default as true
 
 # training section
 X, Y, ft = load_toy(opts)
