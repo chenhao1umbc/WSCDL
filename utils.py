@@ -19,7 +19,6 @@ torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 
 
-
 class OPT:
     """initial c the number of classes, k0 the size of shared dictionary atoms
     mu is the coeff of low-rank term,
@@ -31,7 +30,7 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed = 100
+        self.seed, self.n = 100, 50
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -891,7 +890,7 @@ def load_toy(opts):
     '''Generate toy data'''
     T = 1200
     x = torch.arange(30).float()  # x.sin() only works for float32...
-    featurec = torch.sin(x*2*np.pi/30)*0.0  # '''The common features'''
+    featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
     feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
     feature3 = torch.zeros(30).float()
@@ -900,9 +899,10 @@ def load_toy(opts):
     feature4 = torch.zeros(30).float()
     feature4[np.r_[np.arange(10), np.arange(20, 30)]] = 1
     feature4 = feature4 + torch.cos(x * np.pi / 6)
-    X = torch.zeros(750, 2000)  # shape of [N, T+], it will be truncated
+    n = opts.n  # number of training examples per combination
+    X = torch.zeros(15*n, 2000)  # shape of [N, T+], it will be truncated
     # just the  1 feature
-    for ii in range(50):  # loop through each sample
+    for ii in range(n):  # loop through each sample
         start_point = torch.randint(0, 101, (1,))
         idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
         burst = torch.randint(1, 6, (10,))
@@ -917,7 +917,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(50, 100):
+    for ii in range(n, 2*n):
         start_point = torch.randint(0, 101, (1,))
         idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
         burst = torch.randint(1, 6, (10,))
@@ -932,7 +932,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(100, 150):
+    for ii in range(2*n, 3*n):
         start_point = torch.randint(0, 101, (1,))
         idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
         burst = torch.randint(1, 6, (10,))
@@ -947,7 +947,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(150, 200):
+    for ii in range(3*n, 4*n):
         start_point = torch.randint(0, 101, (1,))
         idx_feat = torch.randint(0, 3, (10,))  # 0 means nothing, 1 means common features, 2 means class features
         burst = torch.randint(1, 6, (10,))
@@ -963,7 +963,7 @@ def load_toy(opts):
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
     # just two features
-    for ii in range(200, 250):
+    for ii in range(4*n, 5*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -979,7 +979,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(250, 300):
+    for ii in range(5*n, 6*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -995,7 +995,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(300, 350):
+    for ii in range(6*n, 7*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1011,7 +1011,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(350, 400):
+    for ii in range(7*n, 8*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1027,7 +1027,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(400, 450):
+    for ii in range(8*n, 9*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1043,7 +1043,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(450, 500):
+    for ii in range(9*n, 10*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1060,7 +1060,7 @@ def load_toy(opts):
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
     # three features
-    for ii in range(500, 550):
+    for ii in range(10*n, 11*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1078,7 +1078,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(550, 600):
+    for ii in range(11*n, 12*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1096,7 +1096,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(600, 650):
+    for ii in range(12*n, 13*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1114,7 +1114,7 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    for ii in range(650, 700):
+    for ii in range(13*n, 14*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1133,7 +1133,7 @@ def load_toy(opts):
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
     # three features
-    for ii in range(700, 750):
+    for ii in range(14*n, 15*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
@@ -1152,23 +1152,23 @@ def load_toy(opts):
             X[ii, start_point + gap[i]: end_point] = current_feature
             start_point = end_point
     # generate labels
-    Y = torch.zeros(750, 4)
+    Y = torch.zeros(15*n, 4)
     for i in range(4):
         current_label = torch.tensor([1, 0, 0, 0]).float()
         current_label = torch.cat((current_label[-i:], current_label[:-i]))
-        Y[i*50 : (i+1)*50] = current_label
+        Y[i*n : (i+1)*n] = current_label
     from itertools import combinations
     comb = list(combinations([0, 1, 2, 3], 2))  # this will give a list of tuples
     for i in range(4, 10):
         current_label = torch.zeros(4)
         current_label[list(comb[i-5])] = 1.0  # make tuple into list for indexing
-        Y[i*50 : (i+1)*50] = current_label
+        Y[i*n : (i+1)*n] = current_label
     for i in range(10, 14):
         current_label = torch.tensor([1, 1, 1, 0]).float()
         current_label = torch.cat((current_label[-(i - 11):], current_label[:-(i - 11)]))
-        Y[i*50 : (i+1)*50] = current_label
+        Y[i*n : (i+1)*n] = current_label
     current_label = torch.tensor([1, 1, 1, 1]).float()
-    Y[(i+1) * 50: (i + 2) * 50] = current_label
+    Y[(i+1) * n: (i + 2) * n] = current_label
 
     X = awgn(X[:, :T], opts.snr)  #truncation step & adding noise
     # # z-norm, the standardization, 0-mean, var-1
@@ -1520,10 +1520,10 @@ def test(D, D0, S, S0, W, X, Y, opts):
             print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
             print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
             t0 = time.time()
-        # S0 = updateS0_test([D, D0, S, S0], X, opts)
-        # if opts.show_details:
-        #     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
-        #     print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
+        S0 = updateS0_test([D, D0, S, S0], X, opts)
+        if opts.show_details:
+            loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
+            print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
             if i > 10 and abs((loss[-1] - loss[-3]) / loss[-3]) < 5e-4: break
         else:
@@ -1587,7 +1587,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
     """
     loss = torch.tensor([], device=opts.dev)
     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-    print('The initial loss function value is %3.4e:' % loss[-1])
+    print('The initial loss function value is :%3.4e' % loss[-1])
     t, t1 = time.time(), time.time()
     for i in range(opts.maxiter):
         t0 = time.time()
@@ -1598,7 +1598,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('loss function value is %3.4e:' %loss[-1])
             print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
 
-        # S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        S0 = updateS0([D, D0, S, S0], X, Y, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
@@ -1611,7 +1611,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
             print('loss function value is %3.4e:' %loss[-1])
 
-        # D0 = updateD0([D, D0, S, S0], X, Y, opts)
+        D0 = updateD0([D, D0, S, S0], X, Y, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()

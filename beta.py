@@ -6,10 +6,10 @@ GPU usage. As to cpu and multi-GPU there may be small modification needed
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
 opts = OPT()
-opts.snr = 20
-opts.lamb = 6 # for sparsity penalty
-opts.eta = 100 # for label penalty
-opts.mu = 0  # for low rank penalty
+opts.snr = 200
+opts.lamb = 10 # for sparsity penalty
+opts.eta = 10 # for label penalty
+opts.mu = 1  # for low rank penalty
 # opts.show_details = False  # default as true
 
 # training section
