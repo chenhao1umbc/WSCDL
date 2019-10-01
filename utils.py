@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import pickle
 tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
-np.set_printoptions(linewidth=180)
-torch.set_printoptions(linewidth=180)
+np.set_printoptions(linewidth=120)
+torch.set_printoptions(linewidth=120)
 torch.backends.cudnn.deterministic = True
 seed = 100
 torch.manual_seed(seed)
@@ -715,7 +715,7 @@ def updateS(DD0SS0W, X, Y, opts):
         ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
         print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
-        print('Local loss for fisher, sparse, label, differences: %1.7f, %s1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
+        print('Local loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
         # print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
         # if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
         # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
@@ -1246,12 +1246,14 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()   # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
+    _1_Y_hat = 1 - Y_hat
     fisher1 = torch.norm(X - R - DconvS.sum(1))**2
     fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
-    # label = -1 * N * opts.eta * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
-    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum()
+    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
+    # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
+    # print(label.item())
     low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return fisher.item(), sparse.item(), label.item()
@@ -1274,11 +1276,15 @@ def loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
     epx_PtScWc[torch.isinf(epx_PtScWc)] = 1e38
     epx_PtSckWck = (sck.mean(1) * wkc).exp()
     epx_PtSckWck[torch.isinf(epx_PtSckWck)] = 1e38
-    g_sck_wc = (-(1-yc)*((epx_PtSckWck+1e-38).log()) + (1+epx_PtScWc).log()).sum()
+    y_hat = 1 / (1 + epx_PtSckWck)
+    _1_y_hat = 1- y_hat
+    g_sck_wc = (-(1-yc)*((epx_PtSckWck+1e-38).log()) + (1+epx_PtSckWck).log()).sum()
+    # g_sck_wc = -((yc * (y_hat+ 1e-38).log()) + (1 - yc) * (1e-38 + _1_y_hat).log()).sum()
+    # print(g_sck_wc.item())
     fisher = 2*(Tdck@sck.t() - b.t()).norm()**2
     sparse = opts.lamb * sck.abs().sum()
     label = opts.eta * g_sck_wc
-    if label <0 :print(stop)
+    if label <0 or torch.isnan(label).sum()>0 :print(stop)
     return fisher.item(), sparse.item(), label.item()
 
 

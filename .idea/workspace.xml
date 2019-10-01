@@ -20,29 +20,6 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>1e-3</find>
-      <find>;</find>
-      <find>torch.cat</find>
-      <find>maxiter = 500</find>
-      <find>M*M</find>
-      <find>/M</find>
-      <find>Md_inv</find>
-      <find>) ); t = time.time()</find>
-      <find>correction</find>
-      <find>plt.figure();</find>
-      <find>loss =</find>
-      <find>znorm</find>
-      <find>1e-4</find>
-      <find>M_2</find>
-      <find>reshape</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>1e-4</replace>
-      <replace>)); t = time.time()</replace>
-    </replaceStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -102,6 +79,9 @@
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
