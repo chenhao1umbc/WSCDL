@@ -26,9 +26,9 @@ plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts)
 X_test, Y_test, _ = load_toy(opts)
 _, _, S_t, S0_t, _ = init(X_test, opts)
 if opts.show_details:  # default True
-    acc, y_hat = test_details(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+    acc, y_hat, S_t, S0_t = test_details(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 else:
-    acc, y_hat = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+    acc, y_hat, S_t, S0_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc)
 plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss, opts=opts)
 print('done')

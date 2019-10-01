@@ -207,6 +207,7 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
         if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < 1e-4: break
         torch.cuda.empty_cache()
         # loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
+    # plt.figure();plt.plot(loss.cpu().numpy(), '-x')
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
     return snk0
@@ -243,7 +244,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     sc_til = sc.clone()  # shape of [N, K, T]
     sc_old = sc.clone(); marker = 0
 
-    loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -255,7 +256,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
-        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
         torch.cuda.empty_cache()
     # print('M max', M.max())
     # if marker == 1 :
@@ -279,8 +280,8 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    maxiter = 500
-    Mw = opts.delta
+    maxiter, correcton = 500, 0.7
+    Mw = opts.delta * correcton
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
@@ -289,21 +290,20 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     sck = sc[:, k, :].clone()  # shape of [N, T]
     sck_old = sck.clone()
     abs_Tdck = abs(Tdck)
-    _2_Tdck_t_Tdck = 2*Tdck.t() @ Tdck  # shape of [T, T]
-    _2_Tdckt_bt = 2*Tdck.t() @ b.t()  # shape of [T, N]
-    M = (2*abs_Tdck.t()@abs_Tdck + 1e-38).sum(1) # M is the diagonal of majorization matrix, shape of [T]
-    sc_til = sc.clone()  # shape of [N, K, T]
-    # sc_old = sc.clone(); marker = 0
+    Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
+    Tdckt_bt = Tdck.t() @ b.t()  # shape of [T, N]
+    M = (abs_Tdck.t()@abs_Tdck + 1e-38).sum(1) # M is the diagonal of majorization matrix, shape of [T]
+    sc_til, sc_old, marker = sc.clone(), sc.clone(), 0 # shape of [N, K, T]
 
-    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
-        nu = sck_til - (_2_Tdck_t_Tdck@sck_til.t() - _2_Tdckt_bt).t()/M  # shape of [N, T]
-        sck_new = shrink(2*M, nu, lamb)  # shape of [N, T]
+        nu = sck_til - (Tdck_t_Tdck@sck_til.t() - Tdckt_bt).t()/M  # shape of [N, T]
+        sck_new = shrink(M, nu, lamb/2)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
-        # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        # loss = torch.cat((loss, loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
         torch.cuda.empty_cache()
     # print('M max', M.max())
     # if marker == 1 :
@@ -314,7 +314,7 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    return sck
+    return sck_old
 
 
 def loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts):
@@ -340,6 +340,38 @@ def loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts):
     term3 = opts.eta * g_sck_wc
     loss = term1 + term2 + term3
     return loss
+
+
+def loss_Sck_test(Tdck, b, sc, sck, opts):
+    """
+    This function calculates the loss func of sck
+    :param Tdck: shape of [T, m=T]
+    :param b: shape of [N, T]
+    :param sc: shape of [N, K, T]
+    :param sck: shape of [N, T]
+    :param opts: for hyper parameters
+    :return:
+    """
+    term1 = (Tdck@sck.t() -b.t()).norm()**2
+    term2 = opts.lamb * sck.abs().sum()
+    loss = term1 + term2
+    return loss
+
+
+def loss_Sck_test_spec(Tdck, b, sc, sck, opts):
+    """
+    This function calculates the loss func of sck
+    :param Tdck: shape of [T, m=T]
+    :param b: shape of [N, T]
+    :param sc: shape of [N, K, T]
+    :param sck: shape of [N, T]
+    :param opts: for hyper parameters
+    :return:
+    """
+    term1 = (Tdck@sck.t() -b.t()).norm()**2
+    term2 = opts.lamb * sck.abs().sum()
+    loss = term1 + term2
+    return term1, term2
 
 
 def solv_wc(x, snc, yc, Mw):
@@ -641,13 +673,13 @@ def updateS0_test(DD0SS0, X, opts):
         dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
         Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
         abs_Tdk0 = abs(Tdk0_t).t()
-        MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
+        MS0_diag = (abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
         MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
         MS0_inv = (1/MS0_diag).diag()
-        b = 2*X - alpha_plus_dk0 + 2*dk0convsck0
+        b = X - alpha_plus_dk0 + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
-        S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, 2*Tdk0_t.t(), b, opts.lamb)
+        S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, Tdk0_t.t(), b, opts.lamb/2)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
 
@@ -709,13 +741,13 @@ def updateS(DD0SS0W, X, Y, opts):
         torch.cuda.empty_cache()
         sc = S[:, c, :, :].clone() # sc will be changed in solv_sck, adding clone to prevent, for debugging
         # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
-        l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
+        # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
         S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
-        ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
-        print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
-        print('Local loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
+        # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
+        # print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
+        # print('Local loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
         # print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
         # if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
         # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
@@ -761,10 +793,16 @@ def updateS_test(DD0SS0W, X, opts):
         b = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
         torch.cuda.empty_cache()
         sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
-        # l0 = loss_fun(X, Y, D, D0, S, S0, W, opts)
+        # l = loss_fun_test(X, D, D0, S, S0, opts)
+        # l0 = loss_fun_test_spec(X, D, D0, S, S0, opts)
+        # l1 = loss_Sck_test_spec(Tdck, b, sc, sc[:, k, :], opts)
         S[:, c, k, :] = solv_sck_test(sc, wc, Tdck, b, k, opts)
-        # print('Main loss after bpgm the diff is: %1.9e' %(l0 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
-        # if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
+        # print('Main fisher after bpgm the diff is: %1.9e' %(l0[0] - loss_fun_test_spec(X, D, D0, S, S0, opts)[0]))
+        # print('Local fisher after bpgm the diff is: %1.9e' % (l1[0] - loss_Sck_test_spec(Tdck, b, sc, sc[:, k, :], opts)[0]))
+        # print('Main sparse after bpgm the diff is: %1.9e' %(l0[1] - loss_fun_test_spec(X, D, D0, S, S0, opts)[1]))
+        # print('Local sparse after bpgm the diff is: %1.9e' % (l1[1] - loss_Sck_test_spec(Tdck, b, sc, sc[:, k, :], opts)[1]))
+        # print('Main sparse after bpgm the diff is: %1.9e' %(l - loss_fun_test(X, D, D0, S, S0, opts)))
+        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
 
@@ -1213,6 +1251,34 @@ def loss_fun_test(X, D, D0, S, S0, opts):
     return cost
 
 
+def loss_fun_test_spec(X, D, D0, S, S0, opts):
+    """
+    This function will calculate the costfunction value
+    :param X: the input data with shape of [N, T]
+    :param D: the discriminative dictionary, [C,K,M]
+    :param D0: the common dictionary, [K0,M]
+    :param S: the sparse coefficients, shape of [N,C,K,T] [samples, classes, num of atoms, time series,]
+    :param S0: the common coefficients, 3-d tensor [N, K0, T]
+    :param opts: the hyper-parameters
+    :return: cost, the value of loss function
+    """
+    N, K0, T = S0.shape
+    M = D0.shape[1]
+    M_2 = int((M-1)/2)  # dictionary atom dimension
+    C, K, _ = D.shape
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+        torch.cuda.empty_cache()
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+
+    fisher = torch.norm(X - R - DconvS.sum(1))**2
+    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
+    return fisher, sparse
+
+
 def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     """
     This function will calculate the costfunction value
@@ -1427,7 +1493,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     y_hat[y_hat < 0.5] = 0
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
-    return acc, 1/(1+exp_PtSnW)
+    return acc, 1/(1+exp_PtSnW), S, S0
 
 
 def test_details(D, D0, S, S0, W, X, Y, opts):
@@ -1449,11 +1515,13 @@ def test_details(D, D0, S, S0, W, X, Y, opts):
     for i in range(opts.maxiter):
         t0 = time.time()
         S = updateS_test([D, D0, S, S0, W], X, opts)
-        S0 = updateS0_test([D, D0, S, S0], X, opts)
         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
-        print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'
-              % (i, time.time() - t0, loss[-1]))
+        print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
+        S0 = updateS0_test([D, D0, S, S0], X, opts)
+        loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
+        print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
+
         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
@@ -1462,7 +1530,7 @@ def test_details(D, D0, S, S0, W, X, Y, opts):
     y_hat[y_hat < 0.5] = 0
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
-    return acc, 1/(1+exp_PtSnW)
+    return acc, 1/(1+exp_PtSnW), S, S0
 
 
 def train(D, D0, S, S0, W, X, Y, opts):
