@@ -1440,7 +1440,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
         plt.plot(D0.squeeze().cpu().numpy())
         plt.plot(ft[0] / (ft[0].norm()+1e-38), '-x')
         plt.title('commom component')
-        plt.legend(['Learned feature', 'Ground true'])
+        plt.legend(['Learned feature', 'Ground truth'])
         plt.xlabel('Time index')
         plt.ylabel('Magnitude')
         for i in range(4):
@@ -1448,7 +1448,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
             plt.plot(D[i, 0, :].cpu().numpy()/D[i, 0, :].cpu().norm().numpy())
             plt.plot(ft[i + 1] / ft[i + 1].norm(), '-x')
             plt.title('Feature ' + str(i + 1))
-            plt.legend(['Learned feature', 'Ground true'])
+            plt.legend(['Learned feature', 'Ground truth'])
             plt.xlabel('Time index')
             plt.ylabel('Magnitude')
         plt.figure()
