@@ -1064,11 +1064,11 @@ def load_toy(opts):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
-        idx_feat = torch.randint(0, 5, (10,))  # 0 means nothing, 1 means common features
-        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1 \
-                or idx_feat[idx_feat==4].shape[0] < 1:
+        idx_feat = torch.randint(2, 5, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 2 or idx_feat[idx_feat==3].shape[0] < 2 \
+                or idx_feat[idx_feat==4].shape[0] < 2:
             # make sure there are discriminative features to learn
-            idx_feat = torch.randint(0, 5, (10,))
+            idx_feat = torch.randint(2, 5, (10,))
         for i in range(10):  # loop over fragment
             if idx_feat[i].item() == 0: current_feature = torch.zeros(30).repeat(burst[i])
             if idx_feat[i].item() == 1: current_feature = featurec.repeat(burst[i])
@@ -1082,11 +1082,11 @@ def load_toy(opts):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
-        idx_feat = torch.randint(0, 5, (10,))  # 0 means nothing, 1 means common features
-        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1 \
-                or idx_feat[idx_feat==4].shape[0] < 1:
+        idx_feat = torch.randint(2, 5, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 2 or idx_feat[idx_feat==3].shape[0] < 2 \
+                or idx_feat[idx_feat==4].shape[0] < 2:
             # make sure there are discriminative features to learn
-            idx_feat = torch.randint(0, 5, (10,))
+            idx_feat = torch.randint(2, 5, (10,))
         for i in range(10):  # loop over fragment
             if idx_feat[i].item() == 0: current_feature = torch.zeros(30).repeat(burst[i])
             if idx_feat[i].item() == 1: current_feature = featurec.repeat(burst[i])
@@ -1100,11 +1100,11 @@ def load_toy(opts):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
-        idx_feat = torch.randint(0, 5, (10,))  # 0 means nothing, 1 means common features
-        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1 \
-                or idx_feat[idx_feat==4].shape[0] < 1:
+        idx_feat = torch.randint(2, 5, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 2 or idx_feat[idx_feat==3].shape[0] < 2 \
+                or idx_feat[idx_feat==4].shape[0] < 2:
             # make sure there are discriminative features to learn
-            idx_feat = torch.randint(0, 5, (10,))
+            idx_feat = torch.randint(2, 5, (10,))
         for i in range(10):  # loop over fragment
             if idx_feat[i].item() == 0: current_feature = torch.zeros(30).repeat(burst[i])
             if idx_feat[i].item() == 1: current_feature = featurec.repeat(burst[i])
@@ -1118,11 +1118,11 @@ def load_toy(opts):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
-        idx_feat = torch.randint(0, 5, (10,))  # 0 means nothing, 1 means common features
+        idx_feat = torch.randint(2, 5, (10,))  # 0 means nothing, 1 means common features
         while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1 \
                 or idx_feat[idx_feat==4].shape[0] < 1:
             # make sure there are discriminative features to learn
-            idx_feat = torch.randint(0, 5, (10,))
+            idx_feat = torch.randint(2, 5, (10,))
         for i in range(10):  # loop over fragment
             if idx_feat[i].item() == 0: current_feature = torch.zeros(30).repeat(burst[i])
             if idx_feat[i].item() == 1: current_feature = featurec.repeat(burst[i])
@@ -1132,16 +1132,16 @@ def load_toy(opts):
             end_point = start_point + current_feature.shape[0] + gap[i]
             X[ii, start_point+gap[i]: end_point] = current_feature
             start_point = end_point
-    # three features
+    # Four features
     for ii in range(14*n, 15*n):
         start_point = torch.randint(0, 51, (1,))
         burst = torch.randint(1, 6, (10,))
         gap = torch.randint(0, 51, (10,))
-        idx_feat = torch.randint(0, 5, (10,))  # 0 means nothing, 1 means common features
-        while idx_feat[idx_feat==2].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1 \
-                or idx_feat[idx_feat==4].shape[0] < 1 or idx_feat[idx_feat==3].shape[0] < 1:
+        idx_feat = torch.randint(1, 5, (10,))  # 0 means nothing, 1 means common features
+        while idx_feat[idx_feat==2].shape[0] < 2 or idx_feat[idx_feat==3].shape[0] < 2 \
+                or idx_feat[idx_feat==4].shape[0] < 2 or idx_feat[idx_feat==3].shape[0] < 2:
             # make sure there are discriminative features to learn
-            idx_feat = torch.randint(0, 5, (10,))
+            idx_feat = torch.randint(1, 5, (10,))
         for i in range(10):  # loop over fragment
             if idx_feat[i].item() == 0: current_feature = featurec.repeat(burst[i])
             if idx_feat[i].item() == 1: current_feature = feature1.repeat(burst[i])

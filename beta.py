@@ -14,10 +14,10 @@ opts.mu = 0  # for low rank penalty
 
 # training section
 X, Y, ft = load_toy(opts)
-D, D0, S, S0, W = init(X[:500], opts)
-D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X[:500], Y[:500], opts)
+D, D0, S, S0, W = init(X[:700], opts)
+D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X[:700], Y[:700], opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
-plot_result(X[:500], Y[:500], D, D0, S, S0, W, ft, loss, opts)
+plot_result(X[:700], Y[:700], D, D0, S, S0, W, ft, loss, opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
 # testing section
