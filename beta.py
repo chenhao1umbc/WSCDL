@@ -7,17 +7,18 @@ from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
 opts = OPT()
 opts.snr = 200
-opts.lamb = 5 # for sparsity penalty
-opts.eta = 1 # for label penalty
+opts.lamb = 2 # for sparsity penalty
+opts.eta = 0 # for label penalty
 opts.mu = 0  # for low rank penalty
-# opts.show_details = False  # default as true
+opts.show_details = False  # default as true
+
 
 # training section
 X, Y, ft = load_toy(opts)
-D, D0, S, S0, W = init(X[:700], opts)
-D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X[:700], Y[:700], opts)
+D, D0, S, S0, W = init(X, opts)
+D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
-plot_result(X[:700], Y[:700], D, D0, S, S0, W, ft, loss, opts)
+plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
 # testing section
