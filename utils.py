@@ -1161,11 +1161,11 @@ def load_toy(opts):
     comb = list(combinations([0, 1, 2, 3], 2))  # this will give a list of tuples
     for i in range(4, 10):
         current_label = torch.zeros(4)
-        current_label[list(comb[i-5])] = 1.0  # make tuple into list for indexing
+        current_label[list(comb[i-4])] = 1.0  # make tuple into list for indexing
         Y[i*n : (i+1)*n] = current_label
     for i in range(10, 14):
         current_label = torch.tensor([1, 1, 1, 0]).float()
-        current_label = torch.cat((current_label[-(i - 11):], current_label[:-(i - 11)]))
+        current_label = torch.cat((current_label[(i - 10):], current_label[:(i - 10)]))
         Y[i*n : (i+1)*n] = current_label
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[(i+1) * n: (i + 2) * n] = current_label
@@ -1533,7 +1533,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     y_hat = 1 / (1 + exp_PtSnW)
     y_hat[y_hat > 0.5] = 1
-    y_hat[y_hat < 0.5] = 0
+    y_hat[y_hat <= 0.5] = 0
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
     return acc, 1/(1+exp_PtSnW), S, S0
