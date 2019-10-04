@@ -59,7 +59,7 @@ def init(X, opts):
     D0 = l2norm(torch.rand(opts.K0, opts.M, device=opts.dev))
     S = torch.zeros(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.zeros(N, opts.K0, T, device=opts.dev)
-    W = torch.ones(opts.C, opts.K, device=opts.dev)
+    W = torch.ones(opts.C, opts.K +1, device=opts.dev)
 
     return D, D0, S, S0, W
 
@@ -376,19 +376,20 @@ def loss_Sck_test_spec(Tdck, b, sc, sck, opts):
 def solv_wc(x, snc, yc, Mw):
     """
     This fuction is using bpgm to update wc
-    :param x: shape of [K], init value of wc
+    :param x: shape of [K+1], init value of wc
     :param snc: shape of [N, K, T]
     :param yc: shape of [N]
     :param Mw: real number, is delta
     :return: wc
     """
+    N = yc.shape[0]
     maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
     wc_old, wc, wc_til = x.clone(), x.clone(), x.clone()
-    pt_snc = snc.mean(2)  # shape of [N, K]
-    abs_pt_snc = abs(pt_snc)  # shape of [N, K]
-    const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K, N]
+    pt_snc = torch.cat((snc.mean(2) , torch.ones(N, 1, device=x.device)), dim=1) # shape of [N, K+1]
+    abs_pt_snc = abs(pt_snc)  # shape of [N, K+1]
+    const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K+1, N]
     M = const.sum(1)/4 + 1e-38  # shape of [K], 1e-38 for robustness
-    one_min_ync = 1 - yc
+    one_min_ync = 1 - yc  # shape of [N]
     M_old = M.clone()
     # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
 
@@ -703,7 +704,7 @@ def updateS(DD0SS0W, X, Y, opts):
         D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
         S0 is 3-d tensor [N, K0, T]
         D0 is a matrix [K0, M]
-        W is a matrix [C, K], where K is per-class atoms
+        W is a matrix [C, K+1], where K is per-class atoms
         X is a matrix [N, T], training Data
         Y is a matrix [N, C] \in {0,1}, training labels
     """
@@ -724,7 +725,7 @@ def updateS(DD0SS0W, X, Y, opts):
 
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
-        wc = W[c, :]  # shape of [K]
+        wc = W[c, :-1]  # shape of [K]
         yc = Y[:, c]  # shape of [N]
         Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
@@ -811,7 +812,7 @@ def updateW(SW, Y, opts):
     the data structure is not in matrix format for computation simplexity
         SW is a list of [S, W]
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
-        W is a matrix [C, K], where K is per-class atoms
+        W is a matrix [C, K+1], where K is per-class atoms
         X is a matrix [N, T], training Data
         Y is a matrix [N, C] \in {0,1}, training labels
     """
@@ -831,11 +832,13 @@ def loss_W(S, W, Y):
     """
     calculating the loss function value for subproblem of W
     :param S: shape of [N, C, K, T]
-    :param W: shape of [C, K]
+    :param W: shape of [C, K+1]
     :param Y: shape of [N, C]
     :return:
     """
-    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    N, C = Y.shape
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1/ (1+ exp_PtSnW)
     # loss0 = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # the same as below
@@ -1187,7 +1190,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     :param D0: the common dictionary, [K0,M]
     :param S: the sparse coefficients, shape of [N,C,K,T] [samples, classes, num of atoms, time series,]
     :param S0: the common coefficients, 3-d tensor [N, K0, T]
-    :param W: the projection for labels, shape of [C, K]
+    :param W: the projection for labels, shape of [C, K+1]
     :param opts: the hyper-parameters
     :return: cost, the value of loss function
     """
@@ -1208,7 +1211,8 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
-    exp_PtSnW = (S.mean(3) * W).sum(2).exp()   # shape of [N, C]
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()   # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
     fisher1 = torch.norm(X - R - DconvS.sum(1))**2
@@ -1288,7 +1292,7 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     :param D0: the common dictionary, [K0,M]
     :param S: the sparse coefficients, shape of [N,C,K,T] [samples, classes, num of atoms, time series,]
     :param S0: the common coefficients, 3-d tensor [N, K0, T]
-    :param W: the projection for labels, shape of [C, K]
+    :param W: the projection for labels, shape of [C, K+1]
     :param opts: the hyper-parameters
     :return: cost, the value of loss function
     """
@@ -1309,6 +1313,7 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S.mean(3) * W).sum(2).exp()   # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
@@ -1355,7 +1360,9 @@ def loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
 
 
 def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
-    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    N, C = Y.shape
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
 
@@ -1529,7 +1536,9 @@ def test(D, D0, S, S0, W, X, Y, opts):
         else:
             if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
-    exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
+    N, C = Y.shape
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     y_hat = 1 / (1 + exp_PtSnW)
     y_hat[y_hat > 0.5] = 1
