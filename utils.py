@@ -880,7 +880,7 @@ def load_data(opts=0):
     """
 
 
-def load_toy(opts):
+def load_toy(opts, test=False):
     """
     So far Aug. 24. 2019, we are loading the synthetic data to see if it works, the time series length is 500
     there are 4 classes, with its mixtures but without overlapping. the features are sin waves and rectangular waves,
@@ -891,7 +891,8 @@ def load_toy(opts):
     :return: X, Y, the data and the label matrix
     """
     '''Generate toy data'''
-    T = 1200
+    T = 1600
+    if test : torch.manual_seed(opts.seed)
     x = torch.arange(30).float()  # x.sin() only works for float32...
     featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
