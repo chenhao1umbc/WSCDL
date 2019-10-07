@@ -37,7 +37,7 @@ Here lists some parameters critical to training results. For more information, p
 
 Because `PyTorch` `v1.2.0` gpu version of the function `svd` is slower than cpu version, in some steps, cpu version of `svd` is used for speed issue.
 
-2. Does it use tensor calculation?
+2.Does it use tensor calculation?
 
 Yes. Although the input data format is matrix, it actually will be reshaped into tensor for calculation efficiency.
 
