@@ -30,7 +30,7 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n = 100, 50
+        self.seed, self.n = 0, 50
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
