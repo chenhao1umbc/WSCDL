@@ -1,4 +1,4 @@
-# Weakly supervised supervised dictionary learning (WSCDL)
+# Weakly supervised convolutional dictionary learning (WSCDL)
 
 This project is the code for the paper "Weakly supervised common and distinctive convolutional dictionary learning". Demo data will be generated in the code.
 ## Requirements
