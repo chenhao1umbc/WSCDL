@@ -99,7 +99,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         Tsck_t, is truncated toeplitz matrix of sck with shape of [N, M, T]
         b is bn with all N, with shape of [N, T]
         """
-    maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
+    maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.clone(), x.clone(), x.clone()
     coef = Tsck_t@Tsck_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
@@ -115,7 +115,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         d, d_old = d_new, d
         torch.cuda.empty_cache()
         # loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
-        if (d - d_old).norm() / d_old.norm() < 1e-4: break
+        if (d - d_old).norm() / d_old.norm() < threshold: break
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d
 
@@ -133,7 +133,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     :param k0: the current index of for loop of K0
     :return: dck0
     """
-    maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
+    maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.clone(), x.clone(), x.clone()
     coef = Tsck0_t@Tsck0_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck0_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
@@ -144,7 +144,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
         nu = d_til - (coef@d_til - term).sum(0) * Minv  # shape of [M]
         d_new = argmin_lowrank(M, nu, mu, D0, k0)  # D0 will be changed, because dk0 is in D0
         d, d_old = d_new, d
-        if (d - d_old).norm()/d_old.norm() < 1e-3:break
+        if (d - d_old).norm()/d_old.norm() < threshold:break
         torch.cuda.empty_cache()
         # loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
     # ll = loss[:-1] - loss[1:]
@@ -162,7 +162,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     :param D0: common dict contains all the dk0, shape of [K0, M]
     :return: dk0
     """
-    K0, m = D0.shape
+    (K0, m), threshold = D0.shape, 1e-4
     rho = 10 * mu +1e-38 # agrangian coefficients
     dev = D0.device
     Z = torch.eye(K0, m, device=dev)
@@ -179,7 +179,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
         Z_minus_D0 = Z- D0
         Y = Y + rho*Z_minus_D0
         cr = torch.cat((cr, Z_minus_D0.norm().reshape(1)))
-        if i>10 and abs(cr[-1] - cr[-2])/cr[i-1] < 5e-4: break
+        if i>10 and abs(cr[-1] - cr[-2])/cr[i-1] < threshold: break
         if cr[-1] <1e-6 : break
     return dk0
 
@@ -195,7 +195,7 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
     :param lamb: sparsity hyper parameter
     :return: dck0
     """
-    maxiter = 500
+    maxiter, threshold = 500, 1e-4
     snk0_old, snk0 = x.clone(), x.clone()
     coef = Minv @ Tdk0.t() @ Tdk0  # shape of [T, T]
     term = (Minv @ Tdk0.t() @b.t()).t()  # shape of [N, T]
@@ -206,7 +206,7 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
         snk0_new = shrink(M, nu, lamb)  # shape of [N, T]
         snk0, snk0_old = snk0_new, snk0
-        if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < 1e-4: break
+        if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < threshold: break
         torch.cuda.empty_cache()
         # loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
     # plt.figure();plt.plot(loss.cpu().numpy(), '-x')
@@ -226,7 +226,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    maxiter = 500
+    maxiter, threshold = 500, 1e-4
     Mw = opts.delta
     lamb = opts.lamb
     dev = opts.dev
@@ -257,7 +257,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         sck_new = shrink(M, nu, lamb)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
-        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
+        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < threshold: break
         # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
         torch.cuda.empty_cache()
     # print('M max', M.max())
@@ -282,7 +282,7 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    maxiter, correcton = 500, 0.7
+    maxiter, correcton, threshold = 500, 0.7, 1e-4
     Mw = opts.delta * correcton
     lamb = opts.lamb
     dev = opts.dev
@@ -304,7 +304,7 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
         nu = sck_til - (Tdck_t_Tdck@sck_til.t() - Tdckt_bt).t()/M  # shape of [N, T]
         sck_new = shrink(M, nu, lamb/2)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
-        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < 1e-4: break
+        if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < threshold: break
         # loss = torch.cat((loss, loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
         torch.cuda.empty_cache()
     # print('M max', M.max())
@@ -385,7 +385,7 @@ def solv_wc(x, snc, yc, Mw):
     :param Mw: real number, is delta
     :return: wc
     """
-    N = yc.shape[0]
+    N, threshold = yc.shape[0], 1e-4
     maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
     wc_old, wc, wc_til = x.clone(), x.clone(), x.clone()
     pt_snc = torch.cat((snc.mean(2) , torch.ones(N, 1, device=x.device)), dim=1) # shape of [N, K+1]
@@ -404,7 +404,7 @@ def solv_wc(x, snc, yc, Mw):
         nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
         wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
         # loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
-        if torch.norm(wc - wc_old)/wc.norm() < 1e-4: break
+        if torch.norm(wc - wc_old)/wc.norm() < threshold: break
         torch.cuda.empty_cache()
     # ll = loss[:-1] - loss[1:]
     # if ll[ll<0].shape[0] > 0: print(something_wrong)
@@ -426,7 +426,7 @@ def svt(L, tau):
     try:
         u, s, v = torch.svd(L)  ########## so far in version 1.2 the torch.svd for GPU could be much slower than CPU
     except:                     ########## and torch.svd may have convergence issues for GPU and CPU.
-        u, s, v = torch.svd(L + 1e-3*L.mean()*torch.rand(l, h))
+        u, s, v = torch.svd(L + 1e-4*L.mean()*torch.rand(l, h))
         print('unstable svd happened')
     s = s - tau
     s[s<0] = 0
@@ -897,7 +897,7 @@ def load_toy(opts, test=False):
     T = 1600
     if test : torch.manual_seed(opts.seed)
     x = torch.arange(30).float()  # x.sin() only works for float32...
-    featurec = torch.sin(x*2*np.pi/30)  # '''The common features'''
+    featurec = featurec = torch.sin(x*2*np.pi/30) - torch.cos(x * 11 * np.pi /30 +1.5)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
     feature2 = torch.sin(x * 2 * np.pi / 20) + torch.cos(x * 2 * np.pi / 5) + torch.sin(x * 2 * np.pi / 8)
     feature3 = torch.zeros(30).float()
@@ -1489,14 +1489,14 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
 #     :param opts: options of hyper-parameters
 #     :return: acc, Y_hat
 #     """
-#     loss = torch.tensor([], device=opts.dev)
+#     loss, threshold = torch.tensor([], device=opts.dev), 1e-4
 #     for i in range(opts.maxiter):
 #         t0 = time.time()
 #         S = updateS_test([D, D0, S, S0, W], X, opts)
 #         S0 = updateS0_test([D, D0, S, S0], X, opts)
 #         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
 #         print('In the %1.0f epoch, the sparse coding time is :%3.2f' % (i, time.time() - t0))
-#         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
+#         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
 #     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
 #     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
 #     y_hat = 1 / (1 + exp_PtSnW)
@@ -1520,7 +1520,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: acc, Y_hat
     """
-    loss = torch.tensor([], device=opts.dev)
+    loss, threshold = torch.tensor([], device=opts.dev), 1e-4
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
     for i in range(opts.maxiter):
@@ -1536,9 +1536,9 @@ def test(D, D0, S, S0, W, X, Y, opts):
             loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
-            if i > 10 and abs((loss[-1] - loss[-3]) / loss[-3]) < 5e-4: break
+            if i > 10 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
         else:
-            if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
+            if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
@@ -1565,7 +1565,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
 #     :param opts: options of hyper-parameters
 #     :return: D, D0, S, S0, W, loss
 #     """
-#     loss = torch.tensor([], device=opts.dev)
+#     loss, threshold = torch.tensor([], device=opts.dev), 1e-4
 #     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
 #     print('The initial loss function value is %3.4e:' % loss[-1])
 #     t = time.time()
@@ -1577,7 +1577,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
 #         D0 = updateD0([D, D0, S, S0], X, Y, opts)
 #         W = updateW([S, W], Y, opts)
 #         loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-#         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
+#         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
 #         print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
 #
 #     print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
@@ -1598,7 +1598,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: D, D0, S, S0, W, loss
     """
-    loss = torch.tensor([], device=opts.dev)
+    loss, threshold = torch.tensor([], device=opts.dev), 1e-4
     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
     print('The initial loss function value is :%3.4e' % loss[-1])
     t, t1 = time.time(), time.time()
@@ -1637,10 +1637,10 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('loss function value is %3.4e:' %loss[-1])
 
         if opts.show_details:
-            if i > 10 and abs((loss[-1] - loss[-6]) / loss[-6]) < 5e-4: break
+            if i > 10 and abs((loss[-1] - loss[-6]) / loss[-6]) < threshold: break
             print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
         else:
-            if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < 5e-4: break
+            if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
 
 

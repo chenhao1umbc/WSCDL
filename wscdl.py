@@ -1,6 +1,5 @@
 """This is the main file to run Weakly supervised supervised dictionary learning
-The default data type is torch.tensor with precision float32, the code is written for single
-GPU usage. As to cpu and multi-GPU there may be small modification needed
+The default data type is torch.tensor with precision float32
 """
 
 from utils import *
@@ -14,11 +13,11 @@ opts.show_details = False  # default as true
 
 
 # training section
-X, Y, ft = load_toy(opts)
+X, Y, opts.ft = load_toy(opts)
 D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 if opts.save_results*0: save_results(D, D0, S, S0, W, opts, loss)
-plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts)
+plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
 # testing section
