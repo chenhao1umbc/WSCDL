@@ -33,7 +33,7 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n = 0, 50
+        self.seed, self.n = 100, 50
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -57,9 +57,12 @@ def init(X, opts):
         W is a matrix [C, K], where K is per-class atoms
     :return: D, D0, S, S0, W
     """
+
     N, T = X.shape
-    D = l2norm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
-    D0 = l2norm(torch.rand(opts.K0, opts.M, device=opts.dev))
+    D = l2norm(torch.cat(opts.ft[1:]).reshape(opts.C, opts.K, opts.M)).to(opts.dev)
+    D0 = l2norm(opts.ft[0].reshape(opts.K0, opts.M)).to(opts.dev)
+    # D = l2norm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
+    # D0 = l2norm(torch.rand(opts.K0, opts.M, device=opts.dev))
     S = torch.zeros(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.zeros(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K +1, device=opts.dev)
@@ -226,7 +229,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    maxiter, threshold = 500, 1e-4
+    maxiter, correction, threshold = 500, 0.7, 1e-4
     Mw = opts.delta
     lamb = opts.lamb
     dev = opts.dev
@@ -248,7 +251,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
 
     # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
-        sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
+        sck_til = sck + correction * Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
         exp_PtSnc_tilWc = (sc_til.mean(2) @ wc).exp()  # exp_PtSnc_tilWc should change due to sck_til changing
         exp_PtSnc_tilWc[torch.isinf(exp_PtSnc_tilWc)] = 1e38
@@ -282,8 +285,8 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    maxiter, correcton, threshold = 500, 0.7, 1e-4
-    Mw = opts.delta * correcton
+    maxiter, correction, threshold = 500, 0.7, 1e-4
+    Mw = opts.delta * correction
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
@@ -336,11 +339,16 @@ def loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts):
     epx_PtScWc[torch.isinf(epx_PtScWc)] = 1e38
     epx_PtSckWck = (sck.mean(1) * wkc).exp()
     epx_PtSckWck[torch.isinf(epx_PtSckWck)] = 1e38
-    g_sck_wc = (-(1-yc)*((epx_PtSckWck+1e-38).log()) + (1+epx_PtScWc).log()).sum()
-    term1 = 2*(Tdck@sck.t() -b.t()).norm()**2
-    term2 = opts.lamb * sck.abs().sum()
-    term3 = opts.eta * g_sck_wc
-    loss = term1 + term2 + term3
+    y_hat = 1 / (1 + epx_PtSckWck)
+    _1_y_hat = 1- y_hat
+    g_sck_wc = (-(1-yc)*((epx_PtSckWck+1e-38).log()) + (1+epx_PtSckWck).log()).sum()
+    # g_sck_wc = -((yc * (y_hat+ 1e-38).log()) + (1 - yc) * (1e-38 + _1_y_hat).log()).sum()
+    # print(g_sck_wc.item()))
+    fisher = 2*(Tdck@sck.t() - b.t()).norm()**2
+    sparse = opts.lamb * sck.abs().sum()
+    label = opts.eta * g_sck_wc
+    loss = fisher + sparse + label
+    if label < 0 or torch.isnan(label).sum() > 0: print(stop)
     return loss
 
 
@@ -1432,25 +1440,25 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Time index')
     plt.ylabel('Example index')
 
-    plt.figure()
-    plt.plot(loss.cpu().numpy(), '-x')
-    plt.title('Loss function value')
-    plt.xlabel('Epoch index')
-    plt.ylabel('Magnitude')
-    plt.grid()
-    if opts.show_details:
-        l = loss.clone()
-        l[:]= torch.log(torch.tensor(-1.0))
-        l[::5] = loss[::5]
-        plt.plot(l.cpu().numpy(), 'o')
-        plt.xlabel('Indexed when each variable is updated')
-        plt.legend(['Loss details', 'Loss after each epoch'])
+    if ft != 0:
+        plt.figure()
+        plt.plot(loss.cpu().numpy(), '-x')
+        plt.title('Loss function value')
+        plt.xlabel('Epoch index')
+        plt.ylabel('Magnitude')
+        plt.grid()
+        if opts.show_details:
+            l = loss.clone()
+            l[:]= torch.log(torch.tensor(-1.0))
+            l[::5] = loss[::5]
+            plt.plot(l.cpu().numpy(), 'o')
+            plt.xlabel('Indexed when each variable is updated')
+            plt.legend(['Loss details', 'Loss after each epoch'])
 
-    if ft !=0 :
         plt.figure()
         plt.plot(D0.squeeze().cpu().numpy())
         plt.plot(ft[0] / (ft[0].norm()+1e-38), '-x')
-        plt.title('commom component')
+        plt.title('Commom component')
         plt.legend(['Learned feature', 'Ground truth'])
         plt.xlabel('Time index')
         plt.ylabel('Magnitude')
@@ -1536,9 +1544,9 @@ def test(D, D0, S, S0, W, X, Y, opts):
             loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
-            if i > 10 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
+            if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
         else:
-            if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
+            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
@@ -1637,10 +1645,10 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('loss function value is %3.4e:' %loss[-1])
 
         if opts.show_details:
-            if i > 10 and abs((loss[-1] - loss[-6]) / loss[-6]) < threshold: break
+            if i > 3 and abs((loss[-1] - loss[-6]) / loss[-6]) < threshold: break
             print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
         else:
-            if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
+            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
 
 
