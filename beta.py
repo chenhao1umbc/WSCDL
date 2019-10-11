@@ -17,6 +17,7 @@ D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 if opts.save_results*0: save_results(D, D0, S, S0, W, opts, loss)
 plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
+
 N, C = Y.shape
 S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
 exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]

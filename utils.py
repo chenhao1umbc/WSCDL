@@ -249,7 +249,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     sc_til = sc.clone()  # shape of [N, K, T]
     sc_old = sc.clone(); marker = 0
 
-    loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + correction * Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -261,18 +261,18 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < threshold: break
-        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
         torch.cuda.empty_cache()
-    print('M max', M.max())
-    if marker == 1 :
-        print('--inf to 1e38 happend within the loop')
-        plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-        print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
-    if (loss[0] - loss[-1]) < 0 :
-        wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
-    print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
+    # print('M max', M.max())
+    # if marker == 1 :
+    #     print('--inf to 1e38 happend within the loop')
+    #     plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    #     print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
+    # if (loss[0] - loss[-1]) < 0 :
+    #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
+    # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    return sck_old, loss
+    return sck_old
 
 
 def solv_sck_test(sc, wc, Tdck, b, k, opts):
@@ -780,16 +780,16 @@ def updateS(DD0SS0W, X, Y, opts):
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         sc = S[:, c, :, :].clone() # sc will be changed in solv_sck, adding clone to prevent, for debugging
-        l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
-        l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
-        S[:, c, k, :] , loss = solv_sck(sc, wc, yc, Tdck, b, k, opts)
-        ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
-        print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
-        print('Local loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
-        print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
-        if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
+        # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
+        # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
+        S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+        # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
+        # print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
+        # print('Local loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
+        # print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
+        # if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
@@ -1452,7 +1452,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
             l = loss.clone()
             l[:]= torch.log(torch.tensor(-1.0))
             l[::5] = loss[::5]
-            plt.plot(l.cpu().numpy(), 'o')
+            plt.plot(l.cpu().numpy(), '--o')
             plt.xlabel('Indexed when each variable is updated')
             plt.legend(['Loss details', 'Loss after each epoch'])
 
@@ -1483,37 +1483,6 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Label index')
     # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)
     # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up in a new figure
-
-
-# def test(D, D0, S, S0, W, X, Y, opts):
-#     """
-#     This function is made to see the test accuracy by checking the reconstrunction label
-#     :param D: The pre-trained D, shape of [C, K, M]
-#     :param D0: pre-trained D0,  shape of [C0, K0, M]
-#     :param S: initial value, shape of [N,C,K,T]
-#     :param S0: initial value, shape of [N,K0,T]
-#     :param W: The pre-trained projection, shape of [C, K]
-#     :param X: testing data, shape of [N, T]
-#     :param Y: testing Lable, ground truth, shape of [N, C]
-#     :param opts: options of hyper-parameters
-#     :return: acc, Y_hat
-#     """
-#     loss, threshold = torch.tensor([], device=opts.dev), 1e-4
-#     for i in range(opts.maxiter):
-#         t0 = time.time()
-#         S = updateS_test([D, D0, S, S0, W], X, opts)
-#         S0 = updateS0_test([D, D0, S, S0], X, opts)
-#         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
-#         print('In the %1.0f epoch, the sparse coding time is :%3.2f' % (i, time.time() - t0))
-#         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
-#     exp_PtSnW = (S.mean(3) * W).sum(2).exp()  # shape of [N, C]
-#     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
-#     y_hat = 1 / (1 + exp_PtSnW)
-#     y_hat[y_hat > 0.5] = 1
-#     y_hat[y_hat < 0.5] = 0
-#     label_diff = Y - y_hat
-#     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
-#     return acc, 1/(1+exp_PtSnW), S, S0
 
 
 def test(D, D0, S, S0, W, X, Y, opts):
@@ -1559,39 +1528,6 @@ def test(D, D0, S, S0, W, X, Y, opts):
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
     return acc, 1/(1+exp_PtSnW), S, S0
-
-
-# def train(D, D0, S, S0, W, X, Y, opts):
-#     """
-#     This function is the main training body of the algorithm
-#     :param D: initial value, D, shape of [C, K, M]
-#     :param D0: pre-trained D0,  shape of [C0, K0, M]
-#     :param S: initial value, shape of [N,C,K,T]
-#     :param S0: initial value, shape of [N,K0,T]
-#     :param W: The pre-trained projection, shape of [C, K]
-#     :param X: testing data, shape of [N, T]
-#     :param Y: testing Lable, ground truth, shape of [N, C]
-#     :param opts: options of hyper-parameters
-#     :return: D, D0, S, S0, W, loss
-#     """
-#     loss, threshold = torch.tensor([], device=opts.dev), 1e-4
-#     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-#     print('The initial loss function value is %3.4e:' % loss[-1])
-#     t = time.time()
-#     for i in range(opts.maxiter):
-#         t0 = time.time()
-#         S = updateS([D, D0, S, S0, W], X, Y, opts)
-#         S0 = updateS0([D, D0, S, S0], X, Y, opts)
-#         D = updateD([D, D0, S, S0, W], X, Y, opts)
-#         D0 = updateD0([D, D0, S, S0], X, Y, opts)
-#         W = updateW([S, W], Y, opts)
-#         loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-#         if i > 10 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
-#         print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
-#
-#     print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
-#     print('All done, the total running time is :%3.2f \n' % (time.time() - t))
-#     return D, D0, S, S0, W, loss
 
 
 def train(D, D0, S, S0, W, X, Y, opts):
