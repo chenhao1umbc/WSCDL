@@ -28,8 +28,9 @@
   </component>
   <component name="ProjectId" id="1Pw552t485gB4fbJm3VSds9rOyG" />
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../process_aasp" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/utils.py" />
     <property name="settings.editor.selected.configurable" value="pyconsole" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/utils.py" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -75,13 +76,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.utils" />
-        <item itemvalue="Python.utils" />
-        <item itemvalue="Python.utils" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="StructureViewFactory">
     <option name="AUTOSCROLL_FROM_SOURCE" value="true" />

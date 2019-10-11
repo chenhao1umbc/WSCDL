@@ -236,7 +236,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     T = b.shape[1]
     P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
     # 'skc update will lead sc change'
-    sck = sc[:, k, :].clone()  # shape of [N, T]
+    sck = sc[:, k, :]  # shape of [N, T]
     sck_old = sck.clone()
     wkc = wc[k]  # scaler
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
@@ -271,8 +271,8 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     if (loss[0] - loss[-1]) < 0 :
         wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
-    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    return sck_old
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    return sck_old, loss
 
 
 def solv_sck_test(sc, wc, Tdck, b, k, opts):
@@ -783,7 +783,7 @@ def updateS(DD0SS0W, X, Y, opts):
         l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
         l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
-        S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+        S[:, c, k, :] , loss = solv_sck(sc, wc, yc, Tdck, b, k, opts)
         ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
         print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
@@ -1256,15 +1256,63 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     exp_PtSnW = (S_tik * W).sum(2).exp()   # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
+    _1_Y_hat = 1 - Y_hat
     fisher1 = torch.norm(X - R - DconvS.sum(1))**2
     fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
     fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
-    # label = -1 * N * opts.eta * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()
-    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum()
+    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
+    # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
     low_rank = N * opts.mu * D0.norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost
+
+
+def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
+    """
+    This function will calculate the costfunction value
+    :param X: the input data with shape of [N, T]
+    :param Y: the input label with shape of [N, C]
+    :param D: the discriminative dictionary, [C,K,M]
+    :param D0: the common dictionary, [K0,M]
+    :param S: the sparse coefficients, shape of [N,C,K,T] [samples, classes, num of atoms, time series,]
+    :param S0: the common coefficients, 3-d tensor [N, K0, T]
+    :param W: the projection for labels, shape of [C, K+1]
+    :param opts: the hyper-parameters
+    :return: cost, the value of loss function
+    """
+    N, K0, T = S0.shape
+    M = D0.shape[1]
+    M_2 = int((M-1)/2)  # dictionary atom dimension
+    C, K, _ = D.shape
+    ycDcconvSc = S[:, :, 0, :].clone()  # initialization
+    ycpDcconvSc = S[:, :, 0, :].clone()  # initialization
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+        ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]  # shape of [N, C, T]
+        ycpDcconvSc[:, c, :] = (1-Y[:, c].reshape(N, 1)) * DconvS[:, c, :]  # shape of [N, C, T]
+        torch.cuda.empty_cache()
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+
+    # using Y_hat is not stable because of log(), 1-Y_hat could be 0
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()   # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    Y_hat = 1 / (1 + exp_PtSnW)
+    _1_Y_hat = 1 - Y_hat
+    fisher1 = torch.norm(X - R - DconvS.sum(1))**2
+    fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
+    fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
+    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
+    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
+    # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
+    # print(label.item())
+    low_rank = N * opts.mu * D0.norm(p='nuc')
+    cost = fisher + sparse + label + low_rank
+    return fisher.item(), sparse.item(), label.item()
 
 
 def loss_fun_test(X, D, D0, S, S0, opts):
@@ -1322,53 +1370,6 @@ def loss_fun_test_spec(X, D, D0, S, S0, opts):
     fisher = torch.norm(X - R - DconvS.sum(1))**2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     return fisher, sparse
-
-
-def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
-    """
-    This function will calculate the costfunction value
-    :param X: the input data with shape of [N, T]
-    :param Y: the input label with shape of [N, C]
-    :param D: the discriminative dictionary, [C,K,M]
-    :param D0: the common dictionary, [K0,M]
-    :param S: the sparse coefficients, shape of [N,C,K,T] [samples, classes, num of atoms, time series,]
-    :param S0: the common coefficients, 3-d tensor [N, K0, T]
-    :param W: the projection for labels, shape of [C, K+1]
-    :param opts: the hyper-parameters
-    :return: cost, the value of loss function
-    """
-    N, K0, T = S0.shape
-    M = D0.shape[1]
-    M_2 = int((M-1)/2)  # dictionary atom dimension
-    C, K, _ = D.shape
-    ycDcconvSc = S[:, :, 0, :].clone()  # initialization
-    ycpDcconvSc = S[:, :, 0, :].clone()  # initialization
-    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
-    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-    for c in range(C):
-        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
-        ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]  # shape of [N, C, T]
-        ycpDcconvSc[:, c, :] = (1-Y[:, c].reshape(N, 1)) * DconvS[:, c, :]  # shape of [N, C, T]
-        torch.cuda.empty_cache()
-    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
-
-    # using Y_hat is not stable because of log(), 1-Y_hat could be 0
-    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
-    exp_PtSnW = (S_tik * W).sum(2).exp()   # shape of [N, C]
-    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
-    Y_hat = 1 / (1 + exp_PtSnW)
-    _1_Y_hat = 1 - Y_hat
-    fisher1 = torch.norm(X - R - DconvS.sum(1))**2
-    fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
-    fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
-    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
-    label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
-    # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
-    # print(label.item())
-    low_rank = N * opts.mu * D0.norm(p='nuc')
-    cost = fisher + sparse + label + low_rank
-    return fisher.item(), sparse.item(), label.item()
 
 
 def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
