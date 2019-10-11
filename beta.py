@@ -6,8 +6,8 @@ from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
 opts = OPT()
 opts.snr = 200
-opts.lamb = 3 # for sparsity penalty
-opts.eta = 1000  # for label penalty
+opts.lamb = 5 # for sparsity penalty
+opts.eta = 50  # for label penalty
 opts.mu = 0  # for low rank penalty
 # opts.show_details = False  # default as true
 
@@ -27,10 +27,11 @@ y_hat[y_hat > 0.5] = 1
 y_hat[y_hat <= 0.5] = 0
 label_diff = Y - y_hat
 acc = label_diff[label_diff == 0].shape[0] / label_diff.numel()
-print('The training data accuracy is : ', acc)
+print('The training data accuracy is : ', acc, '\n')
 # plt.show()
 
 # testing section
+# opts.lamb = 5  # for sparsity penalty
 X_test, Y_test, _ = load_toy(opts, test=True)
 _, _, S_t, S0_t, _ = init(X_test, opts)
 acc, y_hat, S_t, S0_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
