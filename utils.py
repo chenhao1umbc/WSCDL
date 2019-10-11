@@ -59,10 +59,10 @@ def init(X, opts):
     """
 
     N, T = X.shape
-    D = l2norm(torch.cat(opts.ft[1:]).reshape(opts.C, opts.K, opts.M)).to(opts.dev)
-    D0 = l2norm(opts.ft[0].reshape(opts.K0, opts.M)).to(opts.dev)
-    # D = l2norm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
-    # D0 = l2norm(torch.rand(opts.K0, opts.M, device=opts.dev))
+    # D = l2norm(awgn(torch.cat(opts.ft[1:]).reshape(opts.C, opts.K, opts.M), -20)).to(opts.dev)
+    # D0 = l2norm(awgn(opts.ft[0].reshape(opts.K0, opts.M), -20)).to(opts.dev)
+    D = l2norm(torch.rand(opts.C, opts.K, opts.M, device=opts.dev))
+    D0 = l2norm(torch.rand(opts.K0, opts.M, device=opts.dev))
     S = torch.zeros(N, opts.C, opts.K, T, device=opts.dev)
     S0 = torch.zeros(N, opts.K0, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K +1, device=opts.dev)
