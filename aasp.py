@@ -13,11 +13,11 @@ opts.show_details = False  # default as true
 
 
 # training section
-X, Y, ft = load_data(opts)
+X, Y = load_data(opts)
 D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 if opts.save_results*0: save_results(D, D0, S, S0, W, opts, loss)
-plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts)
+plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
 # testing section
