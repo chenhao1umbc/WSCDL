@@ -549,7 +549,7 @@ def updateD(DD0SS0W, X, Y, opts):
 
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
-        Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T],
+        Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T]
         abs_Tsck_t = abs(Tsck_t)
         Md = (abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0) # shape of [M]
         Md_inv = (Md + 1e-38)**(-1)
@@ -922,7 +922,7 @@ def load_data(opts, test=False):
     """
     # route = '/mnt/d/Downloads/AASP_train/'
     route = '/home/chenhao1/Hpython/AASP_train/'
-    x, y = torch.load(route+'train.pt')
+    x, y = torch.load(route+'aasp_train.pt')
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
     xte, yte = X[::4, :], Y[::4, :]

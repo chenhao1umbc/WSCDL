@@ -3,9 +3,8 @@ The default data type is torch.tensor with precision float32
 """
 
 from utils import *
-os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
-opts = OPT(C=16, M=500)
-opts.snr = 200
+os.environ["CUDA_VISIBLE_DEVICES"] = "1,3"
+opts = OPT(C=16, K0=3, K=5, M=30)
 opts.lamb = 2.7 # for sparsity penalty
 opts.eta = 3 # for label penalty
 opts.mu = 0  # for low rank penalty
