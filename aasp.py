@@ -10,7 +10,6 @@ opts.eta = 3 # for label penalty
 opts.mu = 0  # for low rank penalty
 opts.show_details = False  # default as true
 
-
 # training section
 X, Y = load_data(opts)
 D, D0, S, S0, W = init(X, opts)
