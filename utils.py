@@ -920,22 +920,27 @@ def l2norm(x):
     return x_z
 
 
-def load_data(opts, test='train'):
+def load_data(opts, data='train'):
     """
-    :param opts:
-    :return:
+    This function will load the preprocessed AASP dataset
+    :param opts: only need teh cpu or gpu info
+    :return: training, validation or testing data
     """
     # route = '/mnt/d/Downloads/AASP_train/'
-    route = '/home/chenhao1/Hpython/AASP_train/'
-    x, y = torch.load(route+'aasp_train_80*150.pt')
+    route = '/home/chenhao1/Hpython/AASP/'
+    if data == 'test':
+        x, y = torch.load(route+'aasp_test_80*150.pt')
+    else:
+        x, y = torch.load(route + 'aasp_train_80*150.pt')
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
     indx = torch.arange(X.shape[0])
     ind = indx[indx%4 !=0]
     xtr, ytr = l2norm(X[ind, :]), Y[ind, :]
-    xte, yte = xtr[::4, :], ytr[::4, :]
-    if test == 'val' : return xte, yte   # validation
-    return xtr, ytr
+    xval, yval = xtr[::4, :], ytr[::4, :]
+    if data == 'train' : return xtr, ytr
+    if data == 'val' : return xval, yval   # validation
+    if data == 'test': return  l2norm(X), Y  # testing
 
 
 def load_toy(opts, test=False):
@@ -1530,9 +1535,6 @@ def test(D, D0, S, S0, W, X, Y, opts):
         S0 = updateS0_test([D, D0, S, S0], X, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
-
-
-
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
@@ -1576,14 +1578,14 @@ def train(D, D0, S, S0, W, X, Y, opts):
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
             print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.3f' % (1-(S==0).sum().item()/S_numel))
+            print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
 
         S0 = updateS0([D, D0, S, S0], X, Y, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
             print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.3f' % (1-(S0==0).sum().item()/S0_numel))
+            print('check sparsity, None-zero percentage is : %1.4f' % (1-(S0==0).sum().item()/S0_numel))
 
         D = updateD([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
@@ -1629,82 +1631,5 @@ def awgn(x, snr):
     """
     variance = 10 ** (-snr / 10.0)
     noise = torch.tensor(np.sqrt(variance) * np.random.normal(0, 1, x.shape), device=x.device)
-
     return x+noise.to(x.dtype)
 
-# def _wav2array(nchannels, sampwidth, data):
-#     """data must be the string containing the bytes from the wav file."""
-#     num_samples, remainder = divmod(len(data), sampwidth * nchannels)
-#     if remainder > 0:
-#         raise ValueError('The length of data is not a multiple of '
-#                          'sampwidth * num_channels.')
-#     if sampwidth > 4:
-#         raise ValueError("sampwidth must not be greater than 4.")
-#
-#     if sampwidth == 3:
-#         a = np.empty((num_samples, nchannels, 4), dtype=np.uint8)
-#         raw_bytes = np.fromstring(data, dtype=np.uint8)
-#         a[:, :, :sampwidth] = raw_bytes.reshape(-1, nchannels, sampwidth)
-#         a[:, :, sampwidth:] = (a[:, :, sampwidth - 1:sampwidth] >> 7) * 255
-#         result = a.view('<i4').reshape(a.shape[:-1])
-#     else:
-#         # 8 bit samples are stored as unsigned ints; others as signed ints.
-#         dt_char = 'u' if sampwidth == 1 else 'i'
-#         a = np.fromstring(data, dtype='<%s%d' % (dt_char, sampwidth))
-#         result = a.reshape(-1, nchannels)
-#     return result
-#
-#
-# def readwav(file):
-#     """
-#     Read a wav file.
-#     Returns the frame rate, sample width (in bytes) and a numpy array
-#     containing the data.
-#     This function does not read compressed wav files.
-#     """
-#     wav = wave.open(file)
-#     rate = wav.getframerate()
-#     nchannels = wav.getnchannels()
-#     sampwidth = wav.getsampwidth()
-#     nframes = wav.getnframes()
-#     data = wav.readframes(nframes)
-#     wav.close()
-#     array = _wav2array(nchannels, sampwidth, data)
-#     return rate, sampwidth, array
-#
-#
-# def label_str2num(l1, l2, l3, labels):
-#     """
-#     This function will turn the string labels in to vector
-#     :param l1: script01_sid
-#     :param l2: script02_sid
-#     :param l3: script03_sid
-#     :param labels: the labels with string
-#     :return: matrix of 0 and 1
-#     """
-#     pool1 = [i[2] for i in l1]
-#     pool2 = [i[2] for i in l2]
-#     pool3 = [i[2] for i in l3]
-#     pool1.extend(pool2)
-#     pool1.extend(pool3)
-#     pool = list(set(pool1))
-#     pool.sort()
-#
-#     N = len(labels)  # number of examples
-#     Y = np.zeros((N, len(pool)))  # initialization
-#     for i in range(N):
-#         for ii in labels[i]:  # each ii is a string
-#             Y[i, pool.index(ii)] = 1
-#     return Y
-#
-#
-# def spectro(x, bw=256, overlap=0.1, fs=44.1e3, showplot=True):
-#     f, t, sx = sg.spectrogram(x, fs=fs, nperseg=bw, noverlap=int(bw*overlap))
-#     if showplot:
-#         plt.figure()
-#         plt.title('Spectrogram')
-#         plt.pcolormesh(t, f, sx)
-#     plt.ylabel('Frequency [Hz]')
-#     plt.xlabel('Time [sec]')
-#     plt.show()
-#     return sx
