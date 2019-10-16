@@ -498,18 +498,11 @@ def toeplitz(x, m=10, T=10):
     N, m0 = x.shape  # m0 is T for Tsck, and m0 is M for Tdck
     M = m if m < m0 else m0
     M2 = int((M - 1) / 2) + 1  # half length of M, for truncation purpose
-    # x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
-    # xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
-    # tx = torch.zeros(N, m, T, device=dev)
-    # for i in range(m):
-    #     ind = range(M2 + i, M2 + i + T)
-    #     tx[:, i, :] = xm[:, i, ind]
     x_append0 = torch.cat([torch.zeros(N, m), x.cpu(), torch.zeros(N, m)], dim=1)
-    xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
     tx = torch.zeros(N, m, T)
     for i in range(m):
-        ind = range(M2 + i, M2 + i + T)
-        tx[:, i, :] = xm[:, i, ind]
+        indx = range(M2 + i, M2 + i + T)
+    tx[:, :, :] = x_append0[0, indx]
     return tx.flip(1).to(dev)
 
 
