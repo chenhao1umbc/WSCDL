@@ -81,8 +81,7 @@ def acc_newton(P, q):  # both shape of [M]
     :param q: for update D, q = -MD@nu,     for update D0, q = -(MD@nu + rho*Zk0 + Yk0),
     :return: dck or dck0
     """
-    psi = 0
-    maxiter = 200
+    psi, maxiter= 0, 200
     qq = q*q
     for i in range(maxiter):
         f_grad = -2 * ((P+psi)**(-3) * qq).sum()
@@ -93,6 +92,7 @@ def acc_newton(P, q):  # both shape of [M]
         else:
             psi = psi_new.clone()
     dck = -((P + psi_new)**(-1)) * q
+    if torch.isnan(dck).sum() > 0: print(inf_nan_happenned)
     return dck
 
 
@@ -109,7 +109,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
     coef = Tsck_t@Tsck_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
 
-    # loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
+    loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
     for i in range(maxiter):
         d_til = d + correction*Mw*(d - d_old)  # shape of [M]
         nu = d_til - (coef@d_til - term).sum(0) * Md_inv  # shape of [M]
@@ -119,8 +119,9 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
             d_new = acc_newton(Md, -Md*nu)  # QCQP(P, q)
         d, d_old = d_new, d
         torch.cuda.empty_cache()
-        # loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
+        loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         if (d - d_old).norm() / d_old.norm() < threshold: break
+        if torch.isnan(d).sum() > 0: print(inf_nan_happenned)
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d
 
@@ -552,7 +553,9 @@ def updateD(DD0SS0W, X, Y, opts):
         Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T]
         abs_Tsck_t = abs(Tsck_t)
         Md = (abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0) # shape of [M]
-        Md_inv = (Md + 1e-38)**(-1)
+        if Md.sum() == 0: continue  # Sck is too sparse with all 0s
+        Md_inv = (Md)**(-1)
+
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
@@ -566,7 +569,7 @@ def updateD(DD0SS0W, X, Y, opts):
         b = (term1 + term2 + term3)/2
         torch.cuda.empty_cache()
         D[c, k, :] = solv_dck(dck, Md, Md_inv, opts.delta, Tsck_t, b)
-        if torch.isnan(D).sum() + torch.isinf(D).sum() > 0: print(inf_nan_happenned)
+        if torch.isinf(D).sum() > 0: print(inf_nan_happenned)
     return D
 
 
@@ -618,7 +621,8 @@ def updateD0(DD0SS0, X, Y, opts):
         abs_Tsnk0_t = abs(Tsnk0_t)   # shape of [N, M, T]
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
         MD = 4*(abs_Tsnk0_t @ abs_Tsnk0_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0)   # shape of [M]
-        MD_inv = 1/(1e-38+MD)  #shape of [M]
+        if MD.sum() == 0 : continue
+        MD_inv = 1/(MD)  #shape of [M]
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
         torch.cuda.empty_cache()
         # print('D0 loss function value before update is %3.2e:' %loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
@@ -1559,19 +1563,19 @@ def train(D, D0, S, S0, W, X, Y, opts):
     t, t1 = time.time(), time.time()
     for i in range(opts.maxiter):
         t0 = time.time()
-        S = updateS([D, D0, S, S0, W], X, Y, opts)
-        if opts.show_details:
-            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-            print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
-
-        S0 = updateS0([D, D0, S, S0], X, Y, opts)
-        if opts.show_details:
-            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-            print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.3f' % (1 - S0[S0 == 0].shape[0] / S0.numel()))
+        # S = updateS([D, D0, S, S0, W], X, Y, opts)
+        # if opts.show_details:
+        #     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        #     print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
+        #     print('loss function value is %3.4e:' %loss[-1])
+        #     print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
+        #
+        # S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        # if opts.show_details:
+        #     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+        #     print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
+        #     print('loss function value is %3.4e:' %loss[-1])
+        #     print('check sparsity, None-zero percentage is : %1.3f' % (1 - S0[S0 == 0].shape[0] / S0.numel()))
 
         D = updateD([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
