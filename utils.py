@@ -1,6 +1,7 @@
 ##
 # """This file constains all the necessary classes and functions"""
 import os
+import sys
 import pickle
 import time
 import datetime
@@ -104,12 +105,13 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
         Tsck_t, is truncated toeplitz matrix of sck with shape of [N, M, T]
         b is bn with all N, with shape of [N, T]
         """
+    # for the synthetic data correction = 0.1
     maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.clone(), x.clone(), x.clone()
     coef = Tsck_t@Tsck_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
 
-    loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
     for i in range(maxiter):
         d_til = d + correction*Mw*(d - d_old)  # shape of [M]
         nu = d_til - (coef@d_til - term).sum(0) * Md_inv  # shape of [M]
@@ -119,7 +121,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_t, b):
             d_new = acc_newton(Md, -Md*nu)  # QCQP(P, q)
         d, d_old = d_new, d
         torch.cuda.empty_cache()
-        loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
+        # loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         if (d - d_old).norm() / d_old.norm() < threshold: break
         if torch.isnan(d).sum() > 0: print(inf_nan_happenned)
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
@@ -139,6 +141,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     :param k0: the current index of for loop of K0
     :return: dck0
     """
+    # for the synthetic data correction = 0.1
     maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.clone(), x.clone(), x.clone()
     coef = Tsck0_t@Tsck0_t.permute(0, 2, 1)  # shaoe of [N, M, M]
@@ -201,14 +204,15 @@ def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
     :param lamb: sparsity hyper parameter
     :return: dck0
     """
-    maxiter, threshold = 500, 1e-4
+    # for the synthetic data correction = 0.7
+    maxiter, correction,  threshold = 500, 1, 1e-4
     snk0_old, snk0 = x.clone(), x.clone()
     coef = Minv @ Tdk0.t() @ Tdk0  # shape of [T, T]
     term = (Minv @ Tdk0.t() @b.t()).t()  # shape of [N, T]
 
     # loss = torch.cat((torch.tensor([], device=x.device), loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
     for i in range(maxiter):
-        snk0_til = snk0 + Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
+        snk0_til = snk0 + correction*Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
         nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
         snk0_new = shrink(M, nu, lamb)  # shape of [N, T]
         snk0, snk0_old = snk0_new, snk0
@@ -232,7 +236,8 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    maxiter, correction, threshold = 500, 0.7, 1e-4
+    # for the synthetic data correction = 0.7
+    maxiter, correction, threshold = 500, 1, 1e-4 # correction is help to make the loss monotonically decreasing
     Mw = opts.delta
     lamb = opts.lamb
     dev = opts.dev
@@ -289,7 +294,7 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     :return: sck
     """
     maxiter, correction, threshold = 500, 0.7, 1e-4
-    Mw = opts.delta * correction
+    Mw = opts.delta * correction # correction is help to make the loss monotonically decreasing
     lamb = opts.lamb
     dev = opts.dev
     T = b.shape[1]
@@ -425,6 +430,7 @@ def solv_wc(x, snc, yc, Mw):
     :param Mw: real number, is delta
     :return: wc
     """
+    # for the synthetic data correction = 0.1
     N, threshold = yc.shape[0], 1e-4
     maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
     wc_old, wc, wc_til = x.clone(), x.clone(), x.clone()
@@ -1611,7 +1617,6 @@ def train(D, D0, S, S0, W, X, Y, opts):
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
-
 
     print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
     print('All done, the total running time is :%3.2f \n' % (time.time() - t1))

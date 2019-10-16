@@ -54,7 +54,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.aasp">
+  <component name="RunManager" selected="Python.wscdl">
     <configuration name="aasp" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -122,9 +122,6 @@
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -141,10 +138,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.wscdl" />
         <item itemvalue="Python.aasp" />
         <item itemvalue="Python.wscdl" />
         <item itemvalue="Python.beta" />
-        <item itemvalue="Python.utils" />
         <item itemvalue="Python.utils" />
       </list>
     </recent_temporary>
