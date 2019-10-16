@@ -500,8 +500,9 @@ def toeplitz(x, m=10, T=10):
     M2 = int((M - 1) / 2) + 1  # half length of M, for truncation purpose
     x_append0 = torch.cat([torch.zeros(N, m), x.cpu(), torch.zeros(N, m)], dim=1)
     tx = torch.zeros(N, m, T)
+    indx = torch.zeros(m, T).long()
     for i in range(m):
-        indx = range(M2 + i, M2 + i + T)
+        indx[i, :] = torch.arange(M2 + i, M2 + i + T)
     tx[:, :, :] = x_append0[0, indx]
     return tx.flip(1).to(dev)
 
