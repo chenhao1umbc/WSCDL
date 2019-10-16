@@ -6,8 +6,8 @@ from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
 opts = OPT()
 opts.snr = 200
-opts.lamb = 5 # for sparsity penalty
-opts.eta = 50  # for label penalty
+opts.lamb = 2 # for sparsity penalty
+opts.eta = 0  # for label penalty
 opts.mu = 0  # for low rank penalty
 # opts.show_details = False  # default as true
 

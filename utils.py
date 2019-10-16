@@ -35,7 +35,7 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n = 100, 50
+        self.seed, self.n = 0, 50
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -499,12 +499,33 @@ def toeplitz(x, m=10, T=10):
     N, m0 = x.shape  # m0 is T for Tsck, and m0 is M for Tdck
     M = m if m < m0 else m0
     M2 = int((M - 1) / 2) + 1  # half length of M, for truncation purpose
+    t = time.time()
     x_append0 = torch.cat([torch.zeros(N, m), x.cpu(), torch.zeros(N, m)], dim=1)
-    tx = torch.zeros(N, m, T)
+    tx0 = torch.zeros(N, m, T)
     indx = torch.zeros(m, T).long()
     for i in range(m):
         indx[i, :] = torch.arange(M2 + i, M2 + i + T)
-    tx[:, :, :] = x_append0[0, indx]
+    tx0[:, :, :] = x_append0[0, indx]
+    print('method1 time:', time.time()-t)
+
+    t = time.time()
+    x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+    xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
+    tx = torch.zeros(N, m, T, device=dev)
+    for i in range(m):
+        ind = range(M2 + i, M2 + i + T)
+        tx[:, i, :] = xm[:, i, ind]
+    print('method2 time:', time.time() - t)
+
+    t = time.time()
+    x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+    # xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
+    tx = torch.zeros(N, m, T, device=dev)
+    indx = torch.zeros(m, T).long()
+    for i in range(m):
+        ind = range(M2 + i, M2 + i + T)
+    tx[:, :, :] = x_append0[0, ind]
+    print('method3 time:', time.time() - t)
     return tx.flip(1).to(dev)
 
 
@@ -1563,19 +1584,19 @@ def train(D, D0, S, S0, W, X, Y, opts):
     t, t1 = time.time(), time.time()
     for i in range(opts.maxiter):
         t0 = time.time()
-        # S = updateS([D, D0, S, S0, W], X, Y, opts)
-        # if opts.show_details:
-        #     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        #     print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
-        #     print('loss function value is %3.4e:' %loss[-1])
-        #     print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
-        #
-        # S0 = updateS0([D, D0, S, S0], X, Y, opts)
-        # if opts.show_details:
-        #     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        #     print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
-        #     print('loss function value is %3.4e:' %loss[-1])
-        #     print('check sparsity, None-zero percentage is : %1.3f' % (1 - S0[S0 == 0].shape[0] / S0.numel()))
+        S = updateS([D, D0, S, S0, W], X, Y, opts)
+        if opts.show_details:
+            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+            print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
+            print('loss function value is %3.4e:' %loss[-1])
+            print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
+
+        S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        if opts.show_details:
+            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+            print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
+            print('loss function value is %3.4e:' %loss[-1])
+            print('check sparsity, None-zero percentage is : %1.3f' % (1 - S0[S0 == 0].shape[0] / S0.numel()))
 
         D = updateD([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
