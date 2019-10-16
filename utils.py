@@ -461,10 +461,10 @@ def svt(L, tau):
     :return: P the matrix after singular value thresholding
     """
     dev = L.device
-    L = L.cpu()
+    # L = L.cpu()  ##########  in version 1.2 the torch.svd for GPU could be much slower than CPU
     l, h = L.shape
     try:
-        u, s, v = torch.svd(L)  ########## so far in version 1.2 the torch.svd for GPU could be much slower than CPU
+        u, s, v = torch.svd(L)
     except:                     ########## and torch.svd may have convergence issues for GPU and CPU.
         u, s, v = torch.svd(L + 1e-4*L.mean()*torch.rand(l, h))
         print('unstable svd happened')
@@ -920,19 +920,22 @@ def l2norm(x):
     return x_z
 
 
-def load_data(opts, test=False):
+def load_data(opts, test='train'):
     """
     :param opts:
     :return:
     """
     # route = '/mnt/d/Downloads/AASP_train/'
     route = '/home/chenhao1/Hpython/AASP_train/'
-    x, y = torch.load(route+'aasp_train.pt')
+    x, y = torch.load(route+'aasp_train_80*150.pt')
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
-    xte, yte = X[::4, :], Y[::4, :]
-    if test : return xte, yte
-    return xte, yte
+    indx = torch.arange(X.shape[0])
+    ind = indx[indx%4 !=0]
+    xtr, ytr = l2norm(X[ind, :]), Y[ind, :]
+    xte, yte = xtr[::4, :], ytr[::4, :]
+    if test == 'val' : return xte, yte   # validation
+    return xtr, ytr
 
 
 def load_toy(opts, test=False):
@@ -1521,12 +1524,15 @@ def test(D, D0, S, S0, W, X, Y, opts):
         S = updateS_test([D, D0, S, S0, W], X, opts)
         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         if opts.show_details:
-            print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
+            print('check sparsity, None-zero percentage is : %1.3f' % (1-(S==0).sum().item()/S_numel))
             print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
             t0 = time.time()
         S0 = updateS0_test([D, D0, S, S0], X, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
+
+
+
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
@@ -1562,6 +1568,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
     print('The initial loss function value is :%3.4e' % loss[-1])
     t, t1 = time.time(), time.time()
+    S_numel, S0_numel = S.numel(), S0.numel()
     for i in range(opts.maxiter):
         t0 = time.time()
         S = updateS([D, D0, S, S0, W], X, Y, opts)
@@ -1569,14 +1576,14 @@ def train(D, D0, S, S0, W, X, Y, opts):
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
             print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.3f' % (1 - S[S == 0].shape[0] / S.numel()))
+            print('check sparsity, None-zero percentage is : %1.3f' % (1-(S==0).sum().item()/S_numel))
 
         S0 = updateS0([D, D0, S, S0], X, Y, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
             print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.3f' % (1 - S0[S0 == 0].shape[0] / S0.numel()))
+            print('check sparsity, None-zero percentage is : %1.3f' % (1-(S0==0).sum().item()/S0_numel))
 
         D = updateD([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
