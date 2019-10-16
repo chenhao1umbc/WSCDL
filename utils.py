@@ -499,34 +499,59 @@ def toeplitz(x, m=10, T=10):
     N, m0 = x.shape  # m0 is T for Tsck, and m0 is M for Tdck
     M = m if m < m0 else m0
     M2 = int((M - 1) / 2) + 1  # half length of M, for truncation purpose
-    t = time.time()
-    x_append0 = torch.cat([torch.zeros(N, m), x.cpu(), torch.zeros(N, m)], dim=1)
-    tx0 = torch.zeros(N, m, T)
-    indx = torch.zeros(m, T).long()
-    for i in range(m):
-        indx[i, :] = torch.arange(M2 + i, M2 + i + T)
-    tx0[:, :, :] = x_append0[0, indx]
-    print('method1 time:', time.time()-t)
+    if m == T:
+        x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+        tx = torch.zeros(N, m, T, device=dev)
+        indx = torch.zeros(m, T).long()
+        for i in range(m):
+            indx[i, :] = torch.arange(M2 + i, M2 + i + T)
+        tx[:, :, :] = x_append0[0, indx]
+    else :
+        x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+        xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
+        tx = torch.zeros(N, m, T, device=dev)
+        for i in range(m):
+            ind = range(M2 + i, M2 + i + T)
+            tx[:, i, :] = xm[:, i, ind]
 
-    t = time.time()
-    x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
-    xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
-    tx = torch.zeros(N, m, T, device=dev)
-    for i in range(m):
-        ind = range(M2 + i, M2 + i + T)
-        tx[:, i, :] = xm[:, i, ind]
-    print('method2 time:', time.time() - t)
-
-    t = time.time()
-    x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+    # # speed compare code
+    # t = time.time()
+    # x_append0 = torch.cat([torch.zeros(N, m), x.cpu(), torch.zeros(N, m)], dim=1)
+    # tx0 = torch.zeros(N, m, T)
+    # indx = torch.zeros(m, T).long()
+    # for i in range(m):
+    #     indx[i, :] = torch.arange(M2 + i, M2 + i + T)
+    # tx0[:, :, :] = x_append0[0, indx]
+    # print('method1 time:', time.time()-t)
+    #
+    # t = time.time()   # this was the old method
+    # x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
     # xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
-    tx = torch.zeros(N, m, T, device=dev)
-    indx = torch.zeros(m, T).long()
-    for i in range(m):
-        ind = range(M2 + i, M2 + i + T)
-    tx[:, :, :] = x_append0[0, ind]
-    print('method3 time:', time.time() - t)
-    return tx.flip(1).to(dev)
+    # tx = torch.zeros(N, m, T, device=dev)
+    # for i in range(m):
+    #     ind = range(M2 + i, M2 + i + T)
+    #     tx[:, i, :] = xm[:, i, ind]
+    # print('method2 time:', time.time() - t)
+    #
+    # t = time.time()
+    # x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+    # # xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
+    # tx = torch.zeros(N, m, T, device=dev)
+    # indx = torch.zeros(m, T).long()
+    # for i in range(m):
+    #     indx = torch.arange(M2 + i, M2 + i + T)
+    # tx[:, :, :] = x_append0[0, indx]
+    # print('method3 time:', time.time() - t)
+    #
+    # t = time.time()
+    # x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+    # # xm = x_append0.repeat(m, 1, 1).permute(1, 0, 2)  # shape of [N, m, ?+2m]
+    # tx = torch.zeros(N, m, T, device=dev)
+    # for i in range(m):
+    #     ind = range(M2 + i, M2 + i + T)
+    #     tx[:, i, :] = x_append0[0, ind]
+    # print('method4 time:', time.time() - t)
+    return tx.flip(1)
 
 
 def updateD(DD0SS0W, X, Y, opts):
