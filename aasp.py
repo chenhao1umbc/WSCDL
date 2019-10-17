@@ -5,7 +5,7 @@ The default data type is torch.tensor with precision float32
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 opts = OPT(C=16, K0=3, K=3, M=60)
-opts.lamb = 0.1 # for sparsity penalty
+opts.lamb = 0.01 # for sparsity penalty
 opts.eta = 0 # for label penalty
 opts.mu = 0  # for low rank penalty
 # opts.show_details = False  # default as true
