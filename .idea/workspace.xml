@@ -54,7 +54,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.utils">
+  <component name="RunManager" selected="Python.aasp">
     <configuration name="aasp" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -162,10 +162,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.aasp" />
         <item itemvalue="Python.utils" />
         <item itemvalue="Python.temp1" />
         <item itemvalue="Python.wscdl" />
-        <item itemvalue="Python.aasp" />
         <item itemvalue="Python.wscdl" />
       </list>
     </recent_temporary>

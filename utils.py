@@ -933,11 +933,11 @@ def load_data(opts, data='train'):
     :return: training, validation or testing data
     """
     # route = '/mnt/d/Downloads/AASP_train/'
-    route = '/home/chenhao1/Hpython/AASP/'
+    route = '/home/chenhao1/Hpython/'
     if data == 'test':
-        x, y = torch.load(route+'aasp_test_80*150.pt')
+        x, y = torch.load(route+'aasp_test_80by50.pt')
     else:
-        x, y = torch.load(route + 'aasp_train_80*150.pt')
+        x, y = torch.load(route + 'aasp_train_80by50.pt')
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
     indx = torch.arange(X.shape[0])
@@ -1527,15 +1527,16 @@ def test(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: acc, Y_hat
     """
-    loss, threshold = torch.tensor([], device=opts.dev), 1e-4
+    loss, threshold = torch.tensor([], device=opts.dev), 5e-4
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
+    S_numel, S0_numel = S.numel(), S0.numel()
     for i in range(opts.maxiter):
         t0 = time.time()
         S = updateS_test([D, D0, S, S0, W], X, opts)
         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         if opts.show_details:
-            print('check sparsity, None-zero percentage is : %1.3f' % (1-(S==0).sum().item()/S_numel))
+            print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
             print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
             t0 = time.time()
         S0 = updateS0_test([D, D0, S, S0], X, opts)
@@ -1572,7 +1573,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: D, D0, S, S0, W, loss
     """
-    loss, threshold = torch.tensor([], device=opts.dev), 1e-4
+    loss, threshold = torch.tensor([], device=opts.dev), 5e-4
     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
     print('The initial loss function value is :%3.4e' % loss[-1])
     t, t1 = time.time(), time.time()
