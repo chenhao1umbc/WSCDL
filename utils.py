@@ -1617,7 +1617,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
-            print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
+            if i%3 == 0 : print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
 
     print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
     print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
@@ -1625,7 +1625,27 @@ def train(D, D0, S, S0, W, X, Y, opts):
 
 
 def save_results(D, D0, S, S0, W, opts, loss):
-    torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
+    """
+    This function will save the training results
+    :param D: initial value, D, shape of [C, K, M]
+    :param D0: pre-trained D0,  shape of [C0, K0, M]
+    :param S: initial value, shape of [N,C,K,T]
+    :param S0: initial value, shape of [N,K0,T]
+    :param W: The pre-trained projection, shape of [C, K]
+    :param X: testing data, shape of [N, T]
+    :param Y: testing Lable, ground truth, shape of [N, C]
+    :param opts: options of hyper-parameters
+    :param type: type == 0 synthetic data saving
+                type == 1 aasp data with S and S0
+                type == 2 aasp data without opts, S and S0, but with showing opts info in the file name
+    """
+    # if type == 0:  # synthetic data saving
+    #     torch.save([D, D0, S, S0, W, opts, loss], '../toy_DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
+    # if type == 1:  # all aasp data
+    #     torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
+    # if type == 2:  # dictionaries of aas
+    param = str([opts.lamb, opts.eta , opts.mu])
+    torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 
 
 def awgn(x, snr):

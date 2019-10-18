@@ -4,7 +4,7 @@ The default data type is torch.tensor with precision float32
 
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-opts = OPT(C=16, K0=3, K=3, M=60)
+opts = OPT(C=16, K0=3, K=3, M=50)
 opts.lamb = 0.01 # for sparsity penalty
 opts.eta = 0 # for label penalty
 opts.mu = 0  # for low rank penalty
@@ -14,7 +14,7 @@ opts.mu = 0  # for low rank penalty
 X, Y = load_data(opts)
 D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
-if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
+if opts.save_results*0: save_results(D, D0, S, S0, W, opts, loss)
 # plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
