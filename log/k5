@@ -162,3 +162,30 @@ The test data accuracy is :  0.8304843304843305
 The initial loss function value is :6.3218e+02
 In the 0 epoch, the training time is :87.03
 In the 3 epoch, the training time is :68.95
+In the 6 epoch, the training time is :64.89
+In the 9 epoch, the training time is :67.05
+In the 12 epoch, the training time is :59.53
+In the 15 epoch, the training time is :55.67
+In the 18 epoch, the training time is :53.23
+In the 21 epoch, the training time is :51.74
+In the 24 epoch, the training time is :51.74
+In the 27 epoch, the training time is :49.12
+In the 30 epoch, the training time is :48.66
+In the 33 epoch, the training time is :46.99
+In the 36 epoch, the training time is :45.97
+In the 39 epoch, the training time is :44.00
+In the 42 epoch, the training time is :42.64
+In the 45 epoch, the training time is :42.19
+In the 48 epoch, the training time is :41.14
+In the 51 epoch, the training time is :41.33
+After 52 epochs, the loss function value is 7.9731e+01:
+All done, the total running time is :2789.26 
+
+The initial loss function value is 7.0200e+02:
+In the 0 epoch, the sparse coding time is :33.55
+In the 3 epoch, the sparse coding time is :32.60
+In the 6 epoch, the sparse coding time is :31.97
+In the 9 epoch, the sparse coding time is :30.85
+In the 12 epoch, the sparse coding time is :30.14
+In the 15 epoch, the sparse coding time is :29.78
+In the 18 epoch, the sparse coding time is :29.57

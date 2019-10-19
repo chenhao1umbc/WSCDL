@@ -950,7 +950,7 @@ def load_data(opts, data='train'):
     indx = torch.arange(X.shape[0])
     ind = indx[indx%4 !=0]
     xtr, ytr = l2norm(X[ind, :]), Y[ind, :]
-    xval, yval = xtr[::4, :], ytr[::4, :]
+    xval, yval = l2norm(xtr[::4, :]), ytr[::4, :]
     if data == 'train' : return xtr, ytr
     if data == 'val' : return xval, yval   # validation
     if data == 'test': return  l2norm(X), Y  # testing
@@ -1467,12 +1467,12 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
 
     plt.figure()
     plt.subplot(121)
-    plt.imshow((R + DconvS.sum(1))[100:200, 100:200].cpu().numpy(), aspect='auto')
+    plt.imshow((R + DconvS.sum(1))[:30, :30].cpu().numpy(), aspect='auto')
     plt.title('Reconstruted data, zoomed-in')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.subplot(122)
-    plt.imshow(X[100:200, 100:200].cpu().numpy(), aspect='auto')
+    plt.imshow(X[:30, :30].cpu().numpy(), aspect='auto')
     plt.title('Given data, zoomed-in')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
@@ -1507,14 +1507,24 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
             plt.legend(['Learned feature', 'Ground truth'])
             plt.xlabel('Time index')
             plt.ylabel('Magnitude')
+    # plot labels
     plt.figure()
     plt.imshow(Y.cpu().numpy(), aspect='auto')
     plt.title('True labels')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
+
     plt.figure()
     plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
     plt.title('Reconstructed labels')
+    plt.ylabel('Example index')
+    plt.xlabel('Label index')
+
+    plt.figure()
+    Y_hat[Y_hat>0.5] = 1
+    Y_hat[Y_hat<=0.5] = 0
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
+    plt.title('Reconstructed labels after thresholding')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
     # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)

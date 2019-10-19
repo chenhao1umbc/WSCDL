@@ -184,3 +184,11 @@ In the 18 epoch, the sparse coding time is :23.41
 In the 21 epoch, the sparse coding time is :23.72
 In the 24 epoch, the sparse coding time is :23.38
 In the 27 epoch, the sparse coding time is :22.72
+In the 30 epoch, the sparse coding time is :22.51
+In the 33 epoch, the sparse coding time is :22.13
+In the 36 epoch, the sparse coding time is :22.06
+In the 39 epoch, the sparse coding time is :22.12
+In the 42 epoch, the sparse coding time is :22.33
+
+The test data accuracy is :  0.8290598290598291
+{'C': 16, 'K': 4, 'K0': 3, 'M': 50, 'mu': 0.01, 'eta': 0.01, 'lamb': 0.1, 'delta': 0.9, 'maxiter': 200, 'plot': False, 'snr': 20, 'dataset': 0, 'show_details': False, 'save_results': True, 'seed': 0, 'n': 50, 'shuffle': False, 'transpose': False, 'common_term': True, 'dev': 'cuda'}
