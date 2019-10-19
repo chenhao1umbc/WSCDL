@@ -149,3 +149,32 @@ In the 6 epoch, the training time is :57.42
 In the 9 epoch, the training time is :54.52
 In the 12 epoch, the training time is :61.01
 In the 15 epoch, the training time is :65.77
+In the 18 epoch, the training time is :38.86
+In the 21 epoch, the training time is :46.56
+In the 24 epoch, the training time is :44.65
+In the 27 epoch, the training time is :37.24
+In the 30 epoch, the training time is :35.83
+In the 33 epoch, the training time is :35.07
+In the 36 epoch, the training time is :35.26
+In the 39 epoch, the training time is :37.98
+After 41 epochs, the loss function value is 8.7393e+01:
+All done, the total running time is :1993.12 
+
+The initial loss function value is 7.0200e+02:
+In the 0 epoch, the sparse coding time is :21.86
+In the 3 epoch, the sparse coding time is :19.28
+In the 6 epoch, the sparse coding time is :18.44
+In the 9 epoch, the sparse coding time is :17.57
+In the 12 epoch, the sparse coding time is :18.18
+In the 15 epoch, the sparse coding time is :17.69
+In the 18 epoch, the sparse coding time is :17.84
+In the 21 epoch, the sparse coding time is :17.21
+In the 24 epoch, the sparse coding time is :17.34
+In the 27 epoch, the sparse coding time is :16.56
+In the 30 epoch, the sparse coding time is :16.92
+In the 33 epoch, the sparse coding time is :17.02
+In the 36 epoch, the sparse coding time is :16.61
+In the 39 epoch, the sparse coding time is :17.13
+
+The test data accuracy is :  0.8316417378917379
+{'C': 16, 'K': 2, 'K0': 3, 'M': 50, 'mu': 0.01, 'eta': 0.01, 'lamb': 0.1, 'delta': 0.9, 'maxiter': 200, 'plot': False, 'snr': 20, 'dataset': 0, 'show_details': False, 'save_results': True, 'seed': 0, 'n': 50, 'shuffle': False, 'transpose': False, 'common_term': True, 'dev': 'cuda'}

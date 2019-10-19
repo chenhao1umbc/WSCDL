@@ -1,4 +1,5 @@
-"""This is the main file to run Weakly supervised supervised dictionary learning
+"""This is the main fi%%%%%%setting model tunning parameters%%%%%%
+le to run Weakly supervised supervised dictionary learning
 The default data type is torch.tensor with precision float32
 This file will sun aasp with multiple arguments in the terminal
 this file is used for testing

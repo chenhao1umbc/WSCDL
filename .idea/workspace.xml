@@ -54,7 +54,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.beta">
+  <component name="RunManager" selected="Python.aasp">
     <configuration name="aasp" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -96,8 +96,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.beta" />
         <item itemvalue="Python.aasp" />
+        <item itemvalue="Python.beta" />
         <item itemvalue="Python.aasp" />
       </list>
     </recent_temporary>
