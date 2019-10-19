@@ -1,3 +1,8 @@
+"""This is the main file to run Weakly supervised supervised dictionary learning
+The default data type is torch.tensor with precision float32
+This file will sun aasp with multiple arguments in the terminal
+"""
+
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = sys.argv[1]
 opts = OPT(C=16, K0=3, K=3, M=50)

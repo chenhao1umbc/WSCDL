@@ -36,7 +36,7 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n = 0, 50
+        self.seed, self.n, self.shuffle = 0, 50, False
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -934,12 +934,18 @@ def load_data(opts, data='train'):
     """
     # route = '/mnt/d/Downloads/AASP_train/'
     route = '/home/chenhao1/Hpython/'
-    if data == 'test':
+    if data == 'test':  # x, y are numpy double arrays
         x, y = torch.load(route+'aasp_test_80by50.pt')
     else:
         x, y = torch.load(route + 'aasp_train_80by50.pt')
+    if opt.shuffle:
+        n = np.arange(x.shape[0])
+        np.random.shuffle(n)
+
+
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
+    # X = X.reshape(X.shape[0], 80, 50).permute(0, 2, 1).reshape(X.shape[0], -1)  # learn atom of over time
     indx = torch.arange(X.shape[0])
     ind = indx[indx%4 !=0]
     xtr, ytr = l2norm(X[ind, :]), Y[ind, :]
@@ -1448,24 +1454,24 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
 
     plt.figure()
     plt.subplot(121)
-    plt.imshow((R + DconvS.sum(1)).cpu().numpy())
+    plt.imshow((R + DconvS.sum(1)).cpu().numpy(), aspect='auto')
     plt.title('Reconstruted data')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.subplot(122)
-    plt.imshow(X.cpu().numpy())
+    plt.imshow(X.cpu().numpy(), aspect='auto')
     plt.title('Given data')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
 
     plt.figure()
     plt.subplot(121)
-    plt.imshow((R + DconvS.sum(1))[100:200, 100:200].cpu().numpy())
+    plt.imshow((R + DconvS.sum(1))[100:200, 100:200].cpu().numpy(), aspect='auto')
     plt.title('Reconstruted data, zoomed-in')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.subplot(122)
-    plt.imshow(X[100:200, 100:200].cpu().numpy())
+    plt.imshow(X[100:200, 100:200].cpu().numpy(), aspect='auto')
     plt.title('Given data, zoomed-in')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
@@ -1500,11 +1506,11 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
             plt.legend(['Learned feature', 'Ground truth'])
             plt.xlabel('Time index')
             plt.ylabel('Magnitude')
-        plt.figure()
-        plt.imshow(Y.cpu().numpy(), aspect='auto')
-        plt.title('True labels')
-        plt.ylabel('Training example index')
-        plt.xlabel('Label index')
+    plt.figure()
+    plt.imshow(Y.cpu().numpy(), aspect='auto')
+    plt.title('True labels')
+    plt.ylabel('Training example index')
+    plt.xlabel('Label index')
     plt.figure()
     plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
     plt.title('Reconstructed labels')
