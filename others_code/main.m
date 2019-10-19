@@ -20,7 +20,7 @@ for i=1:runs
     valX = X(:,:,permidx(i,no_train+1:end));
     valY = Y(permidx(i,no_train+1:end),:);
     wtx = wtimesx(w{i},valX,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
-    y_hat = get_signal_label(W, valX, option);  % newly written function get the predicted signal labels
+    y_hat = get_signal_label(w{1}, valX, option);  % newly written function get the predicted signal labels
     acc(i) = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
 end
 
