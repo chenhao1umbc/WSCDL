@@ -945,7 +945,7 @@ def load_data(opts, data='train'):
         x, y = x[n], y[n]
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
-    if opts.transpose:
+    if opts.transpose:  # true means stacking over the column
         X = X.reshape(X.shape[0], 80, 50).permute(0, 2, 1).reshape(X.shape[0], -1)  # learn atom of over time
     indx = torch.arange(X.shape[0])
     ind = indx[indx%4 !=0]

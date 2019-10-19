@@ -1,6 +1,7 @@
 """This is the main file to run Weakly supervised supervised dictionary learning
 The default data type is torch.tensor with precision float32
 This file will sun aasp with multiple arguments in the terminal
+this file is used for tuning
 """
 
 from utils import *
@@ -21,12 +22,13 @@ for i in range(5):
     D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
     if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 
-    # X_val, Y_val = load_data(opts, data='val')
-    # _, _, S_v, S0_v, _ = init(X_val, opts)
-    # acc, y_hat, S_, S0_v = test(D, D0, S_v, S0_v, W, X_val, Y_val, opts)
-    # print('\nThe val data accuracy is : ', acc)
+    X_val, Y_val = load_data(opts, data='val')
+    _, _, S_v, S0_v, _ = init(X_val, opts)
+    acc, y_hat, S_, S0_v = test(D, D0, S_v, S0_v, W, X_val, Y_val, opts)
+    print('\nThe val data accuracy is : ', acc)
 
-    X_test, Y_test = load_data(opts, data='test')
-    _, _, S_t, S0_t, _ = init(X_test, opts)
-    acc, y_hat, S_t, S0_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
-    print('\nThe test data accuracy is : ', acc)
+    # X_test, Y_test = load_data(opts, data='test')
+    # _, _, S_t, S0_t, _ = init(X_test, opts)
+    # acc, y_hat, S_t, S0_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+    # print('\nThe test data accuracy is : ', acc)
+print(vars(opts))

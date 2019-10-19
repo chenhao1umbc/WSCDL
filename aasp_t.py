@@ -1,7 +1,13 @@
+"""This is the main file to run Weakly supervised supervised dictionary learning
+The default data type is torch.tensor with precision float32
+This file will sun aasp with multiple arguments in the terminal
+this file is used for testing
+"""
+
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = sys.argv[1]
 n = int(sys.argv[2])
-opts = OPT(C=16, K0=n, K=n, M=50)
+opts = OPT(C=16, K0=3, K=n, M=50)
 opts.lamb = 0.1  # for sparsity penalty
 opts.eta = 0.01 # for label penalty
 opts.mu = 0.01 # for low rank penalty
@@ -26,3 +32,5 @@ for i in range(5):
     _, _, S_t, S0_t, _ = init(X_test, opts)
     acc, y_hat, S_t, S0_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
     print('\nThe test data accuracy is : ', acc)
+
+print(vars(opts))
