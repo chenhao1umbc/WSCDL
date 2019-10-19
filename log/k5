@@ -121,3 +121,44 @@ The test data accuracy is :  0.8272792022792023
 The initial loss function value is :6.3216e+02
 In the 0 epoch, the training time is :67.19
 In the 3 epoch, the training time is :70.28
+In the 6 epoch, the training time is :68.21
+In the 9 epoch, the training time is :68.02
+In the 12 epoch, the training time is :68.22
+In the 15 epoch, the training time is :61.09
+In the 18 epoch, the training time is :54.71
+In the 21 epoch, the training time is :54.32
+In the 24 epoch, the training time is :55.71
+In the 27 epoch, the training time is :54.04
+In the 30 epoch, the training time is :51.66
+In the 33 epoch, the training time is :49.34
+In the 36 epoch, the training time is :48.78
+In the 39 epoch, the training time is :47.81
+In the 42 epoch, the training time is :47.94
+In the 45 epoch, the training time is :46.41
+In the 48 epoch, the training time is :45.29
+In the 51 epoch, the training time is :44.22
+After 52 epochs, the loss function value is 7.9699e+01:
+All done, the total running time is :2947.49 
+
+The initial loss function value is 7.0200e+02:
+In the 0 epoch, the sparse coding time is :34.67
+In the 3 epoch, the sparse coding time is :33.43
+In the 6 epoch, the sparse coding time is :32.29
+In the 9 epoch, the sparse coding time is :31.58
+In the 12 epoch, the sparse coding time is :31.94
+In the 15 epoch, the sparse coding time is :31.17
+In the 18 epoch, the sparse coding time is :30.40
+In the 21 epoch, the sparse coding time is :30.51
+In the 24 epoch, the sparse coding time is :30.42
+In the 27 epoch, the sparse coding time is :29.38
+In the 30 epoch, the sparse coding time is :30.37
+In the 33 epoch, the sparse coding time is :29.68
+In the 36 epoch, the sparse coding time is :29.16
+In the 39 epoch, the sparse coding time is :28.70
+In the 42 epoch, the sparse coding time is :28.41
+In the 45 epoch, the sparse coding time is :29.10
+
+The test data accuracy is :  0.8304843304843305
+The initial loss function value is :6.3218e+02
+In the 0 epoch, the training time is :87.03
+In the 3 epoch, the training time is :68.95
