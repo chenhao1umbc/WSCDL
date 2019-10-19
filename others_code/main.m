@@ -5,7 +5,7 @@ close all;
 addpath('WSCADL-YOU_master')
 
 %% run toy data
-% run settings
+% run setting
 % 
 % acc = zeros(5, 1); 
 % for i=1:runs
