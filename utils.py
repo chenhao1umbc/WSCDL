@@ -36,7 +36,8 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, False
+        self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, False  # n is number of examples per combination for toy data
+        self.common_term = True  # if common term exist
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -1509,12 +1510,12 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.figure()
     plt.imshow(Y.cpu().numpy(), aspect='auto')
     plt.title('True labels')
-    plt.ylabel('Training example index')
+    plt.ylabel('Example index')
     plt.xlabel('Label index')
     plt.figure()
     plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
     plt.title('Reconstructed labels')
-    plt.ylabel('Training example index')
+    plt.ylabel('Example index')
     plt.xlabel('Label index')
     # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)
     # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up in a new figure
@@ -1593,7 +1594,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('loss function value is %3.4e:' %loss[-1])
             print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
 
-        S0 = updateS0([D, D0, S, S0], X, Y, opts)
+        S0 = updateS0([D, D0, S, S0], X, Y, opts) if opts.common_term else S0
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
@@ -1606,7 +1607,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
             print('loss function value is %3.4e:' %loss[-1])
 
-        D0 = updateD0([D, D0, S, S0], X, Y, opts)
+        D0 = updateD0([D, D0, S, S0], X, Y, opts) if opts.common_term else D0
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
