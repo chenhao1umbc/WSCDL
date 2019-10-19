@@ -42,7 +42,7 @@ C=size(Y,2);
 K=1;
 gamma=0;
 runs=5;
-perc=0.8;
+perc=0.75;
 if strcmp(option.method,'online')
     EMiterations=100000;
 else
