@@ -36,7 +36,7 @@ class OPT:
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n, self.shuffle = 0, 50, False
+        self.seed, self.n, self.shuffle = 0, 50, True
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -941,8 +941,7 @@ def load_data(opts, data='train'):
     if opt.shuffle:
         n = np.arange(x.shape[0])
         np.random.shuffle(n)
-
-
+        x, y = x[n], y[n]
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
     # X = X.reshape(X.shape[0], 80, 50).permute(0, 2, 1).reshape(X.shape[0], -1)  # learn atom of over time
