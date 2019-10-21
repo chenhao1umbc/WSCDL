@@ -34,11 +34,13 @@ if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 
 X_test, Y_test = load_data(opts, data='train')
 opts.lamb = 0.001
-_, _, S_tt, S0_tt, _ = init(X_test, opts)
-acc, y_hat, S_tt, S0_tt= test(D, D0, S_tt, S0_tt, W, X_test, Y_test, opts)
+_, _, S_t, S0_t, _ = init(X_test, opts)
+acc, y_hat, S_t, S0_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc)
 print((S==0).sum().item()/S.numel())
-print((S_t==0).sum().item()/S_tt.numel())
-print((S0_t==0).sum().item()/S0_tt.numel())
+print((S_t==0).sum().item()/S_t.numel())
+print((S0_t==0).sum().item()/S0_t.numel())
 print((S0==0).sum().item()/S0.numel())
-plot_result(X_test, Y_test, D, D0, S_tt, S0_tt, W, ft=0, loss=loss, opts=opts)
+plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss, opts=opts)
+
+print('done')
