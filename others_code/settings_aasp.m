@@ -14,6 +14,7 @@ option.display=0;%display the words and probablities;
 % datastr='synspect_2cluster';
 % load([datastr,'.mat']);
 x = importdata('x_80_50.txt');
+x = x./sqrt(sum(x.*x, 2));  % normalize data
 X = zeros(80, 50, size(x, 1));
 for i = 1:size(x, 1)
     X(:,:, i) = reshape(x(i,:), 50, 80)';

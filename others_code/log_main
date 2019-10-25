@@ -1,0 +1,332 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2019 The MathWorks, Inc.
+                  R2019b (9.7.0.1190202) 64-bit (glnxa64)
+                              August 21, 2019
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+>> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> Start trainig model
+>> >> 
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8181
+         0
+         0
+         0
+         0
+
+
+test_acc =
+
+    0.8366
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8181
+    0.8137
+         0
+         0
+         0
+
+
+test_acc =
+
+    0.8391
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8181
+    0.8137
+    0.8037
+         0
+         0
+
+
+test_acc =
+
+    0.8345
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8181
+    0.8137
+    0.8037
+    0.8100
+         0
+
+
+test_acc =
+
+    0.8375
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8181
+    0.8137
+    0.8037
+    0.8100
+    0.8156
+
+
+test_acc =
+
+    0.8391
+
+>> >> >> >> >> >> >> >> >> >> >> >> >> 
