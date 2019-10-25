@@ -6,12 +6,12 @@ this file is used for testing
 
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = '3'
-opts = OPT(C=16, K0=1, K=3, M=50)
-opts.lamb = 0.1  # for sparsity penalty
-opts.eta = 0.01 # for label penalty
-opts.mu = 0.01 # for low rank penalty
+opts = OPT(C=16, K0=1, K=3, M=80)
+opts.lamb = 0.2  # for sparsity penalty
+opts.eta = 0.0 # for label penalty
+opts.mu = 0.0 # for low rank penalty
 opts.common_term = False
-opts.transpose, opts.shuffle, opts.show_details = False, False, False  # default as true
+opts.transpose, opts.shuffle, opts.show_details = True, False, True  # default as true
 
 # training section
 X, Y = load_data(opts)
@@ -33,14 +33,15 @@ if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 # print('\nThe test data accuracy is : ', acc)
 
 X_test, Y_test = load_data(opts, data='train')
-opts.lamb = 0.001
+opts.lamb = 0.2
 _, _, S_t, S0_t, _ = init(X_test, opts)
 acc, y_hat, S_t, S0_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc)
+
 print((S==0).sum().item()/S.numel())
 print((S_t==0).sum().item()/S_t.numel())
-print((S0_t==0).sum().item()/S0_t.numel())
 print((S0==0).sum().item()/S0.numel())
+print((S0_t==0).sum().item()/S0_t.numel())
 plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss, opts=opts)
 
 print('done')

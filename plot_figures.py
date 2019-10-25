@@ -49,3 +49,36 @@ plt.figure();plt.plot((x.reshape(80, 50).T).flatten(), '--x')
 plt.figure();plt.imshow(x.reshape(80, 50), aspect='auto')
 plt.figure();plt.imshow(x.reshape(50, 80), aspect='auto')
 plt.figure();plt.imshow(x.reshape(80, 50).T, aspect='auto')
+
+
+# plot result over k0 and k
+x = [0.8332, 0.8323, 0.8342, 0.8338, 0.8342, 0.8325]
+plt.figure();plt.plot(x, '--x')
+plt.grid()
+plt.title('Test accurate vs atoms in common dictionary')
+plt.xlabel('Number of atoms in common dictionary')
+plt.ylabel('Averaged test accurate ')
+
+x = [0.8243, 0.8325, 0.8338, 0.8307, 0.8304]
+t = [1,2,3,4,5]
+plt.figure();plt.plot(t,x, '--x')
+plt.grid()
+plt.title('Test accurate vs atoms in individual dictionary')
+plt.xlabel('Number of atoms in individual dictionary')
+plt.ylabel('Averaged test accurate ')
+
+# plot error bar
+plt.figure()
+y = (0.8391+0.8375+0.8345+0.8391+0.8366)/5
+a= [0.8068910256410257,
+ 0.8167735042735043,
+ 0.8100071225071225,
+ 0.8071581196581197,
+ 0.8076923076923077]
+plt.errorbar([1], [0.834241452991453], [[0.0025106837606837518], [0.002831196581196571]], fmt='ok', lw=0.5)
+plt.errorbar([ 2], [y], [[0.00285999999], [0.0017399999999999638]], fmt='.k', lw=0.5)
+plt.errorbar([3], [sum(a)/5], [[sum(a)/5- min(a)], [max(a)-sum(a)/5]], fmt='xk', lw=0.5)
+plt.legend(['Ours', "You's", 'Column-wise'], loc=0)
+plt.ylabel('Accuracy')
+plt.xlabel('Method index')
+plt.title('Classification accuracy of 5 runs')
