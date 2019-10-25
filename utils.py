@@ -143,7 +143,7 @@ def solv_dck0(x, M, Minv, Mw, Tsck0_t, b, D0, mu, k0):
     :return: dck0
     """
     # for the synthetic data correction = 0.1
-    maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
+    maxiter, correction, threshold = 500, 0.1, 5e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.clone(), x.clone(), x.clone()
     coef = Tsck0_t@Tsck0_t.permute(0, 2, 1)  # shaoe of [N, M, M]
     term = (Tsck0_t@b.unsqueeze(2)).squeeze()  # shape of [N, M]
@@ -172,7 +172,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     :param D0: common dict contains all the dk0, shape of [K0, M]
     :return: dk0
     """
-    (K0, m), threshold = D0.shape, 1e-4
+    (K0, m), threshold = D0.shape, 5e-4
     rho = 10 * mu +1e-38 # agrangian coefficients
     dev = D0.device
     Z = torch.eye(K0, m, device=dev)
@@ -950,7 +950,7 @@ def load_data(opts, data='train'):
     indx = torch.arange(X.shape[0])
     ind = indx[indx%4 !=0]
     xtr, ytr = l2norm(X[ind, :]), Y[ind, :]
-    xval, yval = l2norm(xtr[::4, :]), ytr[::4, :]
+    xval, yval = l2norm(X[::4, :]), Y[::4, :]
     if data == 'train' : return xtr, ytr
     if data == 'val' : return xval, yval   # validation
     if data == 'test': return  l2norm(X), Y  # testing
