@@ -118,10 +118,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.aasp" />
+        <item itemvalue="Python.aasp" />
+        <item itemvalue="Python.aasp" />
         <item itemvalue="Python.beta" />
         <item itemvalue="Python.utils" />
-        <item itemvalue="Python.utils" />
-        <item itemvalue="Python.aasp" />
       </list>
     </recent_temporary>
   </component>
@@ -185,6 +185,11 @@
           <url>file://$PROJECT_DIR$/beta.py</url>
           <line>46</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/aasp.py</url>
+          <line>24</line>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
