@@ -13,6 +13,7 @@ import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sg
+from sklearn import metrics
 
 tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
@@ -1575,7 +1576,11 @@ def test(D, D0, S, S0, W, X, Y, opts):
     y_hat[y_hat <= 0.5] = 0
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
-    return acc, 1/(1+exp_PtSnW), S, S0
+    acc_all = OPT()
+    acc_all.acc = acc
+    acc_all.recall = recall(Y, y_hat)
+    acc_all.precision = precision(Y, y_hat)
+    return acc_all, 1/(1+exp_PtSnW), S, S0
 
 
 def train(D, D0, S, S0, W, X, Y, opts):
@@ -1677,3 +1682,51 @@ def awgn(x, snr):
     noise = torch.tensor(np.sqrt(variance) * np.random.normal(0, 1, x.shape), device=x.device)
     return x+noise.to(x.dtype)
 
+def get_perf(Y, S, W):
+    """
+    this function will show the performance by checking recall, accuracy, and precision
+    :param Y: The true label
+    :param S: The sparse matrix
+    :param W: the projection vector including the bias
+    :return: None
+    """
+    N, C = Y.shape
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    y_hat = 1 / (1 + exp_PtSnW)
+    y_hat[y_hat > 0.5] = 1
+    y_hat[y_hat <= 0.5] = 0
+    label_diff = Y - y_hat
+    acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
+    print('acc is : ', acc)
+    print('recall is : ', recall(Y, y_hat))
+    print('precision is : ', precision(Y, y_hat))
+
+
+def recall(y, yh):
+    """
+    calculate the recall score for a matrix
+    :param y: N by C
+    :param yh: predicted N by C
+    :return: recall_score
+    """
+    s = 0
+    N, C = y.shape
+    for i in range(C):
+        s = s + metrics.recall_score(y[i], yh[i])
+    return s/C
+
+
+def precision(y, yh):
+    """
+    calculate the recall score for a matrix
+    :param y: N by C
+    :param yh: predicted N by C
+    :return: precision_score
+    """
+    s = 0
+    N, C = y.shape
+    for i in range(C):
+        s = s + metrics.precision_score(y[i], yh[i])
+    return s/C

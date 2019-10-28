@@ -36,7 +36,7 @@ X_test, Y_test = load_data(opts, data='train')
 opts.lamb = 0.2
 _, _, S_t, S0_t, _ = init(X_test, opts)
 acc, y_hat, S_t, S0_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
-print('\nThe test data accuracy is : ', acc)
+print('\nThe test data accuracy is : ', acc.acc)
 
 print((S==0).sum().item()/S.numel())
 print((S_t==0).sum().item()/S_t.numel())
