@@ -38,7 +38,7 @@ class OPT:
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, False  # n is number of examples per combination for toy data
-        self.common_term = True  # if common term exist
+        self.common_term = True*K0  # if common term exist
         if torch.cuda.is_available():
             self.dev = 'cuda'
             print('\nRunning on GPU')
@@ -1713,8 +1713,10 @@ def recall(y, yh):
     """
     s = 0
     N, C = y.shape
+    yc = np.array(y.cpu())
+    yhc = np.array(yh.cpu())
     for i in range(C):
-        s = s + metrics.recall_score(y[i], yh[i])
+        s = s + metrics.recall_score(yc[i], yhc[i])
     return s/C
 
 
@@ -1727,6 +1729,8 @@ def precision(y, yh):
     """
     s = 0
     N, C = y.shape
+    yc = np.array(y.cpu())
+    yhc = np.array(yh.cpu())
     for i in range(C):
-        s = s + metrics.precision_score(y[i], yh[i])
+        s = s + metrics.precision_score(yc[i], yhc[i])
     return s/C
