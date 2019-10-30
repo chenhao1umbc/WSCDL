@@ -957,7 +957,7 @@ def load_data(opts, data='train'):
     if data == 'test': return  l2norm(X), Y  # testing
 
 
-def load_toy(opts, test=False):
+def load_toy(opts, test='train'):
     """
     So far Aug. 24. 2019, we are loading the synthetic data to see if it works, the time series length is 500
     there are 4 classes, with its mixtures but without overlapping. the features are sin waves and rectangular waves,
@@ -969,7 +969,8 @@ def load_toy(opts, test=False):
     """
     '''Generate toy data'''
     T = 1600
-    if test : torch.manual_seed(opts.seed)
+    if test == 'train': torch.manual_seed(seed)
+    if test == 'cv' : torch.manual_seed(opts.seed)
     x = torch.arange(30).float()  # x.sin() only works for float32...
     featurec = featurec = torch.sin(x*2*np.pi/30) - torch.cos(x * 11 * np.pi /30 +1.5)  # '''The common features'''
     feature1 = torch.sin(x * 2 * np.pi / 15) + torch.sin(x * 2 * np.pi / 10)
