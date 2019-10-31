@@ -1252,7 +1252,7 @@ def load_toy(opts, test='train'):
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[(i+1) * n: (i + 2) * n] = current_label
 
-    X = awgn(X[:, :T], opts, test)  #truncation step & adding noise
+    X = awgn(X[:, :T], opts.snr, opts.seed, test)  #truncation step & adding noise
     # # z-norm, the standardization, 0-mean, var-1
     X = znorm(X)
     # unit norm, norm(x) = 1
@@ -1672,16 +1672,15 @@ def save_results(D, D0, S, S0, W, opts, loss):
     torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 
 
-def awgn(x, opts, test='train'):
+def awgn(x, snr, cvseed=0, test='train'):
     """
     This function is adding white guassian noise to the given signal
     :param x: the given signal with shape of [N, T]
     :param snr: a float number
     :return:
     """
-    snr = opts.snr
-    if test == 'train': np.random.seed(seed)
-    if test == 'cv' : np.random.seed(opts.seed)
+    if test == 'train': np.random.seed(seed)  # seed is global variable
+    if test == 'cv' : np.random.seed(cvseed)
     variance = 10 ** (-snr / 10.0)
     noise = torch.tensor(np.sqrt(variance) * np.random.normal(0, 1, x.shape), device=x.device)
     return x+noise.to(x.dtype)
