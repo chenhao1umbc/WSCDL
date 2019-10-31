@@ -54,7 +54,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.wscdl">
+  <component name="RunManager" selected="Python.beta">
     <configuration name="aasp" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -141,10 +141,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.beta" />
         <item itemvalue="Python.wscdl" />
         <item itemvalue="Python.utils" />
         <item itemvalue="Python.utils" />
-        <item itemvalue="Python.beta" />
         <item itemvalue="Python.aasp" />
       </list>
     </recent_temporary>
@@ -208,12 +208,7 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/beta.py</url>
           <line>45</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/wscdl.py</url>
-          <line>27</line>
-          <option name="timeStamp" value="3" />
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

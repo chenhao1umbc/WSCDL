@@ -1717,7 +1717,8 @@ def recall(y, yh):
     yc = np.array(y.cpu())
     yhc = np.array(yh.cpu())
     for i in range(C):
-        s = s + metrics.recall_score(yc[i], yhc[i])
+        s = s + metrics.recall_score(yc[:,i], yhc[:,i])
+
     return s/C
 
 
@@ -1733,5 +1734,5 @@ def precision(y, yh):
     yc = np.array(y.cpu())
     yhc = np.array(yh.cpu())
     for i in range(C):
-        s = s + metrics.precision_score(yc[i], yhc[i])
+        s = s + metrics.precision_score(yc[:,i], yhc[:,i])
     return s/C
