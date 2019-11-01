@@ -79,7 +79,6 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.beta" />
-        <item itemvalue="Python.utils" />
       </list>
     </recent_temporary>
   </component>
@@ -146,8 +145,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/beta.py</url>
-          <line>72</line>
-          <option name="timeStamp" value="11" />
+          <line>45</line>
+          <option name="timeStamp" value="12" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

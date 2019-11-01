@@ -32,7 +32,7 @@ class OPT:
     lamb is the coeff of sparsity
      nu is the coeff of cross-entropy loss
      """
-    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=200):
+    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=200, silent=False):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
         self.maxiter, self.plot, self.snr = maxiter, False, 20
@@ -41,10 +41,10 @@ class OPT:
         self.common_term = True*K0  # if common term exist
         if torch.cuda.is_available():
             self.dev = 'cuda'
-            print('\nRunning on GPU')
+            if not silent: print('\nRunning on GPU')
         else:
             self.dev = 'cpu'
-            print('\nRunning on CPU')
+            if not silent: print('\nRunning on CPU')
 
 
 def init(X, opts):
@@ -1577,7 +1577,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     y_hat[y_hat <= 0.5] = 0
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
-    acc_all = OPT()
+    acc_all = OPT(silent=True)
     acc_all.acc = acc
     acc_all.recall = recall(Y, y_hat)
     acc_all.precision = precision(Y, y_hat)
