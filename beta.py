@@ -23,18 +23,19 @@ if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 
 # X_val, Y_val = load_data(opts, data='val')
 # _, _, S_v, S0_v, _ = init(X_val, opts)
-# acc, y_hat, S_, S0_v = test(D, D0, S_v, S0_v, W, X_val, Y_val, opts)
+# acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_v, S0_v, W, X_val, Y_val, opts)
 # print('\nThe val data accuracy is : ', acc)
 
 # X_test, Y_test = load_data(opts, data='test')
 # _, _, S_t, S0_t, _ = init(X_test, opts)
-# acc, y_hat, S_t, S0_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+# acc, y_hat, S_t, S0_t, loss_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 # print('\nThe test data accuracy is : ', acc)
 
 X_test, Y_test = load_data(opts, data='train')
 opts.lamb = 0.1
 _, _, S_t, S0_t, _ = init(X_test, opts)
-acc, *res= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+acc, y_hat, S_t, S0_t, loss_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+# acc, y_hat, S_t, S0_t, loss_t= test_fista(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc.acc)
 
 print((S==0).sum().item()/S.numel())
@@ -46,11 +47,11 @@ plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss, opts=opts)
 print('done')
 
 
-####################### toy ######################
+# ####################### toy ######################
 # from utils import *
 # os.environ["CUDA_VISIBLE_DEVICES"] = "1, 3"
 # opts = OPT()
-# opts.snr = 200
+# opts.snr = 2
 # opts.lamb = 2.7 # for sparsity penalty
 # opts.eta = 3 # for label penalty
 # opts.mu = 0  # for low rank penalty
@@ -61,13 +62,15 @@ print('done')
 # D, D0, S, S0, W = init(X, opts)
 # D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 # if opts.save_results*0: save_results(D, D0, S, S0, W, opts, loss)
-# plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
+# # plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
 # # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 #
 # # testing section
 # X_test, Y_test, _ = load_toy(opts, test='train')
 # _, _, S_t, S0_t, _ = init(X_test, opts)
-# acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+# # acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+# acc, y_hat, S_t, S0_t, loss_t= test_fista(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 # print('\nThe test data accuracy is : ', acc.acc)
-# plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
+# # plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
+#
 # print('done')

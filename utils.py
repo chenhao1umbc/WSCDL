@@ -739,6 +739,48 @@ def updateS0_test(DD0SS0, X, opts):
     return S0
 
 
+def updateS0_test_fista(DD0SS0, X, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        X is a matrix [N, T], training Data
+        Y is not given
+    """
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    N, K0, T = S0.shape
+    C, K, _ = D.shape
+    M = D0.shape[1]
+    M_2 = int((M-1)/2)  # dictionary atom dimension
+    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+    for c in range(C):
+        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    alpha_plus_dk0 = DconvS.sum(1) + R
+
+    for k0 in range(K0):
+        dk0 = D0[k0, :]
+        snk0 = S0[:, k0, :]  # shape of [N, T]
+        dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
+        Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
+        abs_Tdk0 = abs(Tdk0_t).t()
+        MS0_diag = (abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
+        MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
+        MS0_inv = (1/MS0_diag).diag()
+        b = X - alpha_plus_dk0 + dk0convsck0
+        torch.cuda.empty_cache()
+        # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
+        # S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, Tdk0_t.t(), b, opts.lamb/2)
+        S0[:, k0, :] = fista(b, Tdk0_t.t(), snk0, opts.lamb)
+        # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
+    return S0
+
+
 def loss_S0(_2Tdk0, snk0, b, lamb):
     """
     This function calculates the sub-loss function for S0
@@ -857,6 +899,52 @@ def updateS_test(DD0SS0W, X, opts):
         # print('Main sparse after bpgm the diff is: %1.9e' %(l0[1] - loss_fun_test_spec(X, D, D0, S, S0, opts)[1]))
         # print('Local sparse after bpgm the diff is: %1.9e' % (l1[1] - loss_Sck_test_spec(Tdck, b, sc, sc[:, k, :], opts)[1]))
         # print('Main sparse after bpgm the diff is: %1.9e' %(l - loss_fun_test(X, D, D0, S, S0, opts)))
+        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
+    return S
+
+
+def updateS_test_fista(DD0SS0W, X, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        W is a matrix [C, K], where K is per-class atoms
+        X is a matrix [N, T], training Data
+        Y are the labels, not given
+    """
+    D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
+    N, K0, T = S0.shape
+    M = D0.shape[1]  # dictionary atom dimension
+    M_2 = int((M-1)/2)
+    C, K, _ = D.shape
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    # '''update the current s_n,k^(c) '''
+    for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+        Crange = torch.tensor(range(C))
+        DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+        for cc in range(C):
+            # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+            DconvS[:, cc, :] = F.conv1d(S[:, cc, :, :], Dcopy[cc, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+
+        dck = D[c, k, :]  # shape of [M]
+        sck = S[:, c, k, :]  # shape of [N, T]
+        wc = W[c, :]  # shape of [K]
+        Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
+
+        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
+        c_prime = Crange[Crange != c]  # c_prime contains all the indexes
+        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+        # term 1, 2, 3 should be in the shape of [N, T]
+        b = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+        torch.cuda.empty_cache()
+        sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
+
+        S[:, c, k, :] = fista(b, Tdck, sck, opts.lamb)
+
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
@@ -1584,6 +1672,57 @@ def test(D, D0, S, S0, W, X, Y, opts):
     return acc_all, 1/(1+exp_PtSnW), S, S0, loss
 
 
+def test_fista(D, D0, S, S0, W, X, Y, opts):
+    """
+    This function is made to see the test accuracy by checking the reconstrunction label, with details
+    :param D: The pre-trained D, shape of [C, K, M]
+    :param D0: pre-trained D0,  shape of [C0, K0, M]
+    :param S: initial value, shape of [N,C,K,T]
+    :param S0: initial value, shape of [N,K0,T]
+    :param W: The pre-trained projection, shape of [C, K]
+    :param X: testing data, shape of [N, T]
+    :param Y: testing Lable, ground truth, shape of [N, C]
+    :param opts: options of hyper-parameters
+    :return: acc, Y_hat
+    """
+    loss, threshold = torch.tensor([], device=opts.dev), 5e-4
+    loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
+    print('The initial loss function value is %3.4e:' % loss[-1])
+    S_numel, S0_numel = S.numel(), S0.numel()
+    S, S0 = S.clone(), S0.clone()
+    for i in range(opts.maxiter):
+        t0 = time.time()
+        S = updateS_test_fista([D, D0, S, S0, W], X, opts)
+        loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
+        if opts.show_details:
+            print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
+            print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
+            t0 = time.time()
+        S0 = updateS0_test_fista([D, D0, S, S0], X, opts)
+        if opts.show_details:
+            loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
+            print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
+        if opts.show_details:
+            if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
+        else:
+            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
+            if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
+    N, C = Y.shape
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    y_hat = 1 / (1 + exp_PtSnW)
+    y_hat[y_hat > 0.5] = 1
+    y_hat[y_hat <= 0.5] = 0
+    label_diff = Y - y_hat
+    acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
+    acc_all = OPT(silent=True)
+    acc_all.acc = acc
+    acc_all.recall = recall(Y, y_hat)
+    acc_all.precision = precision(Y, y_hat)
+    return acc_all, 1/(1+exp_PtSnW), S, S0, loss
+
+
 def train(D, D0, S, S0, W, X, Y, opts):
     """
     This function is the main training body of the algorithm, with showing a lot of details
@@ -1742,3 +1881,29 @@ def precision(y, yh):
     # res = s/C
     res = metrics.precision_score(yc.flatten(), yhc.flatten())
     return res
+
+
+def fista(x, d, s, lamb):
+    """
+    Using fista to solve the lasso problem, min_s ||x-ds||_2^2 + lamb||s||_1
+    :param x: input data, shape of [N, T]
+    :param d: dictionary [M=T, K=T], the toeplitz matrix is used here
+    :param s: spars [N, K=T]
+    :param lamb: hyper parameter of sparsity level
+    :return: s
+    """
+    maxiter, threshold = 500, 1e-4
+    _2dtd = 2 * d.t()@d  # shape of [T, T]
+    _2dtx = 2 * d.t()@x.t()  # shape of [T, N]
+    L = _2dtd.norm()  # larger than the l2 norm but easy to code
+    y, sold, told = s.clone(), s.clone(), torch.tensor(1.0, device=d.device) # y is shape of [N,T], t is the step size
+    for i in range(maxiter):
+        nu = y - 1/L * (_2dtd@y.t() - _2dtx).t()  # nu is shape of [N, T]
+        snew = shrink(L, nu, lamb)
+        if torch.norm(snew - sold) / (sold.norm() + 1e-38) < threshold: break
+
+        tnew = (1 + (4*told*told).sqrt())/2
+        y = snew + (told-1)/tnew * (snew - sold)
+        sold, told = snew.clone(), tnew.clone()
+    torch.cuda.empty_cache()
+    return sold
