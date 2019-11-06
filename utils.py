@@ -513,9 +513,28 @@ def toeplitz(x, m=10, T=10):
     for i in range(m):
         indx[i, :] = torch.arange(M2 + i, M2 + i + T)
     tx[:, :, :] = x_append0[:, indx]
-
     return tx.flip(1)
 
+
+def toeplitz2(x, m=10, T=10):
+    """This is a the toepliz matrx for torch.tensor
+    input x has the shape of [N, ?], ? is M or T
+        M is an interger
+        T is truncated length
+    output tx has the shape of [N, m, T]
+    """
+    dev = x.device
+    N, m0 = x.shape  # m0 is T for Tsck, and m0 is M for Tdck
+    M = m if m < m0 else m0
+    M2 = int((M - 1) / 2) + 1  # half length of M, for truncation purpose
+
+    x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
+    tx = torch.zeros(N, m, T, device=dev)
+    indx = torch.zeros(m, T).long()
+    for i in range(m):
+        indx[i, :] = torch.arange(M2 + i, M2 + i + T)
+    tx[:, :, :] = x_append0[:, indx]
+    return tx.flip(1)
 
 def updateD(DD0SS0W, X, Y, opts):
     """this function is to update the distinctive D using BPG-M, updating each d_k^(c)
@@ -813,46 +832,77 @@ def updateS(DD0SS0W, X, Y, opts):
     M_2 = int((M-1)/2)
     C, K, _ = D.shape
     if len(T) == 1:
+        T = T[0]   # *T will make T as a list
         R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+        # '''update the current s_n,k^(c) '''
+        for c, k in [(i, j) for i in range(C) for j in range(K)]:
+            Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
+            Crange = torch.tensor(range(C))
+            DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+            for cc in range(C):
+                # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+                DconvS[:, cc, :] = F.conv1d(S[:, cc, :, :], Dcopy[cc, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+
+            dck = D[c, k, :]  # shape of [M]
+            sck = S[:, c, k, :]  # shape of [N, T]
+            wc = W[c, :]  # shape of [K+1], including bias
+            yc = Y[:, c]  # shape of [N]
+            Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
+
+            dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
+            c_prime = Crange[Crange != c]  # c_prime contains all the indexes
+            Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+            # term 1, 2, 3 should be in the shape of [N, T]
+            term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+            term2 = Y[:, c].reshape(N,1)*(X - R - Y[:, c].reshape(N,1)*Dcp_conv_Sncp - (Y[:, c_prime]*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+            term3 = -(1-Y[:, c]).reshape(N,1)*((1-Y[:, c]).reshape(N,1)*Dcp_conv_Sncp
+                    + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
+            b = (term1 + term2 + term3)/2
+            torch.cuda.empty_cache()
+            sc = S[:, c, :, :].clone() # sc will be changed in solv_sck, adding clone to prevent, for debugging
+            # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
+            # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+            # l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
+            S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+            # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+            # ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
+            # print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
+            # print('Local loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
+            # print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
+            # if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
+            if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     else:
         R = F.conv2d(S0, D0.flip(1).flip(2).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2 + T[0], M_2:M_2 + T[1]]  # r is shape of [N, T)
-    # '''update the current s_n,k^(c) '''
-    for c, k in [(i, j) for i in range(C) for j in range(K)]:
-        Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
-        Crange = torch.tensor(range(C))
-        DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-        for cc in range(C):
-            # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-            DconvS[:, cc, :] = F.conv1d(S[:, cc, :, :], Dcopy[cc, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+        # '''update the current s_n,k^(c) '''
+        for c, k in [(i, j) for i in range(C) for j in range(K)]:
+            Dcopy = D.clone().flip(2).flip(3).unsqueeze(2)  # D shape is [C,K,1, M]
+            Crange = torch.tensor(range(C))
+            DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+            for cc in range(C):
+                # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+                DconvS[:, cc, :] = F.conv2d(S[:, cc, :], Dcopy[cc,:], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T[0], M_2:M_2 + T[1]]
 
-        dck = D[c, k, :]  # shape of [M]
-        sck = S[:, c, k, :]  # shape of [N, T]
-        wc = W[c, :]  # shape of [K+1], including bias
-        yc = Y[:, c]  # shape of [N]
-        Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
+            dck = D[c, k, :]  # shape of [M]
+            sck = S[:, c, k, :]  # shape of [N, T]
+            wc = W[c, :]  # shape of [K+1], including bias
+            yc = Y[:, c]  # shape of [N]
+            Tdck = (toeplitz2(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
-        dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
-        c_prime = Crange[Crange != c]  # c_prime contains all the indexes
-        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
-        # term 1, 2, 3 should be in the shape of [N, T]
-        term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
-        term2 = Y[:, c].reshape(N,1)*(X - R - Y[:, c].reshape(N,1)*Dcp_conv_Sncp - (Y[:, c_prime]*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
-        term3 = -(1-Y[:, c]).reshape(N,1)*((1-Y[:, c]).reshape(N,1)*Dcp_conv_Sncp
-                + ((1-Y[:, c_prime])*DconvS[:, c_prime, :].permute(2,0,1)).sum(2).t())
-        b = (term1 + term2 + term3)/2
-        torch.cuda.empty_cache()
-        sc = S[:, c, :, :].clone() # sc will be changed in solv_sck, adding clone to prevent, for debugging
-        # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
-        # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        # l1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
-        S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
-        # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        # ll1 = loss_Sck_special(Tdck, b, sc, sck, wc, wc[k], yc, opts)
-        # print('Overall loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
-        # print('Local loss for fisher, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
-        # print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
-        # if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
-        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
+            dck_conv_sck = F.conv2d(sck.unsqueeze(1), dck.flip(0).flip(1).reshape(1, 1, M, M),
+                                    padding=M - 1).squeeze()[:, M_2:M_2 + T[0], M_2:M_2 + T[1]]  # shape of [N,T]
+            c_prime = Crange[Crange != c]  # c_prime contains all the indexes
+            Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+            # term 1, 2, 3 should be in the shape of [N, T]
+            term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+            term2 = Y[:, c].reshape(N, 1) * (X - R - Y[:, c].reshape(N, 1) * Dcp_conv_Sncp -
+                                             (Y[:, c_prime] * DconvS[:, c_prime, :].permute(2, 0, 1)).sum(2).t())
+            term3 = -(1 - Y[:, c]).reshape(N, 1) * ((1 - Y[:, c]).reshape(N, 1) * Dcp_conv_Sncp +
+                                                    ((1 - Y[:, c_prime]) * DconvS[:, c_prime, :].permute(2, 0, 1)).sum(2).t())
+            b = (term1 + term2 + term3) / 2
+            torch.cuda.empty_cache()
+            sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, adding clone to prevent, for debugging
+            S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+            if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print(inf_nan_happenned)
     return S
 
 
