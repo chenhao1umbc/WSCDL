@@ -167,7 +167,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/beta.py</url>
-          <line>46</line>
+          <line>47</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>
