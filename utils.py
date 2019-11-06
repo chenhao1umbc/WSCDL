@@ -62,7 +62,6 @@ def init(X, opts):
         W is a matrix [C, K], where K is per-class atoms
     :return: D, D0, S, S0, W
     """
-
     N, T = X.shape
     # D = l2norm(awgn(torch.cat(opts.ft[1:]).reshape(opts.C, opts.K, opts.M), -20)).to(opts.dev)
     # D0 = l2norm(awgn(opts.ft[0].reshape(opts.K0, opts.M), -20)).to(opts.dev)
@@ -804,13 +803,19 @@ def updateS(DD0SS0W, X, Y, opts):
         W is a matrix [C, K+1], where K is per-class atoms
         X is a matrix [N, T], training Data
         Y is a matrix [N, C] \in {0,1}, training labels
+
+        adapting for 2-D convolution, T could be replace by [H, W]
+        M could be replace by [M, M], which is a square patch
     """
     D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
-    N, K0, T = S0.shape
+    N, K0, *T = S0.shape
     M = D0.shape[1]  # dictionary atom dimension
     M_2 = int((M-1)/2)
     C, K, _ = D.shape
-    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    if len(T) == 1:
+        R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    else:
+        R = F.conv2d(S0, D0.flip(1).flip(2).unsqueeze(1), groups=K0, padding=M-1).sum(1)[:, M_2:M_2 + T[0], M_2:M_2 + T[1]]  # r is shape of [N, T)
     # '''update the current s_n,k^(c) '''
     for c, k in [(i, j) for i in range(C) for j in range(K)]:
         Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
@@ -1907,3 +1912,4 @@ def fista(x, d, s, lamb):
         sold, told = snew.clone(), tnew.clone()
     torch.cuda.empty_cache()
     return sold
+
