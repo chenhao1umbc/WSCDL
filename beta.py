@@ -7,7 +7,7 @@ this file is used for testing
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = '3'
 opts = OPT(C=16, K0=1, K=3, M=80)
-opts.lamb = 0.1  # for sparsity penalty
+opts.lamb = 0.01  # for sparsity penalty
 opts.eta = 0.01 # for label penalty
 opts.mu = 0.01 # for low rank penalty
 opts.transpose, opts.shuffle, opts.show_details = True, False, False  # default as true
@@ -34,8 +34,8 @@ if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 # opts.lamb = 0.1
 X_test, Y_test = load_data(opts, data='train')
 _, _, S_t, S0_t, _ = init(X_test, opts)
-acc, y_hat, S_t, S0_t, loss_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 # acc, y_hat, S_t, S0_t, loss_t= test_fista(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+acc, y_hat, S_t, S0_t, loss_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc.acc)
 print('\nThe test data recall is : ', acc.recall)
 
