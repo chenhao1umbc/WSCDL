@@ -536,6 +536,7 @@ def toeplitz2(x, m=10, T=10):
     tx[:, :, :] = x_append0[:, indx]
     return tx.flip(1)
 
+
 def updateD(DD0SS0W, X, Y, opts):
     """this function is to update the distinctive D using BPG-M, updating each d_k^(c)
     input is initialed  DD0SS0

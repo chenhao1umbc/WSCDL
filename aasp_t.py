@@ -26,9 +26,9 @@ for i in range(5):
 
     # X_val, Y_val = load_data(opts, data='val')
     # _, _, S_v, S0_v, _ = init(X_val, opts)
-    # acc, y_hat, S_t, S0_t, loss_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+    # acc, y_hat, S_v, S0_t, loss_v= test(D, D0, S_v, S0_v, W, X_val, Y_val, opts)
     # print('\nThe test data accuracy is : ', acc.acc)
-    # print('\nThe test data recall is : ', acc.recall
+    # print('\nThe test data recall is : ', acc.recall)
 
     X_test, Y_test = load_data(opts, data='test')
     _, _, S_t, S0_t, _ = init(X_test, opts)

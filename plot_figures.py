@@ -82,3 +82,18 @@ plt.legend(['Ours', "You's", 'Column-wise'], loc=0)
 plt.ylabel('Accuracy')
 plt.xlabel('Method index')
 plt.title('Classification accuracy of 5 runs')
+
+# sparse coding with different initialization
+acc = [0.950625, 0.888125, 0.76125, 0.7714583333333334]
+recall = [0.7515723270440252, 0.4381551362683438, 0.057651991614255764, 0.049266247379454925]
+precision = [1.0, 0.9976133651551312, 0.18211920529801323, 0.19831223628691982]
+plt.figure()
+plt.bar(list(range(4)), acc, align='edge')
+plt.bar(list(range(4)),recall, width=0.6, align='edge')
+plt.bar(list(range(4)), precision, width=0.4, align='edge')
+plt.legend(['Accuracy', 'Recall', 'Precision'])
+plt.grid()
+plt.xticks(ticks=[0.5, 1.5, 2.5, 3.5], labels=['Trianing', 'Init. using trainging', 'Init. using 0', 'Init using random'])
+plt.xlabel('Initialization method')
+plt.ylabel('Performance')
+plt.title('Comparing with different initialization methods')
