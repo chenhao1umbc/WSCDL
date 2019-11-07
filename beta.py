@@ -69,8 +69,8 @@ print('done')
 # # testing section
 # X_test, Y_test, _ = load_toy(opts, test='train')
 # _, _, S_t, S0_t, _ = init(X_test, opts)
-# # acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
-# acc, y_hat, S_t, S0_t, loss_t= test_fista(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+# acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
+# # acc, y_hat, S_t, S0_t, loss_t= test_fista(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 # print('\nThe test data accuracy is : ', acc.acc)
 # # plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
 #
