@@ -14,6 +14,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sg
 from sklearn import metrics
+import spams
+import scipy.sparse as sparse
 
 tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
@@ -309,7 +311,7 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
     M = (abs_Tdck.t()@abs_Tdck + 1e-38).sum(1) # M is the diagonal of majorization matrix, shape of [T]
     sc_til, sc_old, marker = sc.clone(), sc.clone(), 0 # shape of [N, K, T]
 
-    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
+    loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -317,17 +319,17 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
         sck_new = shrink(M, nu, lamb/2)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < threshold: break
-        # loss = torch.cat((loss, loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
+        loss = torch.cat((loss, loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
         torch.cuda.empty_cache()
-    # print('M max', M.max())
-    # if marker == 1 :
-    #     print('--inf to 1e38 happend within the loop')
-    #     plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    #     print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
-    # if (loss[0] - loss[-1]) < 0 :
-    #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
-    # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
-    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    print('M max', M.max())
+    if marker == 1 :
+        print('--inf to 1e38 happend within the loop')
+        plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+        print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
+    if (loss[0] - loss[-1]) < 0 :
+        wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
+    print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
+    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return sck_old
 
 
@@ -795,8 +797,12 @@ def updateS0_test_fista(DD0SS0, X, opts):
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
         # S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, Tdk0_t.t(), b, opts.lamb/2)
-        S0[:, k0, :] = fista(b, Tdk0_t.t(), snk0, opts.lamb)
+        # S0[:, k0, :] = fista(b, Tdk0_t.t(), snk0, opts.lamb)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
+
+        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdk0_t.t().cpu().numpy()), lambda1=opts.lamb)
+        a = sparse.csc_matrix.todense(alpha)
+        S0[:, k0, :] = torch.tensor(np.asarray(a).T, device=S.device)
     return S0
 
 
@@ -999,7 +1005,11 @@ def updateS_test_fista(DD0SS0W, X, opts):
         torch.cuda.empty_cache()
         sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
 
-        S[:, c, k, :] = fista(b, Tdck, sck, opts.lamb)
+        # S[:, c, k, :] = fista(b, Tdck, sck, opts.lamb)
+
+        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb)
+        a = sparse.csc_matrix.todense(alpha)
+        S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
 
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
@@ -1953,7 +1963,11 @@ def fista(x, d, s, lamb):
     _2dtx = 2 * d.t()@x.t()  # shape of [T, N]
     L = _2dtd.norm()  # larger than the l2 norm but easy to code
     y, sold, told = s.clone(), s.clone(), torch.tensor(1.0, device=d.device) # y is shape of [N,T], t is the step size
-    for i in range(maxiter):
+    loss = torch.cat((torch.tensor([], device=x.device), loss_fista(x, d, sold, lamb).reshape(1)))
+
+    # for i in range(maxiter):
+    i = 0
+    while True:
         nu = y - 1/L * (_2dtd@y.t() - _2dtx).t()  # nu is shape of [N, T]
         snew = shrink(L, nu, lamb)
         if torch.norm(snew - sold) / (sold.norm() + 1e-38) < threshold: break
@@ -1961,6 +1975,28 @@ def fista(x, d, s, lamb):
         tnew = (1 + (4*told*told).sqrt())/2
         y = snew + (told-1)/tnew * (snew - sold)
         sold, told = snew.clone(), tnew.clone()
+
+        loss = torch.cat((loss, loss_fista(x, d, sold, lamb).reshape(1)))
+        i += 1
+        print(i)
     torch.cuda.empty_cache()
+    # diff = loss[1:] - loss[0:-1]
+    # if (diff>0).sum() > 0 : input("Loss Increases, PRESS ENTER TO CONTINUE.")
+    # plt.plot(loss.cpu().numpy(), '--x')
     return sold
 
+
+def loss_fista(x, d, s, lamb):
+    """
+    calculate the loss function value of each iter in fista
+    min_s ||x-ds||_2^2 + lamb||s||_1
+    :param x: input data, shape of [N, T]
+    :param d: dictionary [M=T, K=T], the toeplitz matrix is used here
+    :param s: spars [N, K=T]
+    :param lamb: hyper parameter of sparsity level
+    :return: loss
+    """
+    term1 = (x.t() - d@s.t()).norm()**2
+    term2 = lamb * s.abs().sum()
+    loss = term1 + term2
+    return loss
