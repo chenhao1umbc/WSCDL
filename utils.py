@@ -800,7 +800,7 @@ def updateS0_test_fista(DD0SS0, X, opts):
         # S0[:, k0, :] = fista(b, Tdk0_t.t(), snk0, opts.lamb)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
 
-        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdk0_t.t().cpu().numpy()), lambda1=opts.lamb)
+        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdk0_t.t().cpu().numpy()), lambda1=opts.lamb/2)
         a = sparse.csc_matrix.todense(alpha)
         S0[:, k0, :] = torch.tensor(np.asarray(a).T, device=S.device)
     return S0
@@ -1007,7 +1007,7 @@ def updateS_test_fista(DD0SS0W, X, opts):
 
         # S[:, c, k, :] = fista(b, Tdck, sck, opts.lamb)
 
-        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb)
+        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb/2)
         a = sparse.csc_matrix.todense(alpha)
         S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
 
