@@ -286,11 +286,10 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     return sck_old
 
 
-def solv_sck_test(sc, wc, Tdck, b, k, opts):
+def solv_sck_test(sc, Tdck, b, k, opts):
     """
     This function solves snck for all N, using BPGM
     :param sc: shape of [N, K, T]
-    :param wc: shape of [K]
     :param Tdck: shape of [T, m=T]
     :param b: shape of [N, T]
     :param k: integer, which atom to update
@@ -321,15 +320,15 @@ def solv_sck_test(sc, wc, Tdck, b, k, opts):
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < threshold: break
         loss = torch.cat((loss, loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
         torch.cuda.empty_cache()
-    print('M max', M.max())
-    if marker == 1 :
-        print('--inf to 1e38 happend within the loop')
-        plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-        print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
-    if (loss[0] - loss[-1]) < 0 :
-        wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
-    print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
-    plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    # print('M max', M.max())
+    # if marker == 1 :
+    #     print('--inf to 1e38 happend within the loop')
+    #     plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    #     print('How many inf to 1e38 happend finally', exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0])
+    # if (loss[0] - loss[-1]) < 0 :
+    #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
+    # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return sck_old
 
 
@@ -913,7 +912,7 @@ def updateS(DD0SS0W, X, Y, opts):
     return S
 
 
-def updateS_test(DD0SS0W, X, opts):
+def updateS_test(DD0SS0, X, opts):
     """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
@@ -921,11 +920,10 @@ def updateS_test(DD0SS0W, X, opts):
         D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
         S0 is 3-d tensor [N, K0, T]
         D0 is a matrix [K0, M]
-        W is a matrix [C, K], where K is per-class atoms
         X is a matrix [N, T], training Data
         Y are the labels, not given
     """
-    D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
     N, K0, T = S0.shape
     M = D0.shape[1]  # dictionary atom dimension
     M_2 = int((M-1)/2)
@@ -942,7 +940,6 @@ def updateS_test(DD0SS0W, X, opts):
 
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
-        wc = W[c, :]  # shape of [K]
         Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
@@ -955,7 +952,7 @@ def updateS_test(DD0SS0W, X, opts):
         # l = loss_fun_test(X, D, D0, S, S0, opts)
         # l0 = loss_fun_test_spec(X, D, D0, S, S0, opts)
         # l1 = loss_Sck_test_spec(Tdck, b, sc, sc[:, k, :], opts)
-        S[:, c, k, :] = solv_sck_test(sc, wc, Tdck, b, k, opts)
+        S[:, c, k, :] = solv_sck_test(sc, Tdck, b, k, opts)
         # print('Main fisher after bpgm the diff is: %1.9e' %(l0[0] - loss_fun_test_spec(X, D, D0, S, S0, opts)[0]))
         # print('Local fisher after bpgm the diff is: %1.9e' % (l1[0] - loss_Sck_test_spec(Tdck, b, sc, sc[:, k, :], opts)[0]))
         # print('Main sparse after bpgm the diff is: %1.9e' %(l0[1] - loss_fun_test_spec(X, D, D0, S, S0, opts)[1]))
@@ -965,7 +962,7 @@ def updateS_test(DD0SS0W, X, opts):
     return S
 
 
-def updateS_test_fista(DD0SS0W, X, opts):
+def updateS_test_fista(DD0SS0, X, opts):
     """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
@@ -973,11 +970,10 @@ def updateS_test_fista(DD0SS0W, X, opts):
         D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
         S0 is 3-d tensor [N, K0, T]
         D0 is a matrix [K0, M]
-        W is a matrix [C, K], where K is per-class atoms
         X is a matrix [N, T], training Data
         Y are the labels, not given
     """
-    D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
     N, K0, T = S0.shape
     M = D0.shape[1]  # dictionary atom dimension
     M_2 = int((M-1)/2)
@@ -994,7 +990,6 @@ def updateS_test_fista(DD0SS0W, X, opts):
 
         dck = D[c, k, :]  # shape of [M]
         sck = S[:, c, k, :]  # shape of [N, T]
-        wc = W[c, :]  # shape of [K]
         Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
@@ -1005,11 +1000,12 @@ def updateS_test_fista(DD0SS0W, X, opts):
         torch.cuda.empty_cache()
         sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
 
-        # S[:, c, k, :] = fista(b, Tdck, sck, opts.lamb)
+        S[:, c, k, :] = fista(b, Tdck, sck, opts.lamb)
 
-        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb/2)
-        a = sparse.csc_matrix.todense(alpha)
-        S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
+        # # istead of fista using SPAMS
+        # alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb/2)
+        # a = sparse.csc_matrix.todense(alpha)
+        # S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
 
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
@@ -1707,7 +1703,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     S, S0 = S.clone(), S0.clone()
     for i in range(opts.maxiter):
         t0 = time.time()
-        S = updateS_test([D, D0, S, S0, W], X, opts)
+        S = updateS_test([D, D0, S, S0], X, opts)
         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         if opts.show_details:
             print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
@@ -1758,7 +1754,7 @@ def test_fista(D, D0, S, S0, W, X, Y, opts):
     S, S0 = S.clone(), S0.clone()
     for i in range(opts.maxiter):
         t0 = time.time()
-        S = updateS_test_fista([D, D0, S, S0, W], X, opts)
+        S = updateS_test_fista([D, D0, S, S0], X, opts)
         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         if opts.show_details:
             print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
@@ -1978,7 +1974,7 @@ def fista(x, d, s, lamb):
 
         loss = torch.cat((loss, loss_fista(x, d, sold, lamb).reshape(1)))
         i += 1
-        print(i)
+        # print(i)
     torch.cuda.empty_cache()
     # diff = loss[1:] - loss[0:-1]
     # if (diff>0).sum() > 0 : input("Loss Increases, PRESS ENTER TO CONTINUE.")
