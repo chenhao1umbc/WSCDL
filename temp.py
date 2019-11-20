@@ -1,6 +1,7 @@
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = '3'
 [D, D0, S, S0, W, opts, loss] = torch.load('/home/chenhao1/Hpython/[0.1, 0.01, 0.01]DD0SS0Woptsloss191106_10_50_30.pt')
+opts.lamb2 = 1
 X, Y = load_data(opts)
 X_test, Y_test = load_data(opts, data='train')
 _, _, S_t, S0_t, _ = init(X_test, opts)

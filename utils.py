@@ -36,7 +36,7 @@ class OPT:
      """
     def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=200, silent=False):
         self.C, self.K, self.K0, self.M = C, K, K0, M
-        self.mu, self.eta, self.lamb, self.delta = mu, eta, lamb, delta
+        self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.01
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, False  # n is number of examples per combination for toy data
@@ -297,7 +297,7 @@ def solv_sck_test(sc, Tdck, b, k, opts):
     """
     maxiter, correction, threshold = 500, 0.7, 1e-4
     Mw = opts.delta * correction # correction is help to make the loss monotonically decreasing
-    lamb = opts.lamb
+    lamb, lamb2 = opts.lamb, opts.lamb2
     dev = opts.dev
     T = b.shape[1]
     P = torch.ones(1, T, device=dev)/T  # shape of [1, T]
@@ -307,14 +307,14 @@ def solv_sck_test(sc, Tdck, b, k, opts):
     abs_Tdck = abs(Tdck)
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
     Tdckt_bt = Tdck.t() @ b.t()  # shape of [T, N]
-    M = (abs_Tdck.t()@abs_Tdck + 1e-38).sum(1) # M is the diagonal of majorization matrix, shape of [T]
+    M = (abs_Tdck.t() @ abs_Tdck + lamb2*torch.eye(T, device=dev)  + 1e-38).sum(1)  # M is the diagonal of majorization matrix, shape of [T]
     sc_til, sc_old, marker = sc.clone(), sc.clone(), 0 # shape of [N, K, T]
 
     loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
-        nu = sck_til - (Tdck_t_Tdck@sck_til.t() - Tdckt_bt).t()/M  # shape of [N, T]
+        nu = sck_til - (Tdck_t_Tdck@sck_til.t() - Tdckt_bt + lamb2 *sck_til.t()).t()/M  # shape of [N, T]
         sck_new = shrink(M, nu, lamb/2)  # shape of [N, T]
         sck_old[:], sck[:] = sck[:], sck_new[:]  # make sure sc is updated in each loop
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < threshold: break
@@ -732,7 +732,7 @@ def updateS0_test(DD0SS0, X, opts):
     D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
     N, K0, T = S0.shape
     C, K, _ = D.shape
-    M = D0.shape[1]
+    M, dev = D0.shape[1], D.device
     M_2 = int((M-1)/2)  # dictionary atom dimension
     Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
     DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
@@ -749,12 +749,14 @@ def updateS0_test(DD0SS0, X, opts):
         Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
         abs_Tdk0 = abs(Tdk0_t).t()
         MS0_diag = (abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
-        MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
+        # MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
+        MS0_diag = MS0_diag + 1e-38 + opts.lamb2*torch.eye(T, device=dev)  # make it robust for inverse
         MS0_inv = (1/MS0_diag).diag()
         b = X - alpha_plus_dk0 + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
-        S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, Tdk0_t.t(), b, opts.lamb/2)
+        # S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, Tdk0_t.t(), b, opts.lamb/2)
+        S0[:, k0, :] = solv_sck_test(S0, Tdk0_t.t(), b, k0, opts)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
 
