@@ -943,8 +943,6 @@ def updateS_test(DD0SS0, X, opts):
         Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
-        c_prime = Crange[Crange != c]  # c_prime contains all the indexes
-        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
         # term 1, 2, 3 should be in the shape of [N, T]
         b = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
         torch.cuda.empty_cache()
@@ -993,8 +991,6 @@ def updateS_test_fista(DD0SS0, X, opts):
         Tdck = (toeplitz(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
-        c_prime = Crange[Crange != c]  # c_prime contains all the indexes
-        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
         # term 1, 2, 3 should be in the shape of [N, T]
         b = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
         torch.cuda.empty_cache()
@@ -1696,7 +1692,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: acc, Y_hat
     """
-    loss, threshold = torch.tensor([], device=opts.dev), 5e-4
+    loss, threshold = torch.tensor([], device=opts.dev), 1e-4
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
     S_numel, S0_numel = S.numel(), S0.numel()
@@ -1715,8 +1711,10 @@ def test(D, D0, S, S0, W, X, Y, opts):
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
+            print(loss)
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
+            print(loss)
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)

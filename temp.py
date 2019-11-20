@@ -1,11 +1,11 @@
 from utils import *
-os.environ["CUDA_VISIBLE_DEVICES"] = '1, 3'
+os.environ["CUDA_VISIBLE_DEVICES"] = '3'
 [D, D0, S, S0, W, opts, loss] = torch.load('/home/chenhao1/Hpython/[0.1, 0.01, 0.01]DD0SS0Woptsloss191106_10_50_30.pt')
 X, Y = load_data(opts)
 X_test, Y_test = load_data(opts, data='train')
 _, _, S_t, S0_t, _ = init(X_test, opts)
 # acc, y_hat, S_t, S0_t, loss_t= test_fista(D, D0, S, S0, W, X_test, Y_test, opts)
-acc, y_hat, S_t, S0_t, loss_t= test(D, D0, S, S0, W, X_test, Y_test, opts)
+acc, y_hat, S_t, S0_t, loss_t= test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc.acc)
 print('\nThe test dasata recall is : ', acc.recall)
 
