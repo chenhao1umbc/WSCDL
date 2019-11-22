@@ -790,18 +790,14 @@ def updateS0_test_fista(DD0SS0, X, opts):
         snk0 = S0[:, k0, :]  # shape of [N, T]
         dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
         Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
-        abs_Tdk0 = abs(Tdk0_t).t()
-        MS0_diag = (abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
-        MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
-        MS0_inv = (1/MS0_diag).diag()
         b = X - alpha_plus_dk0 + dk0convsck0
         torch.cuda.empty_cache()
-        # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
-        # S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, Tdk0_t.t(), b, opts.lamb/2)
-        # S0[:, k0, :] = fista(b, Tdk0_t.t(), snk0, opts.lamb)
-        # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
 
-        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdk0_t.t().cpu().numpy()), lambda1=opts.lamb/2)
+        # bb = torch.cat((b, torch.zeros(N, T, device=b.device)), 1)
+        # TT = torch.cat((Tdk0_t.t(), opts.lamb2 ** 0.5 * torch.eye(T, device=b.device)), 0)
+        # S0[:, k0, :] = fista(bb, TT, snk0, opts.lamb)
+
+        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdk0_t.t().cpu().numpy()), lambda1=opts.lamb/2, lambda2=opts.lamb2)
         a = sparse.csc_matrix.todense(alpha)
         S0[:, k0, :] = torch.tensor(np.asarray(a).T, device=S.device)
     return S0
@@ -996,14 +992,15 @@ def updateS_test_fista(DD0SS0, X, opts):
         # term 1, 2, 3 should be in the shape of [N, T]
         b = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
         torch.cuda.empty_cache()
-        sc = S[:, c, :, :] # sc will be changed in solv_sck, adding clone to prevent
 
-        S[:, c, k, :] = fista(b, Tdck, sck, opts.lamb)
+        # bb = torch.cat((b, torch.zeros(N, T, device=b.device)), 1)
+        # TT = torch.cat((Tdck, opts.lamb2**0.5 * torch.eye(T, device=b.device)), 0)
+        # S[:, c, k, :] = fista(bb, TT, sck, opts.lamb)
 
-        # # istead of fista using SPAMS
-        # alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb/2)
-        # a = sparse.csc_matrix.todense(alpha)
-        # S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
+        # istead of fista using SPAMS
+        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb/2, lambda2=opts.lamb2)
+        a = sparse.csc_matrix.todense(alpha)
+        S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
 
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
@@ -1526,7 +1523,8 @@ def loss_fun_test(X, D, D0, S, S0, opts):
 
     fisher = torch.norm(X - R - DconvS.sum(1))**2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
-    cost = fisher + sparse
+    l2 = opts.lamb2 * (S.norm()**2 + S0.norm()**2)
+    cost = fisher + sparse + l2
     return cost
 
 
@@ -1713,10 +1711,10 @@ def test(D, D0, S, S0, W, X, Y, opts):
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
-            print(loss)
+            # print(loss)
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
-            print(loss)
+            # print(loss)
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
@@ -1747,7 +1745,7 @@ def test_fista(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: acc, Y_hat
     """
-    loss, threshold = torch.tensor([], device=opts.dev), 5e-4
+    loss, threshold = torch.tensor([], device=opts.dev), 1e-4
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
     S_numel, S0_numel = S.numel(), S0.numel()
@@ -1766,8 +1764,10 @@ def test_fista(D, D0, S, S0, W, X, Y, opts):
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
+            # print(loss)
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
+            # print(loss)
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
