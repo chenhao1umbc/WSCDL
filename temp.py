@@ -46,8 +46,8 @@ _, _, S_t, S0_t, _ = init(X_test, opts)
 opts.show_details = False  # default as true
 
 X_test, Y_test = X_test[:2], Y_test[:2]
-acc1, y_hat1, s, S0_t1, loss1= test_fista(D, D0, S[:2], S0[:2], W, X_test, Y_test, opts)
-acc2, y_hat2, ss, S0_t2, loss2 = test_fista(D, D0, S_t[:2], S0_t[:2], W, X_test, Y_test, opts)
+acc1, y_hat1, s, S0_t1, loss1= test(D, D0, S[:2], S0[:2], W, X_test, Y_test, opts)
+acc2, y_hat2, ss, S0_t2, loss2 = test(D, D0, awgn(S[:2], 10), awgn(S0[:2],10), W, X_test, Y_test, opts)
 # acc0, y_hat, ss, S0_t, loss_t = test(D, D0, torch.rand(S_t.shape, device=opts.dev), S0_t, W, X_test, Y_test, opts)
 print('\nloss1', loss1[0], loss1[-1])
 print('loss2', loss2[0], loss2[-1])

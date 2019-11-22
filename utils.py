@@ -295,7 +295,7 @@ def solv_sck_test(sc, Tdck, b, k, opts):
     :param k: integer, which atom to update
     :return: sck
     """
-    maxiter, correction, threshold = 500, 0.7, 1e-4
+    maxiter, correction, threshold = 500, 0.7, 1e-5
     Mw = opts.delta * correction # correction is help to make the loss monotonically decreasing
     lamb, lamb2 = opts.lamb, opts.lamb2
     dev = opts.dev
@@ -739,12 +739,12 @@ def updateS0_test(DD0SS0, X, opts):
     for c in range(C):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
         DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
-    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
-    alpha_plus_dk0 = DconvS.sum(1) + R
+    dconvs = DconvS.sum(1)
 
     for k0 in range(K0):
         dk0 = D0[k0, :]
         snk0 = S0[:, k0, :]  # shape of [N, T]
+        R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:,M_2:M_2 + T]  # r is shape of [N, T)
         dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
         Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
         abs_Tdk0 = abs(Tdk0_t).t()
@@ -752,7 +752,7 @@ def updateS0_test(DD0SS0, X, opts):
         # MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
         MS0_diag = MS0_diag + 1e-38 + opts.lamb2*torch.eye(T, device=dev)  # make it robust for inverse
         MS0_inv = (1/MS0_diag).diag()
-        b = X - alpha_plus_dk0 + dk0convsck0
+        b = X - dconvs - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
         # S0[:, k0, :] = solv_snk0(snk0, MS0_diag, MS0_inv, opts.delta, Tdk0_t.t(), b, opts.lamb/2)
@@ -782,24 +782,24 @@ def updateS0_test_fista(DD0SS0, X, opts):
     for c in range(C):
         # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
         DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M-1).sum(1)[:, M_2:M_2+T]
-    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
-    alpha_plus_dk0 = DconvS.sum(1) + R
+    dconvs = DconvS.sum(1)
 
     for k0 in range(K0):
         dk0 = D0[k0, :]
         snk0 = S0[:, k0, :]  # shape of [N, T]
+        R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:,M_2:M_2 + T]  # r is shape of [N, T)
         dk0convsck0 = F.conv1d(snk0.unsqueeze(1), dk0.flip(0).unsqueeze(0).unsqueeze(0), padding=M-1)[:, 0, M_2:M_2 + T]
         Tdk0_t = toeplitz(dk0.unsqueeze(0), m=T, T=T).squeeze()  # in shape of [m=T, T]
-        b = X - alpha_plus_dk0 + dk0convsck0
+        b = X - dconvs - R + dk0convsck0
         torch.cuda.empty_cache()
 
-        # bb = torch.cat((b, torch.zeros(N, T, device=b.device)), 1)
-        # TT = torch.cat((Tdk0_t.t(), opts.lamb2 ** 0.5 * torch.eye(T, device=b.device)), 0)
-        # S0[:, k0, :] = fista(bb, TT, snk0, opts.lamb)
+        bb = torch.cat((b, torch.zeros(N, T, device=b.device)), 1)
+        TT = torch.cat((Tdk0_t.t(), opts.lamb2 ** 0.5 * torch.eye(T, device=b.device)), 0)
+        S0[:, k0, :] = fista(bb, TT, snk0, opts.lamb)
 
-        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdk0_t.t().cpu().numpy()), lambda1=opts.lamb/2, lambda2=opts.lamb2)
-        a = sparse.csc_matrix.todense(alpha)
-        S0[:, k0, :] = torch.tensor(np.asarray(a).T, device=S.device)
+        # alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdk0_t.t().cpu().numpy()), lambda1=opts.lamb/2, lambda2=opts.lamb2)
+        # a = sparse.csc_matrix.todense(alpha)
+        # S0[:, k0, :] = torch.tensor(np.asarray(a).T, device=S.device)
     return S0
 
 
@@ -993,14 +993,18 @@ def updateS_test_fista(DD0SS0, X, opts):
         b = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
         torch.cuda.empty_cache()
 
-        # bb = torch.cat((b, torch.zeros(N, T, device=b.device)), 1)
-        # TT = torch.cat((Tdck, opts.lamb2**0.5 * torch.eye(T, device=b.device)), 0)
-        # S[:, c, k, :] = fista(bb, TT, sck, opts.lamb)
+        bb = torch.cat((b, torch.zeros(N, T, device=b.device)), 1)
+        TT = torch.cat((Tdck, opts.lamb2**0.5 * torch.eye(T, device=b.device)), 0)
+        r1 = fista(bb, TT, sck, opts.lamb)
+        S[:, c, k, :] = r1
+        # print( r1.abs().sum())
 
-        # istead of fista using SPAMS
-        alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb/2, lambda2=opts.lamb2)
-        a = sparse.csc_matrix.todense(alpha)
-        S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
+        # # istead of fista using SPAMS
+        # alpha = spams.lasso(np.asfortranarray(b.t().cpu().numpy()), D=np.asfortranarray(Tdck.cpu().numpy()), lambda1=opts.lamb/2, lambda2=opts.lamb2)
+        # a = sparse.csc_matrix.todense(alpha)
+        # r2 = torch.tensor(np.asarray(a).T, device=S.device)
+        # # S[:, c, k, :] = torch.tensor(np.asarray(a).T, device=S.device)
+        # print(r2.abs().sum())
 
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
@@ -1882,8 +1886,10 @@ def awgn(x, snr, cvseed=0, test='train'):
     """
     if test == 'train': np.random.seed(seed)  # seed is global variable
     if test == 'cv' : np.random.seed(cvseed)
-    variance = 10 ** (-snr / 10.0)
-    noise = torch.tensor(np.sqrt(variance) * np.random.normal(0, 1, x.shape), device=x.device)
+    Esym = x.norm()**2/ x.numel()
+    SNR = 10 ** (snr / 10.0)
+    N0 = (Esym / SNR).item()
+    noise = torch.tensor(np.sqrt(N0) * np.random.normal(0, 1, x.shape), device=x.device)
     return x+noise.to(x.dtype)
 
 
@@ -1954,7 +1960,7 @@ def fista(x, d, s, lamb):
     :param lamb: hyper parameter of sparsity level
     :return: s
     """
-    maxiter, threshold = 500, 1e-4
+    maxiter, threshold = 500, 1e-5
     _2dtd = 2 * d.t()@d  # shape of [T, T]
     _2dtx = 2 * d.t()@x.t()  # shape of [T, N]
     L = _2dtd.norm()  # larger than the l2 norm but easy to code
