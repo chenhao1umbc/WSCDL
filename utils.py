@@ -1696,13 +1696,14 @@ def test(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: acc, Y_hat
     """
-    loss, threshold = torch.tensor([], device=opts.dev), 1e-4
+    loss, threshold = torch.tensor([], device=opts.dev), 1e-5
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
     S_numel, S0_numel = S.numel(), S0.numel()
     S, S0 = S.clone(), S0.clone()
     for i in range(opts.maxiter):
         t0 = time.time()
+        Sold = S.clone()
         S = updateS_test([D, D0, S, S0], X, opts)
         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         if opts.show_details:
@@ -1714,11 +1715,19 @@ def test(D, D0, S, S0, W, X, Y, opts):
             loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
-            if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
-            # print(loss)
+            if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold:
+                print('break condition loss value diff satisfied')
+                break
+            if support_diff(S, Sold) < 0.05:
+                print('break condition support diff satisfied')
+                break
         else:
-            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
-            # print(loss)
+            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold:
+                print('break condition loss value diff satisfied')
+                break
+            if support_diff(S, Sold) < 0.05:
+                print('break condition support diff satisfied')
+                break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
@@ -1767,11 +1776,19 @@ def test_fista(D, D0, S, S0, W, X, Y, opts):
             loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
             print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
-            if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold: break
-            # print(loss)
+            if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold:
+                print('break condition loss value diff satisfied')
+                break
+            if support_diff(S, Sold) < 0.05:
+                print('break condition support diff satisfied')
+                break
         else:
-            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
-            # print(loss)
+            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold:
+                print('break condition loss value diff satisfied')
+                break
+            if support_diff(S, Sold) < 0.05:
+                print('break condition support diff satisfied')
+                break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
@@ -2002,3 +2019,16 @@ def loss_fista(x, d, s, lamb):
     term2 = lamb * s.abs().sum()
     loss = term1 + term2
     return loss
+
+def support_diff(S, Sold):
+    """
+    This function will return the percentage of the difference for the non-zero locations of the sparse coeffients
+    :param S: sparse coeffients
+    :param Sold: sparse coeffients
+    :return: percentage of different
+    """
+    sf, ssf = S.flatten(), Sold.flatten()
+    a, b = torch.zeros(sf.numel()), torch.zeros(ssf.numel())
+    a[sf != 0] = 1
+    b[ssf != 0] = 1
+    return (a - b).abs().sum().item() / b.sum().item()
