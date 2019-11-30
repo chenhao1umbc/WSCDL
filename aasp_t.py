@@ -15,11 +15,10 @@ opts.mu = 0.01 # for low rank penalty
 opts.transpose, opts.shuffle, opts.show_details = False, False, False  # default as true
 
 # training section
-X, Y = load_data(opts)
 for i in range(5):
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
-
+    X, Y = load_data(opts)
     D, D0, S, S0, W = init(X, opts)
     D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
     if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)

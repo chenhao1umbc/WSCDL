@@ -34,12 +34,12 @@ class OPT:
     lamb is the coeff of sparsity
      nu is the coeff of cross-entropy loss
      """
-    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=200, silent=False):
+    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
         self.C, self.K, self.K0, self.M = C, K, K0, M
         self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.01
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, False  # n is number of examples per combination for toy data
+        self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, True  # n is number of examples per combination for toy data
         self.common_term = True*K0  # if common term exist
         if torch.cuda.is_available():
             self.dev = 'cuda'
@@ -1079,7 +1079,7 @@ def l2norm(x):
 
 def load_data(opts, data='train'):
     """
-    This function will load the preprocessed AASP dataset
+    This function will load the preprocessed AASP dataset, train and val are in one set, test is the other dataset
     :param opts: only need teh cpu or gpu info
     :return: training, validation or testing data
     """
@@ -1739,7 +1739,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
     acc_all = OPT(silent=True)
-    acc_all.acc = acc
+    acc_all.acc = acc.item()
     acc_all.recall = recall(Y, y_hat)
     acc_all.precision = precision(Y, y_hat)
     return acc_all, 1/(1+exp_PtSnW), S, S0, loss
