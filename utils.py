@@ -582,9 +582,9 @@ def updateD(DD0SS0W, X, Y, opts):
         sck = S[:, c, k, :]  # shape of [N, T]
         Tsck_t = toeplitz(sck, M, T)  # shape of [N, M, T]
         abs_Tsck_t = abs(Tsck_t)
-        Md = (abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0) # shape of [M]
+        Md = (abs_Tsck_t @ abs_Tsck_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0) + 1e-38 # shape of [M]
         if Md.sum() == 0: continue  # Sck is too sparse with all 0s
-        Md_inv = (Md)**(-1)
+        Md_inv = (Md +1e-38)**(-1)
 
         dck_conv_sck = F.conv1d(sck.unsqueeze(1), dck.flip(0).reshape(1, 1, M), padding=M-1).squeeze()[:, M_2:M_2+T]  # shape of [N,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
@@ -649,7 +649,7 @@ def updateD0(DD0SS0, X, Y, opts):
         Tsnk0_t = toeplitz(snk0, M, T)  # shape of [N, M, T]
         abs_Tsnk0_t = abs(Tsnk0_t)   # shape of [N, M, T]
         Mw = opts.delta   # * torch.eye(M, device=opts.dev)
-        MD = 4*(abs_Tsnk0_t @ abs_Tsnk0_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0)   # shape of [M]
+        MD = 4*(abs_Tsnk0_t @ abs_Tsnk0_t.permute(0, 2, 1) @ torch.ones(M, device=opts.dev)).sum(0) + 1e-38 # shape of [M]
         if MD.sum() == 0 : continue
         MD_inv = 1/(MD)  #shape of [M]
         b = 2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsnk0
@@ -1718,14 +1718,14 @@ def test(D, D0, S, S0, W, X, Y, opts):
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold:
                 print('break condition loss value diff satisfied')
                 break
-            if support_diff(S, Sold) < 0.01:
+            if support_diff(S, Sold) < 0.005:
                 print('break condition support diff satisfied')
                 break
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold:
                 print('break condition loss value diff satisfied')
                 break
-            if support_diff(S, Sold) < 0.01:
+            if support_diff(S, Sold) < 0.005:
                 print('break condition support diff satisfied')
                 break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))

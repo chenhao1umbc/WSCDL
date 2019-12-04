@@ -6,7 +6,7 @@ this file is used for testing
 
 from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = '3'
-opts = OPT(C=16, K0=3, K=3, M=80*5)
+opts = OPT(C=16, K0=3, K=3, M=80*3)
 opts.lamb = 0.1  # for sparsity penalty
 opts.eta = 0.001 # for label penalty
 opts.mu = 0.01 # for low rank penalty
@@ -14,7 +14,7 @@ opts.transpose, opts.shuffle, opts.show_details = True, True, False  # default a
 X, Y = load_data(opts)
 X_val, Y_val = load_data(opts, data='val')
 
-for i in [0.001, 0.003, 0.005, 0.007, 0.01, 0.03, 0.05, 0.07, 0.1, 0.3, 0.5, 0.7]:
+for i in [ 0.001, 0.003, 0.005, 0.007, 0.01, 0.03, 0.05, 0.07, 0.1, 0.3, 0.5, 0.7]:
     opts.lamb = i
     # training section
     if torch.cuda.is_available():
