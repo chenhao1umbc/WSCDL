@@ -1718,14 +1718,14 @@ def test(D, D0, S, S0, W, X, Y, opts):
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold:
                 print('break condition loss value diff satisfied')
                 break
-            if support_diff(S, Sold) < 0.05:
+            if support_diff(S, Sold) < 0.01:
                 print('break condition support diff satisfied')
                 break
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold:
                 print('break condition loss value diff satisfied')
                 break
-            if support_diff(S, Sold) < 0.05:
+            if support_diff(S, Sold) < 0.01:
                 print('break condition support diff satisfied')
                 break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
@@ -1739,7 +1739,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     label_diff = Y - y_hat
     acc = label_diff[label_diff==0].shape[0]/label_diff.numel()
     acc_all = OPT(silent=True)
-    acc_all.acc = acc.item()
+    acc_all.acc = acc
     acc_all.recall = recall(Y, y_hat)
     acc_all.precision = precision(Y, y_hat)
     return acc_all, 1/(1+exp_PtSnW), S, S0, loss
@@ -1890,7 +1890,7 @@ def save_results(D, D0, S, S0, W, opts, loss):
     # if type == 1:  # all aasp data
     #     torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
     # if type == 2:  # dictionaries of aas
-    param = str([opts.lamb, opts.eta , opts.mu])
+    param = str([opts.K, opts.K0, opts.M, opts.lamb, opts.eta , opts.mu])
     torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 
 
@@ -2031,4 +2031,4 @@ def support_diff(S, Sold):
     a, b = torch.zeros(sf.numel()), torch.zeros(ssf.numel())
     a[sf != 0] = 1
     b[ssf != 0] = 1
-    return (a - b).abs().sum().item() / b.sum().item()
+    return (a - b).abs().sum().item() / (b.sum().item()+ 1e-38)

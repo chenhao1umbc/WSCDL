@@ -1,5 +1,5 @@
 %%%%%%setting model tunning parameters%%%%%%
-winsize=2;
+winsize=5;
 lamb=1e-4;
 N=10;%sparsity constraints;
 snr=10000;

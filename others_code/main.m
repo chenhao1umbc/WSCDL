@@ -45,6 +45,7 @@ for i=1:runs
     y_hat = get_signal_label(w{i}, valX, option);  % newly written function get the predicted signal labels
     acc(i) = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
 
+    % this part is for the test data
     x = importdata('x_test_80_50.txt');
     x = x./sqrt(sum(x.*x, 2));  % normalize data
     X_test = zeros(80, 50, size(x, 1));

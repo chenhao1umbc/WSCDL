@@ -28,13 +28,14 @@
   </component>
   <component name="ProjectId" id="1Pw552t485gB4fbJm3VSds9rOyG" />
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../AASP" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/utils.py" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings module-name="WSCDL" is-module-sdk="true">
+        <option name="useSoftWraps" value="true" />
         <option name="myUseModuleSdk" value="true" />
         <option name="myModuleName" value="WSCDL" />
       </console-settings>
@@ -54,7 +55,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.temp2">
+  <component name="RunManager" selected="Python.beta">
     <configuration name="beta" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -162,11 +163,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.beta" />
+        <item itemvalue="Python.beta" />
         <item itemvalue="Python.temp2" />
         <item itemvalue="Python.temp" />
         <item itemvalue="Python.wscdl" />
-        <item itemvalue="Python.beta" />
-        <item itemvalue="Python.utils" />
       </list>
     </recent_temporary>
   </component>
