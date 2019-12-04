@@ -28,6 +28,8 @@ addpath('WSCADL-YOU_master')
 %% run aasp
 run settings_aasp
 acc = zeros(5, 1); 
+rec = zeros(5, 1); 
+prec = zeros(5, 1); 
 for i=1:runs
     permidx(i,:)=randperm(No_spect);
     trainY = Y(permidx(i,1:no_train),:);
@@ -44,6 +46,7 @@ for i=1:runs
     wtx = wtimesx(w{i},valX,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
     y_hat = get_signal_label(w{i}, valX, option);  % newly written function get the predicted signal labels
     acc(i) = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
+    [rec(i), prec(i)] = prec_rec(y_hat, valY)
 
     % this part is for the test data
     x = importdata('x_test_80_50.txt');
@@ -56,6 +59,7 @@ for i=1:runs
     wtx = wtimesx(w{i},X_test,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
     y_hat_test = get_signal_label(w{i}, X_test, option);  % newly written function get the predicted signal labels
     test_acc = sum((y_hat_test - Y_test) == 0, 'all')/numel(y_hat_test)
+    [test_recall, test_prec] = prec_rec(y_hat_test, Y_test)
 
 end
 
