@@ -1,0 +1,472 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2019 The MathWorks, Inc.
+                  R2019b (9.7.0.1190202) 64-bit (glnxa64)
+                              August 21, 2019
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+>> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> Start trainig model
+>> >> >> >> 
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8156
+         0
+         0
+         0
+         0
+
+
+rec =
+
+    0.6341
+         0
+         0
+         0
+         0
+
+
+prec =
+
+    0.0850
+         0
+         0
+         0
+         0
+
+
+test_acc =
+
+    0.8358
+
+
+test_recall =
+
+    0.1964
+
+
+test_prec =
+
+    0.0124
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8156
+    0.8131
+         0
+         0
+         0
+
+
+rec =
+
+    0.6341
+    0.7647
+         0
+         0
+         0
+
+
+prec =
+
+    0.0850
+    0.0820
+         0
+         0
+         0
+
+
+test_acc =
+
+    0.8356
+
+
+test_recall =
+
+    0.2177
+
+
+test_prec =
+
+    0.0152
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8156
+    0.8131
+    0.8181
+         0
+         0
+
+
+rec =
+
+    0.6341
+    0.7647
+    0.7647
+         0
+         0
+
+
+prec =
+
+    0.0850
+    0.0820
+    0.0841
+         0
+         0
+
+
+test_acc =
+
+    0.8397
+
+
+test_recall =
+
+    0.3286
+
+
+test_prec =
+
+    0.0130
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8156
+    0.8131
+    0.8181
+    0.8150
+         0
+
+
+rec =
+
+    0.6341
+    0.7647
+    0.7647
+    0.8000
+         0
+
+
+prec =
+
+    0.0850
+    0.0820
+    0.0841
+    0.0764
+         0
+
+
+test_acc =
+
+    0.8392
+
+
+test_recall =
+
+    0.3026
+
+
+test_prec =
+
+    0.0130
+
+
+count =
+
+   100
+
+
+count =
+
+   200
+
+
+count =
+
+   300
+
+
+count =
+
+   400
+
+
+count =
+
+   500
+
+
+count =
+
+   600
+
+
+count =
+
+   700
+
+
+count =
+
+   800
+
+
+count =
+
+   900
+
+
+count =
+
+        1000
+
+
+acc =
+
+    0.8156
+    0.8131
+    0.8181
+    0.8150
+    0.8087
+
+
+rec =
+
+    0.6341
+    0.7647
+    0.7647
+    0.8000
+    0.8333
+
+
+prec =
+
+    0.0850
+    0.0820
+    0.0841
+    0.0764
+    0.0621
+
+
+test_acc =
+
+    0.8391
+
+
+test_recall =
+
+    0.2933
+
+
+test_prec =
+
+    0.0124
+
+>> >> >> >> >> >> >> >> >> >> >> >> >> 
