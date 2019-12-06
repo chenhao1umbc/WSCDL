@@ -85,16 +85,21 @@ def acc_newton(P, q):  # both shape of [M]
     :param q: for update D, q = -MD@nu,     for update D0, q = -(MD@nu + rho*Zk0 + Yk0),
     :return: dck or dck0
     """
-    psi, maxiter= 0, 200
+    psi, maxiter= 0, 500
     qq = q*q
-    for i in range(maxiter):
-        f_grad = -2 * ((P+psi)**(-3) * qq).sum()
-        f = ((P+psi)**(-2)*qq).sum()
-        psi_new = psi - 2 * f/f_grad * (f.sqrt() - 1)
-        if (psi_new - psi).item() < 1e-5:  # psi_new should always larger than psi
-            break
-        else:
-            psi = psi_new.clone()
+    if (qq == 0).sum() > 1:
+        psi_new = 0  # q is too small
+        print('acc_newton happenend')
+        # input()
+    else:
+        for i in range(maxiter):
+            f_grad = -2 * ((P+psi)**(-3) * qq).sum()
+            f = ((P+psi)**(-2)*qq).sum()
+            psi_new = psi - 2 * f/f_grad * (f.sqrt() - 1)
+            if (psi_new - psi).item() < 1e-5:  # psi_new should always larger than psi
+                break
+            else:
+                psi = psi_new.clone()
     dck = -((P + psi_new)**(-1)) * q
     if torch.isnan(dck).sum() > 0: print(inf_nan_happenned)
     return dck
