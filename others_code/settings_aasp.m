@@ -18,7 +18,7 @@ load([rt,'train_256by200.mat'])
 X = permute(rs, [2,3,1]);
 x = reshape(X, 256*200, 400);
 x = x./sqrt(sum(x.*x, 1));
-X = reshape(256, 200, 400);
+X = reshape(x, 256, 200, 400);
 Y = labels;
 % x = importdata('x_80_50.txt');
 % x = x./sqrt(sum(x.*x, 2));  % normalize data
