@@ -13,13 +13,21 @@ option.display=0;%display the words and probablities;
 %%%%%%load data%%%
 % datastr='synspect_2cluster';
 % load([datastr,'.mat']);
-x = importdata('x_80_50.txt');
-x = x./sqrt(sum(x.*x, 2));  % normalize data
-X = zeros(80, 50, size(x, 1));
-for i = 1:size(x, 1)
-    X(:,:, i) = reshape(x(i,:), 50, 80)';
-end
-Y = importdata('y_80_50.txt');
+rt = '/home/chenhao1/Hpython/';
+load([rt,'train_256by200.mat'])
+X = permute(rs, [2,3,1]);
+x = reshape(X, 256*200, 400);
+x = x./sqrt(sum(x.*x, 1));
+X = reshape(256, 200, 400);
+Y = labels;
+% x = importdata('x_80_50.txt');
+% x = x./sqrt(sum(x.*x, 2));  % normalize data
+% X = zeros(80, 50, size(x, 1));
+% for i = 1:size(x, 1)
+%     X(:,:, i) = reshape(x(i,:), 50, 80)';
+% end
+% Y = importdata('y_80_50.txt');
+
 data.transform=0;%you can change to 1 if you want to train on synthetic spectrograms
 %%%%%loading data%%%%%%%
 [F,T,No_spect]=size(X);
