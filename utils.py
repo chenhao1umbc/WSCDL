@@ -13,6 +13,7 @@ import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sg
+import scipy.io as sio
 from sklearn import metrics
 import spams
 import scipy.sparse as sparse
@@ -1091,21 +1092,26 @@ def load_data(opts, data='train'):
     # route = '/mnt/d/Downloads/AASP_train/'
     route = '/home/chenhao1/Hpython/'
     if data == 'test':  # x, y are numpy double arrays
-        x, y = torch.load(route+'aasp_test_80by50.pt')
+        # x, y = torch.load(route+'aasp_test_256by200.pt')
+        mat = sio.loadmat(route+'test_256by200.mat')
+        x, y = mat['rs'], mat['labels']
     else:
-        x, y = torch.load(route + 'aasp_train_80by50.pt')
+        # x, y = torch.load(route + 'aasp_train_256by200.pt')
+        mat = sio.loadmat(route+'train_256by200.mat')
+        x, y = mat['rs'], mat['labels']
+    n, f, t = x.shape
     if opts.shuffle:
-        n = np.arange(x.shape[0])
-        np.random.shuffle(n)
-        x, y = x[n], y[n]
+        nn = np.arange(x.shape[0])
+        np.random.shuffle(nn)
+        x, y = x[nn], y[nn]
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
     if opts.transpose:  # true means stacking over the column
-        X = X.reshape(X.shape[0], 80, 50).permute(0, 2, 1).reshape(X.shape[0], -1)  # learn atom of over time
-    indx = torch.arange(X.shape[0])
-    ind = indx[indx%4 !=0]
-    xtr, ytr = l2norm(X[ind, :]), Y[ind, :]
-    xval, yval = l2norm(X[::4, :]), Y[::4, :]
+        X = X.permute(0, 2, 1).reshape(X.shape[0], -1)  # learn atom of over time
+    indx = torch.arange(n)
+    ind, ind2 = indx[indx%4 !=0], indx[indx%4 ==0]
+    xtr, ytr = l2norm(X[ind, :].reshape(ind.shape[0], -1)).reshape(ind.shape[0], f, t), Y[ind, :]
+    xval, yval = l2norm(X[::4, :].reshape(ind2.shape[0], -1)).reshape(ind2.shape[0], f, t), Y[::4, :]
     if data == 'train' : return xtr, ytr
     if data == 'val' : return xval, yval   # validation
     if data == 'test': return  l2norm(X), Y  # testing
