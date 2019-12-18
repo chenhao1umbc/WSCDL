@@ -13,7 +13,8 @@ option.display=0;%display the words and probablities;
 %%%%%%load data%%%
 % datastr='synspect_2cluster';
 % load([datastr,'.mat']);
-rt = '/home/chenhao1/Hpython/';
+% rt = '/home/chenhao1/Hpython/';
+rt = '/extra/chenhao1/';
 load([rt,'train_256by200.mat'])
 X = permute(rs, [2,3,1]);
 x = reshape(X, 256*200, 400);
