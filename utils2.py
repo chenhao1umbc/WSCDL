@@ -77,15 +77,19 @@ def load_data(opts, data='train'):
         x, y = x[nn], y[nn]
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
-    if opts.transpose:  # true means stacking over the column
-        X = X.permute(0, 2, 1).reshape(X.shape[0], -1)  # learn atom of over time
+
+    # standardization
+    X = (X - X.mean())/X.var().sqrt()
+
+    if opts.transpose:  X = X.permute(0, 2, 1)
+
     indx = torch.arange(n)
     ind, ind2 = indx[indx%4 !=0], indx[indx%4 ==0]
-    xtr, ytr = l2norm(X[ind, :].reshape(ind.shape[0], -1)).reshape(ind.shape[0], f, t), Y[ind, :]
-    xval, yval = l2norm(X[::4, :].reshape(ind2.shape[0], -1)).reshape(ind2.shape[0], f, t), Y[::4, :]
+    xtr, ytr = X[ind, :], Y[ind, :]
+    xval, yval = X[::4, :], Y[::4, :]
     if data == 'train' : return xtr, ytr
     if data == 'val' : return xval, yval   # validation
-    if data == 'test': return  l2norm(X), Y  # testing
+    if data == 'test': return  X, Y  # testing
 
 
 

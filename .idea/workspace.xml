@@ -47,7 +47,7 @@
     <option name="myShowVariablesByDefault" value="false" />
     <option name="myUseExistingConsole" value="true" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.wscdl_2d">
     <configuration name="wscdl_1d" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -69,10 +69,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="wscdl_2d" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="WSCDL" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/wscdl_2d.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.wscdl_2d" />
         <item itemvalue="Python.wscdl_1d" />
-        <item itemvalue="Python.plot_figures" />
       </list>
     </recent_temporary>
   </component>
@@ -154,28 +175,28 @@
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>
     <state width="1335" height="786" key="GridCell.Tab.-1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821488717" />
-    <state width="1170" height="793" key="GridCell.Tab.0.bottom" timestamp="1586192981693">
+    <state width="1351" height="793" key="GridCell.Tab.0.bottom" timestamp="1586206603742">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586192981693" />
+    <state width="1351" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586206603742" />
     <state width="824" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1170" height="793" key="GridCell.Tab.0.center" timestamp="1586192981691">
+    <state width="1351" height="793" key="GridCell.Tab.0.center" timestamp="1586206603740">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586192981691" />
+    <state width="1351" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586206603740" />
     <state width="824" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1170" height="793" key="GridCell.Tab.0.left" timestamp="1586192981689">
+    <state width="1351" height="793" key="GridCell.Tab.0.left" timestamp="1586206603739">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586192981689" />
+    <state width="1351" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586206603739" />
     <state width="824" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578317" />
     <state width="1335" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1170" height="793" key="GridCell.Tab.0.right" timestamp="1586192981692">
+    <state width="1351" height="793" key="GridCell.Tab.0.right" timestamp="1586206603741">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586192981692" />
+    <state width="1351" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586206603741" />
     <state width="824" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
     <state width="1335" height="786" key="GridCell.Tab.1.bottom" timestamp="1582821487760">
@@ -198,11 +219,22 @@
     </state>
     <state width="1335" height="786" key="GridCell.Tab.1.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821477838" />
     <state width="1335" height="786" key="GridCell.Tab.1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821487760" />
-    <state x="696" y="404" key="com.intellij.ide.util.TipDialog" timestamp="1586112584579">
+    <state x="724" y="227" key="com.intellij.ide.util.TipDialog" timestamp="1586200277295">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586112584579" />
+    <state x="724" y="227" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586200277295" />
     <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821410374" />
     <state x="696" y="1484" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1583427448679" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/wscdl_2d.py</url>
+          <line>13</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
