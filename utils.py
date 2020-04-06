@@ -1093,11 +1093,11 @@ def load_data(opts, data='train'):
     # route = '/mnt/d/Downloads/AASP_train/'
     route = '../../data/'
     if data == 'test':  # x, y are numpy double arrays
-        # x, y = torch.load(route+'aasp_test_256by200.pt')
+        # x, y = torch.load(route+'aasp_test_80by150.pt')
         mat = sio.loadmat(route+'test_256by200.mat')
         x, y = mat['rs'], mat['labels']
     else:
-        # x, y = torch.load(route + 'aasp_train_256by200.pt')
+        # x, y = torch.load(route + 'aasp_train_80by150.pt')
         mat = sio.loadmat(route+'train_256by200.mat')
         x, y = mat['rs'], mat['labels']
     n, f, t = x.shape
@@ -1901,7 +1901,7 @@ def save_results(D, D0, S, S0, W, opts, loss):
     #     torch.save([D, D0, S, S0, W, opts, loss], '../toy_DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
     # if type == 1:  # all aasp data
     #     torch.save([D, D0, S, S0, W, opts, loss], '../DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
-    # if type == 2:  # dictionaries of aas
+    # if type == 2:  # dictionaries of aasp
     param = str([opts.K, opts.K0, opts.M, opts.lamb, opts.eta , opts.mu])
     torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 
