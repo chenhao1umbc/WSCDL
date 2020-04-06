@@ -1090,7 +1090,6 @@ def load_data(opts, data='train'):
     :param opts: only need teh cpu or gpu info
     :return: training, validation or testing data
     """
-    # route = '/mnt/d/Downloads/AASP_train/'
     route = '../../data/'
     if data == 'test':  # x, y are numpy double arrays
         # x, y = torch.load(route+'aasp_test_80by150.pt')
