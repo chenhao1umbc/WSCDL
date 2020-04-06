@@ -1090,7 +1090,7 @@ def load_data(opts, data='train'):
     :return: training, validation or testing data
     """
     # route = '/mnt/d/Downloads/AASP_train/'
-    route = '/home/chenhao1/Hpython/'
+    route = '../../data/'
     if data == 'test':  # x, y are numpy double arrays
         # x, y = torch.load(route+'aasp_test_256by200.pt')
         mat = sio.loadmat(route+'test_256by200.mat')
