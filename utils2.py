@@ -92,7 +92,34 @@ def load_data(opts, data='train'):
     if data == 'test': return  X, Y  # testing
 
 
+def init(X, opts):
+    """
+    This function will generate the initial value for D D0 S S0 and W
+    :param X: training data with shape of [N, F,T]
+    :param Y: training labels with shape of [N, C]
+    :param opts: an object with hyper-parameters
+        S is 4-d tensor [N,C,K,F,T] [samples,classes, num of atoms, Freq, time series,]
+        D is 3-d tensor [C,K,F,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, F, T]pyth
+        D0 is a matrix [K0, F, M]
+        X is a matrix [N, F, T], training Data, could be in GPU
+        Y is a matrix [N, C] \in {0,1}, training labels
+        W is a matrix [C, K], where K is per-class atoms
+    :return: D, D0, S, S0, W
+    """
+    if opts.transpose:
+        N, T, F = X.shape
+    else:
+        N, F, T = X.shape
+    D = torch.rand(opts.C, opts.K, opts.M, device=opts.dev)
+    D = D/(D*D).sum().sqrt()  # normalization
+    D0 = torch.rand(opts.K0, opts.M, device=opts.dev)
+    D0 = D0/(D0*D0).sum().sqrt()  # normalization
+    S = torch.zeros(N, opts.C, opts.K, T, device=opts.dev)
+    S0 = torch.zeros(N, opts.K0, T, device=opts.dev)
+    W = torch.ones(opts.C, opts.K +1, device=opts.dev)
 
+    return D, D0, S, S0, W
 
 
 
