@@ -1093,21 +1093,16 @@ def load_data(opts, data='train'):
     """
     route = '../../data/'
     if data == 'test':  # x, y are numpy double arrays
-        # x, y = torch.load(route+'aasp_test_80by150.pt')
-        mat = sio.loadmat(route+'test_256by200.mat')
-        xx, y = mat['rs'], mat['labels']
+        x, y = torch.load(route+'aasp_test_80by150.pt')
     else:
-        # x, y = torch.load(route + 'aasp_train_80by150.pt')
-        mat = sio.loadmat(route+'train_256by200.mat')
-        xx, y = mat['rs'], mat['labels']
-    x = xx.reshape(xx.shape[0], -1)
+        x, y = torch.load(route + 'aasp_train_80by150.pt')
     N, T= x.shape
     if opts.shuffle:
         nn = np.arange(x.shape[0])
         np.random.shuffle(nn)
         x, y = x[nn], y[nn]
     if opts.transpose:  # true means stacking over the column
-        X = xx.transpose(0, 2, 1).reshape(xx.shape[0], -1)  # learn atom of over time
+        X = x.reshape(x.shape[0], 80, 150).transpose(0, 2, 1)  # learn atom of over time
 
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
