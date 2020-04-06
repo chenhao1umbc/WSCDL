@@ -43,6 +43,7 @@ class OPT:
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, True  # n is number of examples per combination for toy data
         self.common_term = True*K0  # if common term exist
+        self.shape = '1d' # input data is 1d or 2d, 1d could be vectorized 2d data
         if torch.cuda.is_available():
             self.dev = 'cuda'
             if not silent: print('\nRunning on GPU')
@@ -1094,24 +1095,27 @@ def load_data(opts, data='train'):
     if data == 'test':  # x, y are numpy double arrays
         # x, y = torch.load(route+'aasp_test_80by150.pt')
         mat = sio.loadmat(route+'test_256by200.mat')
-        x, y = mat['rs'], mat['labels']
+        xx, y = mat['rs'], mat['labels']
     else:
         # x, y = torch.load(route + 'aasp_train_80by150.pt')
         mat = sio.loadmat(route+'train_256by200.mat')
-        x, y = mat['rs'], mat['labels']
-    n, f, t = x.shape
+        xx, y = mat['rs'], mat['labels']
+    x = xx.reshape(xx.shape[0], -1)
+    N, T= x.shape
     if opts.shuffle:
         nn = np.arange(x.shape[0])
         np.random.shuffle(nn)
         x, y = x[nn], y[nn]
+    if opts.transpose:  # true means stacking over the column
+        X = xx.transpose(0, 2, 1).reshape(xx.shape[0], -1)  # learn atom of over time
+
     X = torch.from_numpy(x).float().to(opts.dev)
     Y = torch.from_numpy(y).float().to(opts.dev)
-    if opts.transpose:  # true means stacking over the column
-        X = X.permute(0, 2, 1).reshape(X.shape[0], -1)  # learn atom of over time
-    indx = torch.arange(n)
+
+    indx = torch.arange(N)
     ind, ind2 = indx[indx%4 !=0], indx[indx%4 ==0]
-    xtr, ytr = l2norm(X[ind, :].reshape(ind.shape[0], -1)).reshape(ind.shape[0], f, t), Y[ind, :]
-    xval, yval = l2norm(X[::4, :].reshape(ind2.shape[0], -1)).reshape(ind2.shape[0], f, t), Y[::4, :]
+    xtr, ytr = l2norm(X[ind, :].reshape(ind.shape[0], -1)).reshape(ind.shape[0], T), Y[ind, :]
+    xval, yval = l2norm(X[::4, :].reshape(ind2.shape[0], -1)).reshape(ind2.shape[0], T), Y[::4, :]
     if data == 'train' : return xtr, ytr
     if data == 'val' : return xval, yval   # validation
     if data == 'test': return  l2norm(X), Y  # testing

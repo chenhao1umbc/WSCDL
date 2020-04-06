@@ -47,64 +47,7 @@
     <option name="myShowVariablesByDefault" value="false" />
     <option name="myUseExistingConsole" value="true" />
   </component>
-  <component name="RunManager" selected="Python.wscdl_example">
-    <configuration name="plot_figures" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="WSCDL" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/plot_figures.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="speed_compare" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="WSCDL" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/speed_compare.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="wscdl" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="WSCDL" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/wscdl.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager">
     <configuration name="wscdl_1d" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -126,34 +69,10 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="wscdl_example" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="WSCDL" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/wscdl_example.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.wscdl_example" />
         <item itemvalue="Python.wscdl_1d" />
         <item itemvalue="Python.plot_figures" />
-        <item itemvalue="Python.plot_figures" />
-        <item itemvalue="Python.speed_compare" />
       </list>
     </recent_temporary>
   </component>
@@ -211,6 +130,10 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
+    <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586188064821">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586188064821" />
     <state x="667" y="303" key="FileChooserDialogImpl" timestamp="1586050936291">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -231,28 +154,28 @@
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>
     <state width="1335" height="786" key="GridCell.Tab.-1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821488717" />
-    <state width="1170" height="793" key="GridCell.Tab.0.bottom" timestamp="1586179144458">
+    <state width="1170" height="793" key="GridCell.Tab.0.bottom" timestamp="1586188066489">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586179144458" />
+    <state width="1170" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586188066489" />
     <state width="824" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1170" height="793" key="GridCell.Tab.0.center" timestamp="1586179144456">
+    <state width="1170" height="793" key="GridCell.Tab.0.center" timestamp="1586188066486">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586179144456" />
+    <state width="1170" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586188066486" />
     <state width="824" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1170" height="793" key="GridCell.Tab.0.left" timestamp="1586179144453">
+    <state width="1170" height="793" key="GridCell.Tab.0.left" timestamp="1586188066485">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586179144453" />
+    <state width="1170" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586188066485" />
     <state width="824" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578317" />
     <state width="1335" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1170" height="793" key="GridCell.Tab.0.right" timestamp="1586179144457">
+    <state width="1170" height="793" key="GridCell.Tab.0.right" timestamp="1586188066488">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1170" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586179144457" />
+    <state width="1170" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586188066488" />
     <state width="824" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
     <state width="1335" height="786" key="GridCell.Tab.1.bottom" timestamp="1582821487760">
@@ -281,5 +204,16 @@
     <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586112584579" />
     <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821410374" />
     <state x="696" y="1484" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1583427448679" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/utils.py</url>
+          <line>1115</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
