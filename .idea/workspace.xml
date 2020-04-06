@@ -47,7 +47,7 @@
     <option name="myShowVariablesByDefault" value="false" />
     <option name="myUseExistingConsole" value="true" />
   </component>
-  <component name="RunManager" selected="Python.temp">
+  <component name="RunManager" selected="Python.plot_figures">
     <configuration name="beta" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -69,19 +69,34 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="plot_figures" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="plot_figures" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/plot_figures.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="speed_compare" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="WSCDL" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/speed_compare.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -111,27 +126,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="temp2" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="WSCDL" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/temp2.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="wscdl" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -155,11 +149,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.temp" />
-        <item itemvalue="Python.temp" />
         <item itemvalue="Python.plot_figures" />
-        <item itemvalue="Python.beta" />
-        <item itemvalue="Python.beta" />
+        <item itemvalue="Python.plot_figures" />
+        <item itemvalue="Python.speed_compare" />
+        <item itemvalue="Python.temp" />
+        <item itemvalue="Python.temp" />
       </list>
     </recent_temporary>
   </component>
@@ -237,24 +231,28 @@
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>
     <state width="1335" height="786" key="GridCell.Tab.-1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821488717" />
-    <state width="824" height="786" key="GridCell.Tab.0.bottom" timestamp="1582821578318">
+    <state width="1014" height="786" key="GridCell.Tab.0.bottom" timestamp="1586132687728">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state width="1014" height="786" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586132687728" />
     <state width="824" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="824" height="786" key="GridCell.Tab.0.center" timestamp="1582821578318">
+    <state width="1014" height="786" key="GridCell.Tab.0.center" timestamp="1586132687726">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state width="1014" height="786" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586132687726" />
     <state width="824" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="824" height="786" key="GridCell.Tab.0.left" timestamp="1582821578317">
+    <state width="1014" height="786" key="GridCell.Tab.0.left" timestamp="1586132687725">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state width="1014" height="786" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586132687725" />
     <state width="824" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578317" />
     <state width="1335" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="824" height="786" key="GridCell.Tab.0.right" timestamp="1582821578318">
+    <state width="1014" height="786" key="GridCell.Tab.0.right" timestamp="1586132687727">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state width="1014" height="786" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586132687727" />
     <state width="824" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
     <state width="1335" height="786" key="GridCell.Tab.1.bottom" timestamp="1582821487760">
@@ -283,21 +281,5 @@
     <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586112584579" />
     <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821410374" />
     <state x="696" y="1484" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1583427448679" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/wscdl.py</url>
-          <line>27</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/temp.py</url>
-          <line>13</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
