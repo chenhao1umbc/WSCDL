@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as sg
 import scipy.io as sio
 from sklearn import metrics
-import spams
+# import spams
 import scipy.sparse as sparse
 
 tt = datetime.datetime.now
