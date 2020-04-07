@@ -24,3 +24,5 @@ acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc.acc)
 plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
 print('done')
+
+
