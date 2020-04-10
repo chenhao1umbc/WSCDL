@@ -209,7 +209,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS.sum(1)  # using the same name to save memory
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0)  # R is the common reconstruction
-
+    pdb.set_trace()
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S_tik * W).sum(2).exp()   # shape of [N, C]
