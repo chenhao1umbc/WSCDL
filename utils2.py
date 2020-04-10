@@ -13,7 +13,7 @@ import bisect
 import pdb
 
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as Func
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sg
@@ -204,11 +204,11 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     C, K, *_ = D.shape
     CK, NC = K*C, N*C
     # DconvS should be the shape of (N, CK, F,T)
-    DconvS = F.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
+    DconvS = Func.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS.sum(1)  # using the same name to save memory
-    R = F.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0)  # R is the common reconstruction
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0)  # R is the common reconstruction
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
