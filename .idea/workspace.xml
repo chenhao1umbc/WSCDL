@@ -9,9 +9,6 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FavoritesManager">
-    <favorites_list name="WSCDL" />
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -28,12 +25,11 @@
   <component name="ProjectId" id="1Pw552t485gB4fbJm3VSds9rOyG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/WSCDL.ipynb" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Python" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/utils.py" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -73,9 +69,6 @@
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -83,7 +76,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/wscdl_2d.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
@@ -92,6 +85,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.wscdl_2d" />
         <item itemvalue="Python.wscdl_2d" />
         <item itemvalue="Python.wscdl_1d" />
       </list>
@@ -123,14 +117,15 @@
       <is-autoscroll-to-source value="true" />
     </todo-panel>
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.m" />
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
@@ -149,8 +144,13 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="636" y="218" key="#Notifications" timestamp="1586398197133">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="636" y="218" key="#Notifications/0.0.1920.1080@0.0.1920.1080" timestamp="1586398197133" />
     <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586188064821">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -175,28 +175,28 @@
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>
     <state width="1335" height="786" key="GridCell.Tab.-1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821488717" />
-    <state width="1351" height="793" key="GridCell.Tab.0.bottom" timestamp="1586267104989">
+    <state width="1351" height="793" key="GridCell.Tab.0.bottom" timestamp="1586537075086">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586267104989" />
+    <state width="1351" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586537075086" />
     <state width="824" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1351" height="793" key="GridCell.Tab.0.center" timestamp="1586267104986">
+    <state width="1351" height="793" key="GridCell.Tab.0.center" timestamp="1586537075083">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586267104986" />
+    <state width="1351" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586537075083" />
     <state width="824" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1351" height="793" key="GridCell.Tab.0.left" timestamp="1586267104985">
+    <state width="1351" height="793" key="GridCell.Tab.0.left" timestamp="1586537075082">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586267104985" />
+    <state width="1351" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586537075082" />
     <state width="824" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578317" />
     <state width="1335" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1351" height="793" key="GridCell.Tab.0.right" timestamp="1586267104987">
+    <state width="1351" height="793" key="GridCell.Tab.0.right" timestamp="1586537075085">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586267104987" />
+    <state width="1351" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586537075085" />
     <state width="824" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
     <state width="1335" height="786" key="GridCell.Tab.1.bottom" timestamp="1582821487760">
@@ -219,11 +219,34 @@
     </state>
     <state width="1335" height="786" key="GridCell.Tab.1.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821477838" />
     <state width="1335" height="786" key="GridCell.Tab.1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821487760" />
-    <state x="724" y="227" key="com.intellij.ide.util.TipDialog" timestamp="1586200277295">
+    <state x="296" y="231" key="SettingsEditor" timestamp="1586468444081">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="724" y="227" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586200277295" />
+    <state x="296" y="231" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1586468444081" />
+    <state x="441" y="284" key="com.intellij.execution.console.ConsoleHistoryController$MyBrowseAction$1" timestamp="1586533694443">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="441" y="284" key="com.intellij.execution.console.ConsoleHistoryController$MyBrowseAction$1/0.0.1920.1080@0.0.1920.1080" timestamp="1586533694443" />
+    <state x="724" y="227" key="com.intellij.ide.util.TipDialog" timestamp="1586268619043">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="724" y="227" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586268619043" />
     <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821410374" />
     <state x="696" y="1484" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1583427448679" />
+    <state x="616" y="271" width="672" height="678" key="search.everywhere.popup" timestamp="1586460211537">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="616" y="271" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1586460211537" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/utils2.py</url>
+          <line>213</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

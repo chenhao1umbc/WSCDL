@@ -98,11 +98,11 @@ def init(X, opts):
     :param X: training data with shape of [N, F,T]
     :param Y: training labels with shape of [N, C]
     :param opts: an object with hyper-parameters
-        S is 4-d tensor [N,C,K,F,T] [samples,classes, num of atoms, Freq, time series,]
-        D is 3-d tensor [C,K,F,M] [num of atoms, classes, atom size]
-        S0 is 3-d tensor [N, K0, F, T]pyth
-        D0 is a matrix [K0, F, M]
-        X is a matrix [N, F, T], training Data, could be in GPU
+        S is 5-d tensor [N,C,K,F,T] [samples,classes, num of atoms, Freq, time series,]
+        D is 4-d tensor [C,K,F,M] [num of atoms, classes, atom size]
+        S0 is 4-d tensor [N, K0, F, T]
+        D0 is 3-d tensor [K0, F, M]
+        X is 3-d tensor [N, F, T], training Data, could be in GPU
         Y is a matrix [N, C] \in {0,1}, training labels
         W is a matrix [C, K+1], where K is per-class atoms
     :return: D, D0, S, S0, W
@@ -111,12 +111,12 @@ def init(X, opts):
         N, T, F = X.shape
     else:
         N, F, T = X.shape
-    D = torch.rand(opts.C, opts.K, opts.M,1, device=opts.dev)
+    D = torch.rand(opts.C, opts.K, opts.Dh,opts.Dw, device=opts.dev)
     D = D/(D*D).sum().sqrt()  # normalization
-    D0 = torch.rand(opts.K0, opts.M,1, device=opts.dev)
+    D0 = torch.rand(opts.K0, opts.Dh, opts.Dw, device=opts.dev)
     D0 = D0/(D0*D0).sum().sqrt()  # normalization
-    S = torch.zeros(N, opts.C, opts.K, F, T, device=opts.dev)
-    S0 = torch.zeros(N, opts.K0, F, T, device=opts.dev)
+    S = torch.zeros(N, opts.C, opts.K, 1, T, device=opts.dev)
+    S0 = torch.zeros(N, opts.K0, 1, T, device=opts.dev)
     W = torch.ones(opts.C, opts.K +1, device=opts.dev)
     return D, D0, S, S0, W
 
@@ -190,18 +190,27 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     This function will calculate the costfunction value
     :param X: the input data with shape of [N, F, T]
     :param Y: the input label with shape of [N, C]
-    :param D: the discriminative dictionary, [C,K,F,M]
-    :param D0: the common dictionary, [K0,F,M]
-    :param S: the sparse coefficients, shape of [N,C,K,F,T] [samples, classes, num of atoms, time series,]
-    :param S0: the common coefficients, 3-d tensor [N, K0,F,T]
+    :param D: the discriminative dictionary, [C,K,Dh,Dw]
+    :param D0: the common dictionary, [K0,Dh,Dw]
+    :param S: the sparse coefficients, shape of [N,C,K,1,T] [samples, classes, num of atoms, time series,]
+    :param S0: the common coefficients, 3-d tensor [N, K0,1,T]
     :param W: the projection for labels, shape of [C, K+1]
     :param opts: the hyper-parameters
     :return: cost, the value of loss function
     """
-    N, K0, F, T = S0.shape
-    M = D0.shape[-1]
+    N, K0, _, T = S0.shape
+    M = opts.M  # suppose to be the same as F
     M_2 = int((M-1)/2)  # dictionary atom dimension
-    C, K, _ = D.shape
+    C, K, *_ = D.shape
+    CK, NC = K*C, N*C
+    # DconvS should be the shape of (N, CK, F,T)
+    DconvS = F.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, D.shape[-2], D.shape[-1]).flip(2,3), padding=(255,1), groups=CK)
+    ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,M,T).sum(1)  # output shape of (N, F, T)
+    ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,M,T).sum(1)  # output shape of (N, F, T)
+    DconvS = DconvS.sum(1)  # using the same name to save memory
+    R = F.conv2d(S0, D0)  # R is the common reconstruction
+
+
     ycDcconvSc = S[:, :, 0, :, :].clone()  # initialization
     ycpDcconvSc = S[:, :, 0, :, :].clone()  # initialization
     Dcopy = D.clone().flip(2,3).unsqueeze(2)  # D shape is [C,K,1,F, M]
@@ -230,5 +239,17 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     cost = fisher + sparse + label + low_rank
     return cost
 
+
+def save_results(D, D0, S, S0, W, opts, loss):
+    """
+    This function will save the training results
+    :param D: initial value, D, shape of [C, K, M]
+    :param D0: pre-trained D0,  shape of [C0, K0, M]
+    :param S: initial value, shape of [N,C,K,T]
+    :param S0: initial value, shape of [N,K0,T]
+    :param W: The pre-trained projection, shape of [C, K]
+    """
+    param = str([opts.K, opts.K0, opts.M, opts.lamb, opts.eta , opts.mu])
+    torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 
 
