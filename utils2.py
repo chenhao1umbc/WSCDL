@@ -39,8 +39,9 @@ class OPT:
     lamb is the coeff of sparsity
      nu is the coeff of cross-entropy loss
      """
-    def __init__(self, C=4, K0=1, K=1, M=30, mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
-        self.C, self.K, self.K0, self.M = C, K, K0, M
+    def __init__(self, C=4, K0=1, K=1, Dh=256, Dw=3,\
+                 mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
+        self.C, self.K, self.K0, self.Dh, self.Dw = C, K, K0, Dh, Dw
         self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.01
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
@@ -124,10 +125,10 @@ def init(X, opts):
 def train(D, D0, S, S0, W, X, Y, opts):
     """
     This function is the main training body of the algorithm, with showing a lot of details
-    :param D: initial value, D, shape of [C, K, F, M]
-    :param D0: pre-trained D0,  shape of [C0, K0, F, M]
-    :param S: initial value, shape of [N,C,K, F, T]
-    :param S0: initial value, shape of [N,K0,F,T]
+    :param D: initial value, D, shape of [C, K, Dh, Dw]
+    :param D0: pre-trained D0,  shape of [C0, K0, Dh, Dw]
+    :param S: initial value, shape of [N,C,K, 1, T]
+    :param S0: initial value, shape of [N,K0,1,T]
     :param W: The pre-trained projection, shape of [C, K+1]
     :param X: testing data, shape of [N, F, T]
     :param Y: testing Lable, ground truth, shape of [N, C]
@@ -198,30 +199,16 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     :param opts: the hyper-parameters
     :return: cost, the value of loss function
     """
-    N, K0, _, T = S0.shape
-    M = opts.M  # suppose to be the same as F
-    M_2 = int((M-1)/2)  # dictionary atom dimension
+    N, F, T = X.shape
+    K0, Dh, Dw = D0.shape
     C, K, *_ = D.shape
     CK, NC = K*C, N*C
     # DconvS should be the shape of (N, CK, F,T)
-    DconvS = F.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, D.shape[-2], D.shape[-1]).flip(2,3), padding=(255,1), groups=CK)
-    ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,M,T).sum(1)  # output shape of (N, F, T)
-    ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,M,T).sum(1)  # output shape of (N, F, T)
+    DconvS = F.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
+    ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
+    ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS.sum(1)  # using the same name to save memory
-    R = F.conv2d(S0, D0)  # R is the common reconstruction
-
-
-    ycDcconvSc = S[:, :, 0, :, :].clone()  # initialization
-    ycpDcconvSc = S[:, :, 0, :, :].clone()  # initialization
-    Dcopy = D.clone().flip(2,3).unsqueeze(2)  # D shape is [C,K,1,F, M]
-    DconvS = S[:, :, 0, :, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-    for c in range(C):
-        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv2d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
-        ycDcconvSc[:, c, :] = Y[:, c].reshape(N, 1) * DconvS[:, c, :]  # shape of [N, C, T]
-        ycpDcconvSc[:, c, :] = (1-Y[:, c].reshape(N, 1)) * DconvS[:, c, :]  # shape of [N, C, T]
-        torch.cuda.empty_cache()
-    R = F.conv2d(S0, D0.flip(1).unsqueeze(1), groups=K0, padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    R = F.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0)  # R is the common reconstruction
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
