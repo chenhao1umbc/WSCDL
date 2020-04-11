@@ -175,28 +175,28 @@
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>
     <state width="1335" height="786" key="GridCell.Tab.-1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821488717" />
-    <state width="1351" height="793" key="GridCell.Tab.0.bottom" timestamp="1586541602281">
+    <state width="1302" height="793" key="GridCell.Tab.0.bottom" timestamp="1586640086496">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586541602281" />
+    <state width="1302" height="793" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1586640086496" />
     <state width="824" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1351" height="793" key="GridCell.Tab.0.center" timestamp="1586541602278">
+    <state width="1302" height="793" key="GridCell.Tab.0.center" timestamp="1586640086494">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586541602278" />
+    <state width="1302" height="793" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1586640086494" />
     <state width="824" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1351" height="793" key="GridCell.Tab.0.left" timestamp="1586541602277">
+    <state width="1302" height="793" key="GridCell.Tab.0.left" timestamp="1586640086493">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586541602277" />
+    <state width="1302" height="793" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1586640086493" />
     <state width="824" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578317" />
     <state width="1335" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1351" height="793" key="GridCell.Tab.0.right" timestamp="1586541602279">
+    <state width="1302" height="793" key="GridCell.Tab.0.right" timestamp="1586640086495">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1351" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586541602279" />
+    <state width="1302" height="793" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1586640086495" />
     <state width="824" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
     <state width="1335" height="786" key="GridCell.Tab.1.bottom" timestamp="1582821487760">
@@ -237,21 +237,5 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="616" y="271" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1586460211537" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils2.py</url>
-          <line>213</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils2.py</url>
-          <line>226</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

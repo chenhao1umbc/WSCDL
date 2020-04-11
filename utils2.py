@@ -208,21 +208,22 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS.sum(1)  # using the same name to save memory
-    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0)  # R is the common reconstruction
-    pdb.set_trace()
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+    torch.cuda.empty_cache()
+
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
-    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    S_tik = torch.cat((S.squeeze().mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S_tik * W).sum(2).exp()   # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
     _1_Y_hat = 1 - Y_hat
-    fisher1 = torch.norm(X - R - DconvS.sum(1))**2
-    fisher2 = torch.norm(X - R - ycDcconvSc.sum(1)) ** 2
-    fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc.sum(1)) ** 2
+    fisher1 = torch.norm(X - R - DconvS)**2
+    fisher2 = torch.norm(X - R - ycDcconvSc) ** 2
+    fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
     # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
-    low_rank = N * opts.mu * D0.norm(p='nuc')
+    low_rank = N * opts.mu * D0.reshape(D0.shape[-2], D0.shape[-1]*K0).norm(p='nuc')
     cost = fisher + sparse + label + low_rank
     return cost
 
@@ -238,5 +239,76 @@ def save_results(D, D0, S, S0, W, opts, loss):
     """
     param = str([opts.K, opts.K0, opts.M, opts.lamb, opts.eta , opts.mu])
     torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
+
+
+def updateS(DD0SS0W, X, Y, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, T]
+        D0 is a matrix [K0, M]
+        W is a matrix [C, K+1], where K is per-class atoms
+        X is a matrix [N, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+
+        adapting for 2-D convolution, T could be replace by [H, W]
+        M could be replace by [M, M], which is a square patch
+    """
+    D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
+    N, F, T = X.shape
+    K0, Dh, Dw = D0.shape
+    C, K, *_ = D.shape
+    CK, NC = K * C, N * C
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+
+    # '''update the current s_n,k^(c) '''
+    for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
+        DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
+                             padding=(255, 1), groups=CK).reshape(N,C,K, F, T).sum(2)
+        Crange = torch.tensor(range(C))
+        dck = D[c, k, :]  # shape of [Dh, Dw]
+        sck = S[:, c, k, :]  # shape of [N, 1, T]
+        wc = W[c, :]  # shape of [K+1], including bias
+        yc = Y[:, c]  # shape of [N]
+        dck_conv_sck = Func.conv2d(sck, dck.flip(0,1),padding=(255,1)).squeeze()  # shape of [N,F,T]
+        c_prime = Crange[Crange != c]  # c_prime contains all the indexes
+        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+
+    M = D0.shape[1]  # dictionary atom dimension
+    M_2 = int((M-1)/2)
+    for c, k in [(i, j) for i in range(C) for j in range(K)]:
+        Dcopy = D.clone().flip(2).flip(3).unsqueeze(2)  # D shape is [C,K,1, M]
+        Crange = torch.tensor(range(C))
+        DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
+        for cc in range(C):
+            # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
+            DconvS[:, cc, :] = F.conv2d(S[:, cc, :], Dcopy[cc,:], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T[0], M_2:M_2 + T[1]]
+
+        dck = D[c, k, :]  # shape of [M]
+        sck = S[:, c, k, :]  # shape of [N, T]
+        wc = W[c, :]  # shape of [K+1], including bias
+        yc = Y[:, c]  # shape of [N]
+        Tdck = (toeplitz2(dck.unsqueeze(0), m=T, T=T).squeeze()).t()  # shape of [T, m=T]
+
+        dck_conv_sck = F.conv2d(sck.unsqueeze(1), dck.flip(0).flip(1).reshape(1, 1, M, M),
+                                padding=M - 1).squeeze()[:, M_2:M_2 + T[0], M_2:M_2 + T[1]]  # shape of [N,T]
+        c_prime = Crange[Crange != c]  # c_prime contains all the indexes
+        Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
+        # term 1, 2, 3 should be in the shape of [N, T]
+        term1 = X - R - (DconvS.sum(1) - dck_conv_sck)  # D'*S' = (DconvS.sum(1) - dck_conv_sck
+        term2 = Y[:, c].reshape(N, 1) * (X - R - Y[:, c].reshape(N, 1) * Dcp_conv_Sncp -
+                                         (Y[:, c_prime] * DconvS[:, c_prime, :].permute(2, 0, 1)).sum(2).t())
+        term3 = -(1 - Y[:, c]).reshape(N, 1) * ((1 - Y[:, c]).reshape(N, 1) * Dcp_conv_Sncp +
+                                                ((1 - Y[:, c_prime]) * DconvS[:, c_prime, :].permute(2, 0, 1)).sum(2).t())
+        b = (term1 + term2 + term3) / 2
+        torch.cuda.empty_cache()
+        sc = S[:, c, :, :].clone()  # sc will be changed in solv_sck, adding clone to prevent, for debugging
+        S[:, c, k, :] = solv_sck(sc, wc, yc, Tdck, b, k, opts)
+        if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print(inf_nan_happenned)
+    return S
+
 
 
