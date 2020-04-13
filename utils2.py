@@ -136,7 +136,9 @@ def train(D, D0, S, S0, W, X, Y, opts):
     :return: D, D0, S, S0, W, loss
     """
     loss, threshold = torch.tensor([], device=opts.dev), 5e-4
+    t0 = time.time()
     loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+    print('calc loss time', time.time()-t0)
     print('The initial loss function value is :%3.4e' % loss[-1])
     t, t1 = time.time(), time.time()
     S_numel, S0_numel = S.numel(), S0.numel()
