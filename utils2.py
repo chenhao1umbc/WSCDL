@@ -142,7 +142,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
     S_numel, S0_numel = S.numel(), S0.numel()
     for i in range(opts.maxiter):
         t0 = time.time()
-        S = updateS([D, D0, S, S0, W], X, Y, opts)
+        # S = updateS([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
@@ -242,19 +242,16 @@ def save_results(D, D0, S, S0, W, opts, loss):
 
 
 def updateS(DD0SS0W, X, Y, opts):
-    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    """this function is to update the sparse coefficients for dictionary D using BPG-M, updating each S_n,k^(c)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
-        D is 3-d tensor [C,K,M] [num of atoms, classes, atom size]
+        D is 3-d tensor [C,K,Dh,Dw] [num of atoms, classes, atom size]
         S0 is 3-d tensor [N, K0, T]
-        D0 is a matrix [K0, M]
+        D0 is a matrix [K0, Dh, Dw]
         W is a matrix [C, K+1], where K is per-class atoms
-        X is a matrix [N, T], training Data
+        X is a matrix [N, F, T], training Data
         Y is a matrix [N, C] \in {0,1}, training labels
-
-        adapting for 2-D convolution, T could be replace by [H, W]
-        M could be replace by [M, M], which is a square patch
     """
     D, D0, S, S0, W = DD0SS0W  # where DD0SS0 is a list
     N, F, T = X.shape
@@ -274,7 +271,7 @@ def updateS(DD0SS0W, X, Y, opts):
         sck = S[:, c, k, :]  # shape of [N, 1, T]
         wc = W[c, :]  # shape of [K+1], including bias
         yc = Y[:, c]  # shape of [N]
-        dck_conv_sck = Func.conv2d(sck.unsqueeze(1), dck.reshape(1,1,Dh,Dw).flip(0, 1), padding=(255, 1)).squeeze()  # shape of [N,F,T]
+        dck_conv_sck = Func.conv2d(sck.unsqueeze(1), dck.reshape(1,1,Dh,Dw).flip(2, 3), padding=(255, 1)).squeeze()  # shape of [N,F,T]
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
         Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck  # shape of [N, F, T]
         Tdck = toeplitz_dck(dck, [Dh, Dw, T]) # shape of [T, m=T]
@@ -393,4 +390,95 @@ def shrink(M, nu, lamb):
     b = lamb / M  # shape of [T]
     P = torch.sign(nu) * Func.relu(abs(nu) -b)
     return P
+
+
+def updateS0(DD0SS0, X, Y, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,Dh,Dw] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, Dh, Dw]
+        D0 is a matrix [K0, M]
+        W is a matrix [C, K+1], where K is per-class atoms
+        X is a matrix [N, F, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+    """
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    N, F, T = X.shape
+    K0, Dh, Dw = D0.shape
+    C, K, *_ = D.shape
+    CK, NC = K * C, N * C
+    Crange = torch.tensor(range(C))
+    NC_1, FT = N * (C - 1), F*T
+
+    "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
+    DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
+                         padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
+    ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, C, F, T).sum(1)  # output shape of (N, F, T)
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+    alpha_plus_dk0 = DconvS.sum(1) + R
+    beta_plus_dk0 = ycDcconvSc + R
+
+    for k0 in range(K0):
+        dk0 = D0[k0, :]
+        snk0 = S0[:, k0, :]  # shape of [N, 1, T]
+        dk0convsck0 = Func.conv2d(snk0.unsqueeze(1), dk0.reshape(1,1,Dh,Dw).flip(2, 3), padding=(255,1)).squeeze()
+        Tdk0 = toeplitz_dck(dk0, [Dh, Dw, T])  # shape of [FT, T]
+        abs_Tdk0 = abs(Tdk0)
+        MS0_diag = (4*abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
+        MS0_diag = MS0_diag + 1e-38 # make it robust for inverse
+        MS0_inv = (1/MS0_diag).diag()
+        b = (2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0).reshape(N, FT)
+
+        torch.cuda.empty_cache()
+        # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
+        S0[:, k0, :] = solv_snk0(snk0.squeeze(), MS0_diag, MS0_inv, opts.delta, 2*Tdk0, b, opts.lamb)
+        # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
+    return S0
+
+
+def solv_snk0(x, M, Minv, Mw, Tdk0, b, lamb):
+    """
+    :param x: is the snk0, shape of [N, T]
+    :param M: is MD, the majorizer matrix with shape of [T], diagonal of matrix
+    :param Minv: is MD^(-1)
+    :param Mw: is a number, not diagonal matrix
+    :param Tdk0: is truncated toeplitz matrix of dk0 with shape of [M, T], already *2
+    :param b: bn with all N, with shape of [N, F*T]
+    :param lamb: sparsity hyper parameter
+    :return: dck0
+    """
+    # for the synthetic data correction = 0.7
+    maxiter, correction,  threshold = 500, 1, 1e-4
+    snk0_old, snk0 = x.clone(), x.clone()
+    coef = Minv @ Tdk0.t() @ Tdk0  # shape of [T, T]
+    term = (Minv @ Tdk0.t() @b.t()).t()  # shape of [N, T]
+
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
+    for i in range(maxiter):
+        snk0_til = snk0 + correction*Mw*(snk0 - snk0_old)  # Mw is just a number for calc purpose
+        nu = snk0_til - (coef@snk0_til.t()).t() + term  # nu is [N, T]
+        snk0_new = shrink(M, nu, lamb)  # shape of [N, T]
+        snk0, snk0_old = snk0_new, snk0
+        if torch.norm(snk0 - snk0_old)/(snk0_old.norm() +1e-38) < threshold: break
+        torch.cuda.empty_cache()
+        # loss = torch.cat((loss, loss_S0(Tdk0, snk0, b, lamb).reshape(1)))
+    # plt.figure();plt.plot(loss.cpu().numpy(), '-x')
+    # ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
+    return snk0.unsqueeze(1)
+
+
+def loss_S0(_2Tdk0, snk0, b, lamb):
+    """
+    This function calculates the sub-loss function for S0
+    :param _2Tdk0: shape of [FT, T]
+    :param snk0: shape of [N, T]
+    :param b: shape of [N, FT]
+    :param lamb: scaler
+    :return: loss
+    """
+    return ((_2Tdk0 @ snk0.t() - b.t())**2).sum()/2 + lamb * abs(snk0).sum()
+
 
