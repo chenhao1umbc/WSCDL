@@ -525,27 +525,6 @@ def toeplitz(x, m=10, T=10):
     return tx.flip(1)
 
 
-def toeplitz2(x, m=10, T=10):
-    """This is a the toepliz matrx for torch.tensor
-    input x has the shape of [N, ?], ? is M or T
-        M is an interger
-        T is truncated length
-    output tx has the shape of [N, m, T]
-    """
-    dev = x.device
-    N, m0 = x.shape  # m0 is T for Tsck, and m0 is M for Tdck
-    M = m if m < m0 else m0
-    M2 = int((M - 1) / 2) + 1  # half length of M, for truncation purpose
-
-    x_append0 = torch.cat([torch.zeros(N, m, device=dev), x, torch.zeros(N, m, device=dev)], dim=1)
-    tx = torch.zeros(N, m, T, device=dev)
-    indx = torch.zeros(m, T).long()
-    for i in range(m):
-        indx[i, :] = torch.arange(M2 + i, M2 + i + T)
-    tx[:, :, :] = x_append0[:, indx]
-    return tx.flip(1)
-
-
 def updateD(DD0SS0W, X, Y, opts):
     """this function is to update the distinctive D using BPG-M, updating each d_k^(c)
     input is initialed  DD0SS0
