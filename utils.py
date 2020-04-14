@@ -1457,6 +1457,7 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     cost = fisher + sparse + label + low_rank
     return fisher.item(), sparse.item(), label.item()
 
+
 def loss_fun_test(X, D, D0, S, S0, opts):
     """
     This function will calculate the costfunction value
