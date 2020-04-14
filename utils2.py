@@ -142,31 +142,31 @@ def train(D, D0, S, S0, W, X, Y, opts):
     S_numel, S0_numel = S.numel(), S0.numel()
     for i in range(opts.maxiter):
         t0 = time.time()
-        # S = updateS([D, D0, S, S0, W], X, Y, opts)
+        S = updateS([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
-            # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
-            # print('loss function value is %3.4e:' %loss[-1])
+            print('loss function value is %3.4e:' %loss[-1])
             print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
 
-        # S0 = updateS0([D, D0, S, S0], X, Y, opts) if opts.common_term else S0
+        S0 = updateS0([D, D0, S, S0], X, Y, opts) if opts.common_term else S0
         if opts.show_details:
-            # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
-            # print('loss function value is %3.4e:' %loss[-1])
+            print('loss function value is %3.4e:' %loss[-1])
             print('check sparsity, None-zero percentage is : %1.4f' % (1-(S0==0).sum().item()/S0_numel))
 
-        # D = updateD([D, D0, S, S0, W], X, Y, opts)
+        D = updateD([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
-            # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
-            # print('loss function value is %3.4e:' %loss[-1])
+            print('loss function value is %3.4e:' %loss[-1])
 
-        # D0 = updateD0([D, D0, S, S0], X, Y, opts) if opts.common_term else D0
+        D0 = updateD0([D, D0, S, S0], X, Y, opts) if opts.common_term else D0
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
-            # print('loss function value is %3.4e:' %loss[-1])
+            print('loss function value is %3.4e:' %loss[-1])
 
         W = updateW([S, W], Y, opts)
         loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
