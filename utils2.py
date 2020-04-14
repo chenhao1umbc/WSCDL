@@ -561,7 +561,7 @@ def toeplitz_sck_core(sck, Dh_Dw_T):
 
 
 def solv_dck(x, Md, Md_inv, Mw, Tsck_core, b):
-    """x, is the dck, shape of [Dh * Dw]
+    """x, is the dck, shape of [Dh, Dw]
         M is with shape of [Dh * Dw], diagonal of the majorized matrix
         Minv, is Md^(-1), shape of [Dh * Dw]
         Mw, is a number, == opts.delta
@@ -570,17 +570,18 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_core, b):
         b is bn with all N, with shape of [N, F, T]
         """
     # for the synthetic data correction = 0.1
-    N, Dh, Dw = b.shape
+    Dh, Dw = x.shape
+    N, F, T = b.shape
     maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.view(-1).clone(), x.view(-1).clone(), x.view(-1).clone()
     "coef is the shape of [N, Dw*Dh, Dw*Dh], with block diagnal structure of Dw*Dw small blocks"
     coef_core = (Tsck_core.permute(0, 2, 1) @ Tsck_core.abs())  # shape of [N, Dw, Dw]
-    term = (Tsck_core@b.permute(0,2,1)).permute(0,2,1).reshape(N, -1) # shape of [N, FT],permute before reshape is a must
+    term =(b@Tsck_core).reshape(N, -1)# shape of [N, FT],permute before reshape is a must
 
     # loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
     for i in range(maxiter):
         d_til = d + correction*Mw*(d - d_old)  # shape of [M]
-        nu = d_til - ((coef_core@ d_til.view(Dh,Dw).t()).t().reshape(N,-1) - term).sum(0) * Md_inv  # shape of [Dh * Dw]
+        nu = d_til - ((d_til.view(Dh,Dw) @ coef_core).reshape(N,-1) - term).sum(0) * Md_inv  # shape of [Dh * Dw]
         if torch.norm(nu) <= 1:
             d_new = nu
         else:
@@ -591,7 +592,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_core, b):
         if (d - d_old).norm() / d_old.norm() < threshold: break
         if torch.isnan(d).sum() > 0: print('inf_nan_happenned')
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    return d
+    return d.reshape(Dh, Dw)
 
 
 
