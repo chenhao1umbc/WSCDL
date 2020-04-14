@@ -1038,7 +1038,7 @@ def solv_sck_test(sc, Tdck, b, k, opts):
     #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
-    return sck_old
+    return sck_old.unsqueeze(-2)
 
 
 def updateS0_test(DD0SS0, X, opts):
@@ -1069,16 +1069,26 @@ def updateS0_test(DD0SS0, X, opts):
         R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
         dk0convsck0 = Func.conv2d(snk0.unsqueeze(1), dk0.reshape(1, 1, Dh, Dw).flip(2, 3), padding=(255, 1)).squeeze()
         Tdk0 = toeplitz_dck(dk0, [Dh, Dw, T])  # shape of [FT, T]
-        abs_Tdk0 = abs(Tdk0)
-
-        MS0_diag = (abs_Tdk0.t() @ abs_Tdk0).sum(1)  # in the shape of [T]
-        MS0_diag = MS0_diag + 1e-38 + opts.lamb2*torch.eye(T, device=dev)  # make it robust for inverse
         b = X - DconvS - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
         S0[:, k0, :] = solv_sck_test(S0, Tdk0, b, k0, opts)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
+
+
+def support_diff(S, Sold):
+    """
+    This function will return the percentage of the difference for the non-zero locations of the sparse coeffients
+    :param S: sparse coeffients
+    :param Sold: sparse coeffients
+    :return: percentage of different
+    """
+    sf, ssf = S.view(-1), Sold.view(-1)
+    a, b = torch.zeros(sf.numel()), torch.zeros(ssf.numel())
+    a[sf != 0] = 1
+    b[ssf != 0] = 1
+    return (a - b).abs().sum().item() / (b.sum().item()+ 1e-38)
 
 
 def recall(y, yh):
