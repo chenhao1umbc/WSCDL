@@ -156,11 +156,11 @@ def train(D, D0, S, S0, W, X, Y, opts):
             # print('loss function value is %3.4e:' %loss[-1])
             print('check sparsity, None-zero percentage is : %1.4f' % (1-(S0==0).sum().item()/S0_numel))
 
-        D = updateD([D, D0, S, S0, W], X, Y, opts)
+        # D = updateD([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
-            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
+            # loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
+            # print('loss function value is %3.4e:' %loss[-1])
 
         D0 = updateD0([D, D0, S, S0], X, Y, opts) if opts.common_term else D0
         if opts.show_details:
@@ -527,7 +527,7 @@ def updateD(DD0SS0W, X, Y, opts):
         torch.cuda.empty_cache()
 
         D[c, k, :] = solv_dck(dck, Md, Md_inv, opts.delta, Tsck_core, b)
-        if torch.isinf(D).sum() > 0: print(inf_nan_happenned)
+        if torch.isinf(D).sum() > 0: print('inf_nan_happenned')
     return D
 
 
@@ -576,7 +576,7 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_core, b):
     d_til, d_old, d = x.view(-1).clone(), x.view(-1).clone(), x.view(-1).clone()
     "coef is the shape of [N, Dw*Dh, Dw*Dh], with block diagnal structure of Dw*Dw small blocks"
     coef_core = (Tsck_core.permute(0, 2, 1) @ Tsck_core.abs())  # shape of [N, Dw, Dw]
-    term =(b@Tsck_core).reshape(N, -1)# shape of [N, FT],permute before reshape is a must
+    term =(b@Tsck_core).reshape(N, -1)# shape of [N, DhDw],permute before reshape is a must
 
     # loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
     for i in range(maxiter):
@@ -623,4 +623,166 @@ def acc_newton(P, q):  # both shape of [M]
     dck = -((P + psi_new)**(-1)) * q
     if torch.isnan(dck).sum() > 0: print(inf_nan_happenned)
     return dck
+
+
+
+def updateD0(DD0SS0, X, Y, opts):
+    """this function is to update the common dictionary D0 using BPG-M, updating each d_k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        S is 4-d tensor [N,C,K,1,T] [samples,classes, num of atoms, time series,]
+        D is 3-d tensor [C,K,Dh,Dw] [num of atoms, classes, atom size]
+        S0 is 3-d tensor [N, K0, 1, T]
+        D0 is a matrix [K0, Dh, Dw]
+        X is a matrix [N, F, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+    """
+    D, D0, S, S0 = DD0SS0  # where DD0SS0 is a list
+    N, F, T = X.shape
+    K0, Dh, Dw = D0.shape
+    C, K, *_ = D.shape
+    CK, NC = K * C, N * C
+    Crange = torch.tensor(range(C))
+    NC_1, FT = N * (C - 1), F*T
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T)
+    "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
+    DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
+                         padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
+    ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, C, F, T).sum(1)  # output shape of (N, F, T)
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+    alpha_plus_dk0 = DconvS.sum(1) + R
+    beta_plus_dk0 = ycDcconvSc + R
+
+    # '''update the current dk0'''
+    for k0 in range(K0):
+        dk0 = D0[k0, :]  # shape [Dh, Dw]
+        snk0 = S0[:, k0, :]  # shape of [N, 1, T]
+        dk0convsnk0 = Func.conv2d(snk0.unsqueeze(1), dk0.reshape(1, 1, Dh, Dw).flip(2, 3), padding=(255, 1)).squeeze()
+        b = 2 * X - alpha_plus_dk0 - beta_plus_dk0 + 2 * dk0convsnk0  #shape of [N, F, T]
+
+        Tsnk0_core = toeplitz_sck_core(snk0.squeeze(), [Dh, Dw, T])  # shape of [N, T, Dw]
+        Md_core = 4*(Tsnk0_core.abs().permute(0,2,1) @ Tsnk0_core.abs()).sum(2).sum(0)  # shape of [Dw]
+        Md = Md_core.repeat(Dh)  # shape of [Dh * Dw]
+        Md_inv = (Md + 1e-38) ** (-1)  # shape of [Dh * Dw]
+        torch.cuda.empty_cache()
+
+        # print('D0 loss function value before update is %3.2e:' %loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
+        D0[k0, :] = solv_dck0(dk0, Md, Md_inv, opts.delta, 2*Tsnk0_core, b, D0, opts.mu * N, k0)
+        # print('D0 loss function value after update is %3.2e:' % loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
+        if torch.isnan(D0).sum() + torch.isinf(D0).sum() > 0: print(inf_nan_happenned)
+    return D0
+
+
+def solv_dck0(x, M, Minv, Mw, Tsnk0_core, b, D0, mu, k0):
+    """
+    :param x: is the dck, shape of [Dh, Dw]
+    :param M: is MD, the majorizer matrix with shape of [Dh*Dw], diagonal matrix
+    :param Minv: is MD^(-1), shape of [Dh*Dw]
+    :param Mw: is a number not diagonal matrix
+    :param Tsnk0_core: is truncated toeplitz matrix of sck with shape of [N,T,Dw], already *2
+    :param b: bn with all N, with shape of [N,F,T]
+    :param D0: is the shared dictionary, shape of [K0, Dh, Dw]
+    :param mu: is the coefficient fo low-rank term, mu = N*mu
+    :param k0: the current index of for loop of K0
+    :return: dck0: is shape of [Dh, Dw]
+    """
+    # for the synthetic data correction = 0.1
+    [K0, Dh, Dw]= D0.shape
+    N, F, T = b.shape
+    DhDw = Dh * Dw
+    maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
+    d_til, d_old, d = x.view(-1).clone(), x.view(-1).clone(), x.view(-1).clone()
+    "coef is the shape of [N, Dw*Dh, Dw*Dh], with block diagnal structure of Dw*Dw small blocks"
+    coef_core = (Tsnk0_core.permute(0, 2, 1) @ Tsnk0_core.abs())  # shape of [N, Dw, Dw]
+    term =(b@Tsnk0_core).reshape(N, -1)# shape of [N, DhDw],permute before reshape is a must
+
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
+    for i in range(maxiter):
+        d_til = d + correction*Mw*(d - d_old)  # shape of [DhDw],  Mw is just a number for calc purpose
+        nu = d_til - ((d_til.view(Dh, Dw) @ coef_core).reshape(N, -1) - term).sum(0) * Minv # shape of [DhDw]
+        d_new = argmin_lowrank(M, nu, mu, D0.view(K0, DhDw), k0)  # D0 will be changed, because dk0 is in D0
+        d, d_old = d_new, d
+        if (d - d_old).norm()/d_old.norm() < threshold:break
+        torch.cuda.empty_cache()
+        # loss = torch.cat((loss, loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
+    # ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    return d.reshape(Dh, Dw)
+
+
+def argmin_lowrank(M, nu, mu, D0, k0):
+    """
+    Solving the QCQP with low rank panelty term. This function is using ADMM to solve dck0
+    :param M: majorizer matrix
+    :param nu: make d close to ||d-nu||_M^2
+    :param mu: hyper-param of ||D0||_*
+    :param D0: common dict contains all the dk0, shape of [K0, M]
+    :return: dk0
+    """
+    (K0, m), threshold = D0.shape, 5e-4
+    rho = 10 * mu +1e-38 # agrangian coefficients
+    dev = D0.device
+    Z = torch.eye(K0, m, device=dev)
+    Y = torch.eye(K0, m, device=dev)  # lagrangian coefficients
+    P = M + rho
+    Mbynu = M * nu
+    maxiter = 200
+    cr = torch.tensor([], device=dev)
+    # begin of ADMM
+    for i in range(maxiter):
+        Z = svt(D0-1/rho*Y, mu/rho)
+        q = -(Mbynu + rho * Z[k0, :] + Y[k0, :])
+        dk0 = D0[k0, :] = acc_newton(P, q)
+        Z_minus_D0 = Z- D0
+        Y = Y + rho*Z_minus_D0
+        cr = torch.cat((cr, Z_minus_D0.norm().reshape(1)))
+        if i>10 and abs(cr[-1] - cr[-2])/cr[i-1] < threshold: break
+        if cr[-1] <1e-6 : break
+    return dk0
+
+
+def svt(L, tau):
+    """
+    This function is to implement the signular value thresholding, solving the following
+    min_P tau||P||_* + 1/2||P-L||_F^2
+    :param L: low rank matrix to proximate
+    :param tau: the threshold
+    :return: P the matrix after singular value thresholding
+    """
+    dev = L.device
+    # L = L.cpu()  ##########  in version 1.2 the torch.svd for GPU could be much slower than CPU
+    l, h = L.shape
+    try:
+        u, s, v = torch.svd(L)
+    except:                     ########## and torch.svd may have convergence issues for GPU and CPU.
+        u, s, v = torch.svd(L + 1e-4*L.mean()*torch.rand(l, h))
+        print('unstable svd happened')
+    s = s - tau
+    s[s<0] = 0
+    P = u @ s.diag() @ v.t()
+    return P.to(dev)
+
+
+def updateW(SW, Y, opts):
+    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    input is initialed  DD0SS0
+    the data structure is not in matrix format for computation simplexity
+        SW is a list of [S, W]
+        S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
+        W is a matrix [C, K+1], where K is per-class atoms
+        X is a matrix [N, T], training Data
+        Y is a matrix [N, C] \in {0,1}, training labels
+    """
+    S, W = SW
+    N, C, K, T = S.shape
+    # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
+    for c in range(C):
+        # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :], Y[:, c], opts.delta)
+        # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
+    if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
+    return W
+
 
