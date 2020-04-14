@@ -7,7 +7,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=2, K=3, M=50)
 opts.shape = '1d'
 opts.lamb, opts.eta, opts.mu = 0.1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
-opts.transpose, opts.shuffle, opts.show_details = True, False, True  # default as true
+opts.transpose, opts.shuffle, opts.show_details = False, False, True  # default as true
 
 # training section
 X, Y = load_data(opts)

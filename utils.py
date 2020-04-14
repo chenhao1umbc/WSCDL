@@ -1781,7 +1781,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
     S_numel, S0_numel = S.numel(), S0.numel()
     for i in range(opts.maxiter):
         t0 = time.time()
-        S = updateS([D, D0, S, S0, W], X, Y, opts)
+        # S = updateS([D, D0, S, S0, W], X, Y, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
