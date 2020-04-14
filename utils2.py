@@ -162,11 +162,11 @@ def train(D, D0, S, S0, W, X, Y, opts):
             print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
             # print('loss function value is %3.4e:' %loss[-1])
 
-        D0 = updateD0([D, D0, S, S0], X, Y, opts) if opts.common_term else D0
+        # D0 = updateD0([D, D0, S, S0], X, Y, opts) if opts.common_term else D0
         if opts.show_details:
             loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
             print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
+            # print('loss function value is %3.4e:' %loss[-1])
 
         W = updateW([S, W], Y, opts)
         loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
@@ -775,14 +775,73 @@ def updateW(SW, Y, opts):
         Y is a matrix [N, C] \in {0,1}, training labels
     """
     S, W = SW
-    N, C, K, T = S.shape
+    N, C, K, _, T = S.shape
     # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
         # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
-        W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :], Y[:, c], opts.delta)
+        W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :].squeeze(), Y[:, c], opts.delta)
         # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
     return W
 
+
+def solv_wc(x, snc, yc, Mw):
+    """
+    This fuction is using bpgm to update wc
+    :param x: shape of [K+1], init value of wc
+    :param snc: shape of [N, K, T]
+    :param yc: shape of [N]
+    :param Mw: real number, is delta
+    :return: wc
+    """
+    # for the synthetic data correction = 0.1
+    N, threshold = yc.shape[0], 1e-4
+    maxiter, correction = 500, 0.1  # correction is help to make the loss monotonically decreasing
+    wc_old, wc, wc_til = x.clone(), x.clone(), x.clone()
+    pt_snc = torch.cat((snc.mean(2) , torch.ones(N, 1, device=x.device)), dim=1) # shape of [N, K+1]
+    abs_pt_snc = abs(pt_snc)  # shape of [N, K+1]
+    const = abs_pt_snc.t() * abs_pt_snc.sum(1)  # shape of [K+1, N]
+    M = const.sum(1)/4 + 1e-38  # shape of [K], 1e-38 for robustness
+    one_min_ync = 1 - yc  # shape of [N]
+    # M_old = M.clone()
+    # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
+
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
+    for i in range(maxiter):
+        wc_til = wc + correction*Mw*(wc - wc_old)  # Mw is just a number for calc purpose
+        exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
+        exp_pt_snc_wc_til[torch.isinf(exp_pt_snc_wc_til)] = 1e38
+        nu = wc_til + M**(-1) * ((one_min_ync - exp_pt_snc_wc_til/(1+exp_pt_snc_wc_til))*pt_snc.t()).sum(1)  # nu is [K]
+        wc, wc_old = nu.clone(), wc[:]  # gradient is not needed, nu is the best solution
+        # loss = torch.cat((loss, loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
+        if torch.norm(wc - wc_old)/wc.norm() < threshold: break
+        torch.cuda.empty_cache()
+    # ll = loss[:-1] - loss[1:]
+    # if ll[ll<0].shape[0] > 0: print(something_wrong)
+    # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    return wc
+
+
+def loss_W(S, W, Y):
+    """
+    calculating the loss function value for subproblem of W
+    :param S: shape of [N, C, K, T]
+    :param W: shape of [C, K+1]
+    :param Y: shape of [N, C]
+    :return:
+    """
+    N, C = Y.shape
+    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
+    Y_hat = 1/ (1+ exp_PtSnW)
+    # loss0 = -1 * (Y * Y_hat.log() + (1 - Y) * (1 - Y_hat + 3e-38).log()).sum()  # the same as below
+    loss = (-1 * (1 - Y) * (exp_PtSnW + 1e-38).log() + (exp_PtSnW + 1).log()).sum()
+
+    # loss = (-1 * (1 - Y) * PtSnW + (exp_PtSnW + 1).log()).sum()
+    # this one is not stable due inf by setting the threshold 1e38, which means
+    # if PtSnW = 40, then exp_PtSnW = inf, but set to exp_PtSnW = 1e38, log(exp_PtSnW) = 38, not 40
+
+    return loss
 
