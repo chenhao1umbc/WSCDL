@@ -218,14 +218,14 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
     _1_Y_hat = 1 - Y_hat
-    fisher1 = torch.norm(X - R - DconvS)**2
-    fisher2 = torch.norm(X - R - ycDcconvSc) ** 2
-    fisher = fisher1 + fisher2 + torch.norm(ycpDcconvSc) ** 2
+    fidelity1 = torch.norm(X - R - DconvS)**2
+    fidelity2 = torch.norm(X - R - ycDcconvSc) ** 2
+    fidelity = fidelity1 + fidelity2 + torch.norm(ycpDcconvSc) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
     # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
     low_rank = N * opts.mu * D0.reshape(D0.shape[-2], D0.shape[-1]*K0).norm(p='nuc')
-    cost = fisher + sparse + label + low_rank
+    cost = fidelity + sparse + label + low_rank
     return cost
 
 
@@ -953,10 +953,10 @@ def loss_fun_test(X, D, D0, S, S0, opts):
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)
     torch.cuda.empty_cache()
 
-    fisher = torch.norm(X - R - DconvS.sum(1)) ** 2
+    fidelity = torch.norm(X - R - DconvS.sum(1)) ** 2
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     l2 = opts.lamb2 * (S.norm() ** 2 + S0.norm() ** 2)
-    cost = fisher + sparse + l2
+    cost = fidelity + sparse + l2
     return cost
 
 

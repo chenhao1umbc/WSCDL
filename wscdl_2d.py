@@ -11,6 +11,7 @@ opts.transpose, opts.shuffle, opts.show_details = False, False, True  # default 
 
 # training section
 X, Y = load_data(opts)
+X , Y = X[:3], Y[:3]
 D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
