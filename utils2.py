@@ -327,17 +327,17 @@ def updateS(DD0SS0W, X, Y, opts):
         b = (term1.reshape(N, FT) + term2 + term3) / 2  # shape of [N, F*T]
         torch.cuda.empty_cache()
 
-        l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
-        l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        l1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
+        # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
+        # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # l1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
         S[:, c, k, :] = solv_sck(S[:, c, :].squeeze(), wc, yc, Tdck, b, k, opts)
-        ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
-        ll1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
-        print('Overall loss for fidelity, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
-        print('Local loss for fidelity, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
-        print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
-        if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
-        if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print('inf_nan_happenned')
+        # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # ll1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
+        # print('Overall loss for fidelity, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
+        # print('Local loss for fidelity, sparse, label, differences: %1.7f, %1.7f, %1.7f' % (l1[0]-ll1[0], l1[1]-ll1[1], l1[2]-ll1[2]))
+        # print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
+        # if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
+        # if torch.isnan(S).sum() + torch.isinf(S).sum() > 0: print('inf_nan_happenned')
     return S
 
 
