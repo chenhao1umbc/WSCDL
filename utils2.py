@@ -535,9 +535,9 @@ def updateS0(DD0SS0, X, Y, opts):
         b = (2*X - alpha_plus_dk0 - beta_plus_dk0 + 2*dk0convsck0).reshape(N, FT)
 
         torch.cuda.empty_cache()
-        print(loss_S0(Tdk0, snk0, b, opts.lamb))
+        # print(loss_S0(Tdk0, snk0.squeeze(), b, opts.lamb))
         S0[:, k0, :] = solv_snk0(snk0.squeeze(), MS0_diag, MS0_inv, opts.delta, 2*Tdk0, b, opts.lamb)
-        print(loss_S0(Tdk0, S0[:, k0, :], b, opts.lamb))
+        # print(loss_S0(Tdk0, S0[:, k0, :].squeeze(), b, opts.lamb))
     return S0
 
 
