@@ -249,11 +249,9 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     # DconvS should be the shape of (N, CK, F,T)
     DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=CK)
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
-    ycpDcconvSc = ((1 - Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(
-        1)  # output shape of (N, F, T)
+    ycpDcconvSc = ((1 - Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS.sum(1)  # using the same name to save memory
-    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(
-        1)  # shape of (N, F, T), R is the common recon.
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
     torch.cuda.empty_cache()
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
@@ -351,24 +349,18 @@ def toeplitz_dck(dck, Dh_Dw_T):
     """
     dev = dck.device
     Dh, Dw, T = Dh_Dw_T
-    m, m1, m2= Dh*(T+Dw-1), T+Dw-1, 2*T+Dw
-    'dck_padded0 is the shape of [Dh, m2]'
+    offset = (Dw - 1) // 2
+    ind1, ind2 = T+Dw-1-offset, 2*T+Dw-1-offset
+    'dck_padded0 is the shape of [Dh, 2*T+Dw]'
     dck_padded0 = torch.cat([torch.zeros(Dh, T, device=dev), dck.flip(1), torch.zeros(Dh, T, device=dev)], dim=1)
-    indx = torch.zeros(m, T).long()
-    for i in range(m):
-        ii = i % m2
-        iii = i // m1
-        indx[i, :] = torch.arange(m1-ii+iii*m2, m2-1-ii+iii*m2)
+    indx = torch.zeros(T, T).long()
+    for i in range(T):
+        indx[i, :] = torch.arange(ind1-i, ind2-i)
+    indx = indx.repeat(Dh,1)  #shape of [Dh*T, T]
+    ind0 = torch.arange(0, Dh*dck_padded0.shape[1], dck_padded0.shape[1]).repeat(200,1).t().reshape(Dh*T,1)
+    indx = indx + ind0
     tx = dck_padded0.view(-1)[indx]
-
-    # this part is for truncation
-    ind1 = (Dw-1) //2
-    ind2 = T + ind1
-    rr = torch.arange(ind1, ind2)
-    ind = rr
-    for i in range(1, Dh):
-        ind = torch.cat([ind, m1*i + rr])
-    return tx[ind]
+    return tx
 
 
 def solv_sck(sc, wc, yc, Tdck, b, k, opts):
