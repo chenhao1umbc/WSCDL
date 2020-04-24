@@ -328,7 +328,7 @@ def updateS(DD0SS0W, X, Y, opts):
         torch.cuda.empty_cache()
 
         # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
-        # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         # l1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
         S[:, c, k, :] = solv_sck(S[:, c, :].squeeze(), wc, yc, Tdck, b, k, opts)
         # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
@@ -612,7 +612,7 @@ def updateD(DD0SS0W, X, Y, opts):
                              padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
         dck = D[c, k, :]  # shape of [Dh, Dw]
         sck = S[:, c, k, :]  # shape of [N, 1, T]
-        Tsck_core = toeplitz_sck_core(sck.squeeze(), [Dh, Dw, T])  # shape of [N, T, Dw]
+        Tsck_core = toeplitz_sck_core(sck.squeeze(), [Dh, Dw, T])  # shape of [N, T, Dw], supposed to be [N, T*Dh, Dw*Dh]
         Md_core = (Tsck_core.abs().permute(0,2,1) @ Tsck_core.abs()).sum(2).sum(0)  # shape of [Dw]
         Md = Md_core.repeat(Dh)  # shape of [Dh * Dw]
         Md_inv = (Md + 1e-38) ** (-1)  # shape of [Dh * Dw]
@@ -629,8 +629,14 @@ def updateD(DD0SS0W, X, Y, opts):
         b = (term1+ term2.reshape(N, F, T)  + term3.reshape(N, F, T) ) / 2
         torch.cuda.empty_cache()
 
+        # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
+        # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         D[c, k, :] = solv_dck(dck, Md, Md_inv, opts.delta, Tsck_core, b)
-        if torch.isinf(D).sum() > 0: print('inf_nan_happenned')
+        # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # print('Overall loss for fidelity, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
+        # print('Main loss after bpgm the diff is: %1.9e' %(l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)))
+        # if (l00 - loss_fun(X, Y, D, D0, S, S0, W, opts)) <0 : print(bug)
+        # if torch.isinf(D).sum() > 0: print('inf_nan_happenned')
     return D
 
 
@@ -665,23 +671,23 @@ def toeplitz_sck_core(sck, Dh_Dw_T):
 
 def solv_dck(x, Md, Md_inv, Mw, Tsck_core, b):
     """x, is the dck, shape of [Dh, Dw]
-        M is with shape of [Dh * Dw], diagonal of the majorized matrix
-        Minv, is Md^(-1), shape of [Dh * Dw]
+        Md is with shape of [Dh * Dw], diagonal of the majorized matrix
+        Md_inv, is Md^(-1), shape of [Dh * Dw]
         Mw, is a number, == opts.delta
         Tsck_core, is shape of [N, T, Dw]
                     is the core of Tsck, which is  [N, T*Dh, Dw*Dh]
         b is bn with all N, with shape of [N, F, T]
         """
-    # for the synthetic data correction = 0.1
     Dh, Dw = x.shape
     N, F, T = b.shape
     maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.view(-1).clone(), x.view(-1).clone(), x.view(-1).clone()
     "coef is the shape of [N, Dw*Dh, Dw*Dh], with block diagnal structure of Dw*Dw small blocks"
-    coef_core = (Tsck_core.permute(0, 2, 1) @ Tsck_core.abs())  # shape of [N, Dw, Dw]
+    coef_core = (Tsck_core.permute(0, 2, 1) @ Tsck_core)  # shape of [N, Dw, Dw]
     term =(b@Tsck_core).reshape(N, -1)# shape of [N, DhDw],permute before reshape is a must
 
-    # loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_t, d, b).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=x.device), loss_D(Tsck_core, d.view(Dh, Dw), b).reshape(1)))
+    # dn = []
     for i in range(maxiter):
         d_til = d + correction*Mw*(d - d_old)  # shape of [M]
         nu = d_til - ((d_til.view(Dh,Dw) @ coef_core).reshape(N,-1) - term).sum(0) * Md_inv  # shape of [Dh * Dw]
@@ -690,13 +696,26 @@ def solv_dck(x, Md, Md_inv, Mw, Tsck_core, b):
         else:
             d_new = acc_newton(Md, -Md*nu)  # QCQP(P, q)
         d, d_old = d_new, d
-        torch.cuda.empty_cache()
-        # loss = torch.cat((loss, loss_D(Tsck_t, d, b).reshape(1)))
         if (d - d_old).norm() / d_old.norm() < threshold: break
         if torch.isnan(d).sum() > 0: print('inf_nan_happenned')
+        torch.cuda.empty_cache()
+
+    #     loss = torch.cat((loss, loss_D(Tsck_core, d.view(Dh, Dw), b).reshape(1)))
+    #     dn.append(d.norm())
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
     return d.reshape(Dh, Dw)
 
+
+
+def loss_D(Tsck_t, dck, b):
+    """
+    calculate the loss function value for updating D, sum( norm(Tsnck*dck - bn)**2 ) , s.t. norm(dck) <=1
+    :param Tsck_t: is shape of [N, T, Dw]
+    :param dck: cth, kth, atom of D, shape of [Dh, Dw]
+    :param b: the definiation is long in the algorithm, shape of [N, F, T]
+    :return: loss fucntion value
+    """
+    return 2*((dck@Tsck_t.permute(0, 2, 1) - b)**2 ).sum()
 
 
 def acc_newton(P, q):  # both shape of [M]
