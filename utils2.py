@@ -328,7 +328,7 @@ def updateS(DD0SS0W, X, Y, opts):
         torch.cuda.empty_cache()
 
         # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
-        l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
+        # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         # l1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
         S[:, c, k, :] = solv_sck(S[:, c, :].squeeze(), wc, yc, Tdck, b, k, opts)
         # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
@@ -395,7 +395,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     sc_til = sc.clone()  # shape of [N, K, T]
     marker = 0
 
-    # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+    loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
     for i in range(maxiter):
         sck_til = sck + correction * Mw * (sck - sck_old)  # shape of [N, T]
         sc_til[:, k, :] = sck_til
@@ -408,7 +408,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
         if exp_PtSnc_tilWc[exp_PtSnc_tilWc == 1e38].shape[0] > 0: marker = 1
         if torch.norm(sck - sck_old) / (sck.norm() + 1e-38) < threshold: break
         torch.cuda.empty_cache()
-        # loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
+        loss = torch.cat((loss, loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts).reshape(1)))
 
     # print('M max', M.max())
     # if marker == 1 :
@@ -419,6 +419,7 @@ def solv_sck(sc, wc, yc, Tdck, b, k, opts):
     #     wait = input("Loss Increases, PRESS ENTER TO CONTINUE.")
     # print('sck loss after bpgm the diff is :%1.9e' %(loss[0] - loss[-1]))
     # plt.figure(); plt.plot(loss.cpu().numpy(), '-x')
+    # wait = input(" PRESS ENTER TO CONTINUE.")
     return sck_old.unsqueeze(-2)
 
 
