@@ -207,9 +207,9 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
 
     DconvS = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, Dh, Dw)
-    for i in range(CK):
-        Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw], supposed to be [N, T*Dh, Dw*Dh]
-        DconvS[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+    for ck in range(CK):
+        Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw], supposed to be [N, T*Dh, Dw*Dh]
+        DconvS[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
 
     # # DconvS should be the shape of (N, CK, F,T)
     # DconvS = Func.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
@@ -320,9 +320,9 @@ def updateS(DD0SS0W, X, Y, opts):
         # "DconvS is the shape of (N,CK, F, T) to (N, C, F, T) ----> there is bug in cuda version, it is too slow"
         # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
         #                      padding=(255, 1), groups=CK).reshape(N,C,K, F, T).sum(2)
-        for i in range(CK):
-            Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(),[Dh, Dw, T])  # shape of [N, T, Dw], supposed to be [N, T*Dh, Dw*Dh]
-            DconvS0[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+        for ck in range(CK):
+            Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  # shape of [N, T, Dw], supposed to be [N, T*Dh, Dw*Dh]
+            DconvS0[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
         DconvS = DconvS0.reshape(N, C, K, F, T).sum(2)
 
         dck = D[c, k, :]  # shape of [Dh, Dw]
@@ -632,8 +632,8 @@ def updateD(DD0SS0W, X, Y, opts):
         # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
         #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
         for i in range(CK):
-            Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(),[Dh, Dw, T])  # shape of [N,T,Dw]
-            DconvS0[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+            Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  # shape of [N,T,Dw]
+            DconvS0[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
         DconvS = DconvS0.reshape(N, C, K, F, T).sum(2)
 
         dck = D[c, k, :]  # shape of [Dh, Dw]
@@ -1135,9 +1135,9 @@ def updateS_test(DD0SS0, X, opts):
         # "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
         # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
         #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
-        for i in range(CK):
-            Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(), [Dh, Dw, T])  # shape of [N,T,Dw]
-            DconvS0[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+        for ck in range(CK):
+            Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(), [Dh, Dw, T])  # shape of [N,T,Dw]
+            DconvS0[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
         DconvS = DconvS0.reshape(N, C, K, F, T).sum(2)
 
         dck = D[c, k, :]  # shape of [Dh, Dw]
