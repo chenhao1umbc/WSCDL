@@ -1029,7 +1029,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     Y_hat = 1 / (1 + exp_PtSnW)
 
     "plot the input data"
-    plt.imshow(torch.cat(a.split(1,dim=0), dim=2).squeeze(), aspect='auto')
+    plt.imshow(X[0].cpu())
 
 
 
@@ -1112,8 +1112,15 @@ def loss_fun_test(X, D, D0, S, S0, opts):
     K0, Dh, Dw = D0.shape
     C, K, *_ = D.shape
     CK, NC = K * C, N * C
+
     # DconvS should be the shape of (N, CK, F,T), R is the common reconstruction
-    DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=CK).sum(1)
+    # DconvS = Func.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
+    DconvS = torch.zeros(N, CK, F, T, device=opts.dev)
+    Dr = D.reshape(CK, Dh, Dw)
+    for ck in range(CK):
+        Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw], supposed to be [N, T*Dh, Dw*Dh]
+        DconvS[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)
     torch.cuda.empty_cache()
 
@@ -1163,7 +1170,7 @@ def updateS_test(DD0SS0, X, opts):
         b = X - R - (DconvS.sum(1) - dck_conv_sck)  # shape of [N, F, T]
         torch.cuda.empty_cache()
 
-        S[:, c, k, :] = solv_sck_test(S[:, c, :].squeeze(), Tdck, b.view(N, FT), k, opts)
+        S[:, c, k, :] = solv_sck_test(S[:, c, :].squeeze(), Tdck, b.reshape(N, FT), k, opts)
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
@@ -1181,7 +1188,7 @@ def solv_sck_test(sc, Tdck, b, k, opts):
     Mw = opts.delta * correction # correction is help to make the loss monotonically decreasing
     lamb, lamb2 = opts.lamb, opts.lamb2
     dev = opts.dev
-    T = b.shape[1]
+    T = sc.shape[2]
     # 'skc update will lead sc change'
     sck = sc[:, k, :].clone()  # shape of [N, T]
     sck_old = sck.clone()

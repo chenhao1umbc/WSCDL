@@ -18,7 +18,7 @@ plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
 # testing section
-X_test, Y_test = load_data(opts, data='train')
+X_test, Y_test = load_data(opts, data='val')
 _, _, S_t, S0_t, _ = init(X_test, opts)
 acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc.acc)
