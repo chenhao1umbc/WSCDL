@@ -644,7 +644,7 @@ def updateD(DD0SS0W, X, Y, opts):
         Md_inv = (Md + 1e-38) ** (-1)  # shape of [Dh * Dw]
 
         # dck_conv_sck = Func.conv2d(sck.unsqueeze(1), dck.reshape(1, 1, Dh, Dw).flip(2, 3), padding=(255, 1)).squeeze()  # shape of [N,F,T]
-        dck_conv_sck0 = (dck @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+        dck_conv_sck = (dck @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
         Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
         # term 1, 2, 3 should be in the shape of [N, F, T] or [N, FT]
