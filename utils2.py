@@ -288,7 +288,7 @@ def save_results(D, D0, S, S0, W, opts, loss):
     :param S0: initial value, shape of [N,K0,T]
     :param W: The pre-trained projection, shape of [C, K]
     """
-    param = str([opts.K, opts.K0, opts.M, opts.lamb, opts.eta , opts.mu])
+    param = str([opts.K, opts.K0, opts.Dw, opts.lamb, opts.eta , opts.mu])
     torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
 
 
@@ -534,9 +534,16 @@ def updateS0(DD0SS0, X, Y, opts):
     Crange = torch.tensor(range(C))
     NC_1, FT = N * (C - 1), F*T
 
-    "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
-    DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
-                         padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
+    # "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
+    # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
+    #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
+    DconvS = torch.zeros(N, CK, F, T, device=opts.dev)
+    Dr = D.reshape(CK, Dh, Dw)
+    for ck in range(CK):
+        Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(), [Dh, Dw, T])  # shape of [N,T,Dw]
+        DconvS[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+    DconvS = DconvS.reshape(N, C, K, F, T).sum(2)
+
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, C, F, T).sum(1)  # output shape of (N, F, T)
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
     alpha_plus_dk0 = DconvS.sum(1) + R
@@ -793,10 +800,18 @@ def updateD0(DD0SS0, X, Y, opts):
     CK, NC = K * C, N * C
     Crange = torch.tensor(range(C))
     NC_1, FT = N * (C - 1), F*T
+
+    # "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
+    # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
+    #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
+    DconvS = torch.zeros(N, CK, F, T, device=opts.dev)
+    Dr = D.reshape(CK, Dh, Dw)
+    for ck in range(CK):
+        Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(), [Dh, Dw, T])  # shape of [N,T,Dw]
+        DconvS[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+    DconvS = DconvS.reshape(N, C, K, F, T).sum(2)
+
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T)
-    "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
-    DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
-                         padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, C, F, T).sum(1)  # output shape of (N, F, T)
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
     alpha_plus_dk0 = DconvS.sum(1) + R
