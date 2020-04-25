@@ -211,8 +211,8 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
         Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw], supposed to be [N, T*Dh, Dw*Dh]
         DconvS[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
 
-    # DconvS should be the shape of (N, CK, F,T)
-    DconvS = Func.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
+    # # DconvS should be the shape of (N, CK, F,T)
+    # DconvS = Func.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
 
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
