@@ -63,7 +63,7 @@ def load_data(opts, data='train'):
     :param opts: only need teh cpu or gpu info
     :return: training, validation or testing data
     """
-    route = '../../data/'
+    route = '../data/'
     if data == 'test':  # x, y are numpy double arrays
         # x, y = torch.load(route+'aasp_test_80by150.pt')
         mat = sio.loadmat(route+'test_256by200.mat')
