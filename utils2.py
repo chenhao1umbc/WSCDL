@@ -312,7 +312,7 @@ def updateS(DD0SS0W, X, Y, opts):
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
     Crange = torch.tensor(range(C))
     NC_1, FT = N * (C - 1), F*T
-    DconvS = torch.zeros(N, CK, F, T, device=opts.dev)
+    DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, Dh, Dw)
 
     # '''update the current s_n,k^(c) '''
@@ -322,8 +322,8 @@ def updateS(DD0SS0W, X, Y, opts):
         #                      padding=(255, 1), groups=CK).reshape(N,C,K, F, T).sum(2)
         for i in range(CK):
             Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(),[Dh, Dw, T])  # shape of [N, T, Dw], supposed to be [N, T*Dh, Dw*Dh]
-            DconvS[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
-        DconvS = DconvS.reshape(N, C, K, F, T).sum(2)
+            DconvS0[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+        DconvS = DconvS0.reshape(N, C, K, F, T).sum(2)
 
         dck = D[c, k, :]  # shape of [Dh, Dw]
         sck = S[:, c, k, :]  # shape of [N, 1, T]
@@ -623,7 +623,7 @@ def updateD(DD0SS0W, X, Y, opts):
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  #shape of (N, F, T)
     Crange = torch.tensor(range(C))
     NC_1, FT = N * (C - 1), F*T
-    DconvS = torch.zeros(N, CK, F, T, device=opts.dev)
+    DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, Dh, Dw)
 
     # '''update the current d_c,k '''
@@ -633,7 +633,8 @@ def updateD(DD0SS0W, X, Y, opts):
         #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
         for i in range(CK):
             Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(),[Dh, Dw, T])  # shape of [N,T,Dw]
-            DconvS[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+            DconvS0[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+        DconvS = DconvS0.reshape(N, C, K, F, T).sum(2)
 
         dck = D[c, k, :]  # shape of [Dh, Dw]
         sck = S[:, c, k, :]  # shape of [N, 1, T]
@@ -1126,7 +1127,7 @@ def updateS_test(DD0SS0, X, opts):
     CK, NC = K * C, N * C
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
     NC_1, FT = N * (C - 1), F*T
-    DconvS = torch.zeros(N, CK, F, T, device=opts.dev)
+    DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, Dh, Dw)
 
     # '''update the current d_c,k '''
@@ -1136,7 +1137,8 @@ def updateS_test(DD0SS0, X, opts):
         #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
         for i in range(CK):
             Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, i].squeeze(), [Dh, Dw, T])  # shape of [N,T,Dw]
-            DconvS[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+            DconvS0[:, i] = (Dr[i] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
+        DconvS = DconvS0.reshape(N, C, K, F, T).sum(2)
 
         dck = D[c, k, :]  # shape of [Dh, Dw]
         sck = S[:, c, k, :]  # shape of [N, 1, T]
