@@ -631,7 +631,7 @@ def updateD(DD0SS0W, X, Y, opts):
         # "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
         # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
         #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
-        for i in range(CK):
+        for ck in range(CK):
             Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  # shape of [N,T,Dw]
             DconvS0[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
         DconvS = DconvS0.reshape(N, C, K, F, T).sum(2)

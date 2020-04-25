@@ -228,11 +228,6 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/utils2.py</url>
-          <line>1142</line>
-          <option name="timeStamp" value="73" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils2.py</url>
           <line>327</line>
           <option name="timeStamp" value="74" />
         </line-breakpoint>
