@@ -870,7 +870,7 @@ def solv_dck0(x, M, Minv, Mw, Tsnk0_core, b, D0, mu, k0):
     maxiter, correction, threshold = 500, 0.1, 1e-4  # correction is help to make the loss monotonically decreasing
     d_til, d_old, d = x.view(-1).clone(), x.view(-1).clone(), x.view(-1).clone()
     "coef is the shape of [N, Dw*Dh, Dw*Dh], with block diagnal structure of Dw*Dw small blocks"
-    coef_core = (Tsnk0_core.permute(0, 2, 1) @ Tsnk0_core.abs())  # shape of [N, Dw, Dw]
+    coef_core = (Tsnk0_core.permute(0, 2, 1) @ Tsnk0_core)  # shape of [N, Dw, Dw]
     term =(b@Tsnk0_core).reshape(N, -1)# shape of [N, DhDw],permute before reshape is a must
 
     # loss = torch.cat((torch.tensor([], device=x.device), loss_D0(Tsck0_t, d, b, D0, mu).reshape(1)))
@@ -894,7 +894,7 @@ def argmin_lowrank(M, nu, mu, D0, k0):
     :param M: majorizer matrix
     :param nu: make d close to ||d-nu||_M^2
     :param mu: hyper-param of ||D0||_*
-    :param D0: common dict contains all the dk0, shape of [K0, M]
+    :param D0: common dict contains all the dk0, shape of [K0, Dh*Dw]
     :return: dk0
     """
     (K0, m), threshold = D0.shape, 5e-4
