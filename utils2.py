@@ -181,6 +181,7 @@ def train(D, D0, S, S0, W, X, Y, opts):
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             if i%3 == 0 : print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
+        torch.cuda.empty_cache()
 
     print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
     print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
@@ -1276,7 +1277,7 @@ def updateS0_test(DD0SS0, X, opts):
         b = X - DconvS_NFT - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
-        S0[:, k0, :] = solv_sck_test(S0, Tdk0, b, k0, opts)
+        S0[:, k0, :] = solv_sck_test(S0, Tdk0, b.reshape(N, FT), k0, opts)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
 
