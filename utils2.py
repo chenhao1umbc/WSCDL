@@ -1094,7 +1094,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
                 break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
-    S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    S_tik = torch.cat((S.squeeze().mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     y_hat = 1 / (1 + exp_PtSnW)
@@ -1277,7 +1277,7 @@ def updateS0_test(DD0SS0, X, opts):
         b = X - DconvS_NFT - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
-        S0[:, k0, :] = solv_sck_test(S0, Tdk0, b.reshape(N, FT), k0, opts)
+        S0[:, k0, :] = solv_sck_test(S0.squeeze(), Tdk0, b.reshape(N, FT), k0, opts)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
 
