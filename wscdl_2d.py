@@ -8,14 +8,14 @@ opts = OPT(C=16, K0=2, K=3)
 opts.lamb, opts.eta, opts.mu = 0.1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
 opts.transpose, opts.shuffle, opts.show_details = False, False, True  # default as true
 
-# # training section
-# X, Y = load_data(opts)
-# X , Y = X[:5], Y[:5]
-# D, D0, S, S0, W = init(X, opts)
-# D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
-# if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
-# plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
-# # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
+# training section
+X, Y = load_data(opts)
+# X , Y = X[::3], Y[::3]
+D, D0, S, S0, W = init(X, opts)
+D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
+if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
+plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
+# D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
 # testing section
 D, D0, S, S0, W, opts, loss = torch.load('../[3, 2, 3, 0.1, 0.1, 0.01]DD0SS0Woptsloss200425_23_17_17.pt')

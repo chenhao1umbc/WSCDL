@@ -209,7 +209,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev) # faster on GPU
     Dr = D.reshape(CK, 1, Dh, Dw)
     # for ck in range(CK):
-    #     Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw], supposed to be [N, T*Dh, Dw*Dh]
+    #     Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw]
     #     DconvS[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
 
     # "DconvS should be the shape of (N, CK, F,T)  not fast on GPU"
@@ -221,7 +221,8 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     ycpDcconvSc =((1-Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N,CK,F,T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS0.sum(1)  # using the same name to save memory
-    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+    "shape of (N, F, T), R is the common recon."
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)
     torch.cuda.empty_cache()
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
@@ -263,7 +264,8 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
     ycpDcconvSc = ((1 - Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS.sum(1)  # using the same name to save memory
-    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+    "shape of (N, F, T), R is the common recon."
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)
     torch.cuda.empty_cache()
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
@@ -313,7 +315,8 @@ def updateS(DD0SS0W, X, Y, opts):
     K0, Dh, Dw = D0.shape
     C, K, *_ = D.shape
     CK, NC = K * C, N * C
-    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+    "shape of (N, F, T), R is the common recon."
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)
     Crange = torch.tensor(range(C))
     NC_1, FT = N * (C - 1), F*T
     DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
@@ -325,7 +328,7 @@ def updateS(DD0SS0W, X, Y, opts):
         # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),
         #                      padding=(255, 1), groups=CK).reshape(N,C,K, F, T).sum(2)
         # for ck in range(CK):
-        #     Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  # shape of [N, T, Dw], supposed to be [N, T*Dh, Dw*Dh]
+        #     Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  # shape of [N, T, Dw]
         #     DconvS0[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T) # Dr is shape(CK,  Dh, Dw)
         for ck in range(CK):
             DconvS0[:, ck] = Func.conv1d(S.reshape(N,CK,1,T)[:,ck], Dr[ck].permute(1, 0, 2).flip(2), padding=1).squeeze()
@@ -662,7 +665,8 @@ def updateD(DD0SS0W, X, Y, opts):
         Md = Md_core.repeat(Dh)  # shape of [Dh * Dw]
         Md_inv = (Md + 1e-38) ** (-1)  # shape of [Dh * Dw]
 
-        # dck_conv_sck = Func.conv2d(sck.unsqueeze(1), dck.reshape(1, 1, Dh, Dw).flip(2, 3), padding=(255, 1)).squeeze()  # shape of [N,F,T]
+        # dck_conv_sck = Func.conv2d(sck.unsqueeze(1),
+        #                            dck.reshape(1, 1, Dh, Dw).flip(2, 3), padding=(255, 1)).squeeze()  # shape of [N,F,T]
         dck_conv_sck = (dck @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
         c_prime = Crange[Crange != c]  # c_prime contains all the indexes
         Dcp_conv_Sncp = DconvS[:, c, :] - dck_conv_sck
@@ -956,9 +960,11 @@ def updateW(SW, Y, opts):
     N, C, K, _, T = S.shape
     # print('the loss_W for updating W %1.3e:' %loss_W(S, W, Y))
     for c in range(C):
-        # print('Before bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('Before bpgm wc loss is : %1.3e'
+        #       % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :].squeeze(), Y[:, c], opts.delta)
-        # print('After bpgm wc loss is : %1.3e' % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
+        # print('After bpgm wc loss is : %1.3e'
+        #       % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
     if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
     return W
@@ -985,7 +991,8 @@ def solv_wc(x, snc, yc, Mw):
     # M_old = M.clone()
     # print('before bpgm wc loss is : %1.3e' %loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)))
 
-    # loss = torch.cat((torch.tensor([], device=x.device), loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
+    # loss = torch.cat((torch.tensor([], device=x.device),
+    #           loss_W(snc.clone().unsqueeze(1), wc.reshape(1, -1), yc.clone().unsqueeze(-1)).reshape(1)))
     for i in range(maxiter):
         wc_til = wc + correction*Mw*(wc - wc_old)  # Mw is just a number for calc purpose
         exp_pt_snc_wc_til = (pt_snc @ wc_til).exp()  # shape of [N]
@@ -1072,12 +1079,14 @@ def test(D, D0, S, S0, W, X, Y, opts):
         loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
         if opts.show_details:
             print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
-            print('In the %1.0f epoch, the sparse coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
+            print('In the %1.0f epoch, the sparse coding time is :'
+                  '%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
             t0 = time.time()
         S0 = updateS0_test([D, D0, S, S0], X, opts)
         if opts.show_details:
             loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
-            print('In the %1.0f epoch, the sparse0 coding time is :%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
+            print('In the %1.0f epoch, the sparse0 coding time is :'
+                  '%3.2f, loss function value is :%3.4e'% (i, time.time() - t0, loss[-1]))
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold:
                 print('break condition loss value diff satisfied')
@@ -1132,7 +1141,7 @@ def loss_fun_test(X, D, D0, S, S0, opts):
     DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, 1, Dh, Dw)
     # for ck in range(CK):
-    #     Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw], supposed to be [N, T*Dh, Dw*Dh]
+    #     Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw]
     #     DconvS[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
     for ck in range(CK):
         DconvS0[:, ck] = Func.conv1d(S.reshape(N,CK,1,T)[:,ck], Dr[ck].permute(1, 0, 2).flip(2), padding=1).squeeze()
@@ -1164,7 +1173,8 @@ def updateS_test(DD0SS0, X, opts):
     K0, Dh, Dw = D0.shape
     C, K, *_ = D.shape
     CK, NC = K * C, N * C
-    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+    "shape of (N, F, T), R is the common recon."
+    R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2,3),  padding=(255,1), groups=K0).sum(1)
     NC_1, FT = N * (C - 1), F*T
     DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, 1, Dh, Dw)
@@ -1184,7 +1194,8 @@ def updateS_test(DD0SS0, X, opts):
 
         dck = D[c, k, :]  # shape of [Dh, Dw]
         sck = S[:, c, k, :]  # shape of [N, 1, T]
-        # dck_conv_sck = Func.conv2d(sck.unsqueeze(1), dck.reshape(1, 1, Dh, Dw).flip(2, 3),padding=(255, 1)).squeeze()  # shape of [N,F,T]
+        # dck_conv_sck = Func.conv2d(sck.unsqueeze(1),
+        #                            dck.reshape(1, 1, Dh, Dw).flip(2, 3),padding=(255, 1)).squeeze()  # shape of [N,F,T]
         Tdck = toeplitz_dck(dck, [Dh, Dw, T])  # shape of [FT, T]
         dck_conv_sck = (Tdck @ sck.permute(0, 2, 1)).reshape(N, F, T)
         b = X - R - (DconvS_NFT - dck_conv_sck)  # shape of [N, F, T]
@@ -1215,7 +1226,7 @@ def solv_sck_test(sc, Tdck, b, k, opts):
     abs_Tdck = abs(Tdck)
     Tdck_t_Tdck = Tdck.t() @ Tdck  # shape of [T, T]
     Tdckt_bt = Tdck.t() @ b.t()  # shape of [T, N]
-    M = (abs_Tdck.t() @ abs_Tdck + lamb2*torch.eye(T, device=dev)  + 1e-38).sum(1)  # M is the diagonal of majorization matrix, shape of [T]
+    M = (abs_Tdck.t() @ abs_Tdck + lamb2*torch.eye(T, device=dev)  + 1e-38).sum(1)  # M is the diagonal, shape of [T]
     sc_til, sc_old, marker = sc.clone(), sc.clone(), 0 # shape of [N, K, T]
 
     # loss = torch.cat((torch.tensor([], device=opts.dev), loss_Sck_test(Tdck, b, sc, sck, opts).reshape(1)))
@@ -1258,12 +1269,10 @@ def updateS0_test(DD0SS0, X, opts):
     NC_1, FT = N * (C - 1), F * T
 
     "DconvS is the shape of (N,CK, F, T) to (N, C, F, T)"
-    # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3),padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
+    # DconvS = Func.conv2d(S.reshape(N, CK, 1, T),
+    #                      D.reshape(CK, 1, Dh, Dw).flip(2, 3),padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
     DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, 1, Dh, Dw)
-    # for ck in range(CK):
-    #     Tsck_core = toeplitz_sck_core(S.reshape(N, CK, 1, T)[:, ck].squeeze(),[Dh, Dw, T])  #shape of [N,T,Dw], supposed to be [N, T*Dh, Dw*Dh]
-    #     DconvS[:, ck] = (Dr[ck] @ Tsck_core.permute(0, 2, 1)).reshape(N, F, T)
     for ck in range(CK):
         DconvS0[:, ck] = Func.conv1d(S.reshape(N,CK,1,T)[:,ck], Dr[ck].permute(1, 0, 2).flip(2), padding=1).squeeze()
     DconvS_NFT = DconvS0.sum(1)  # shape of [N, F, T]
@@ -1271,7 +1280,8 @@ def updateS0_test(DD0SS0, X, opts):
     for k0 in range(K0):
         dk0 = D0[k0, :]
         snk0 = S0[:, k0, :]  # shape of [N, 1, T]
-        R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
+        R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3),
+                        padding=(255, 1), groups=K0).sum(1)  # shape of (N, F, T), R is the common recon.
         dk0convsck0 = Func.conv2d(snk0.unsqueeze(1), dk0.reshape(1, 1, Dh, Dw).flip(2, 3), padding=(255, 1)).squeeze()
         Tdk0 = toeplitz_dck(dk0, [Dh, Dw, T])  # shape of [FT, T]
         b = X - DconvS_NFT - R + dk0convsck0
