@@ -1,18 +1,16 @@
-"""This is the main file to run Weakly supervised supervised dictionary learning
+"""This is the main file to run MIML-auto encoder, the extension of WSCDL
 The default data type is torch.tensor with precision float32
 """
 
-from utils2 import *
+from utils3 import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=2, K=3)
-opts.transpose, opts.shuffle, opts.show_details = False, False, True
-X, Y = load_data(opts)
-opts.Dh, opts.Dw = 256, 9
 opts.lamb, opts.eta, opts.mu = 0.1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
-
+opts.transpose, opts.shuffle, opts.show_details = False, False, True  # default as true
 
 # training section
-X , Y = X[:5], Y[:5]
+X, Y = load_data(opts)
+# X , Y = X[::3], Y[::3]
 D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
