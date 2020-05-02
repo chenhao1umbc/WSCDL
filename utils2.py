@@ -267,11 +267,11 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     Dr = D.reshape(CK, 1, Dh, Dw)
     for ck in range(CK):
         DconvS0[:, ck] = Func.conv1d(S.reshape(N,CK,1,T)[:,ck],Dr[ck].permute(1,0,2).flip(2),padding=opts.offset).squeeze()
-    DconvS = DconvS0.reshape(N, CK, F, T)   # shape of [N,CK,F,T]
+    DconvS = DconvS0.reshape(N, C, K, F, T)   # shape of [N,CK,F,T]
 
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
     ycpDcconvSc = ((1 - Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
-    DconvS = DconvS.sum(1)  # using the same name to save memory
+    DconvS = DconvS0.sum(1)  # using the same name to save memory
     "shape of (N, F, T), R is the common recon."
     R = Func.conv2d(S0, D0.reshape(K0, 1, Dh, Dw).flip(2, 3), padding=(255, opts.offset), groups=K0).sum(1)
     torch.cuda.empty_cache()
