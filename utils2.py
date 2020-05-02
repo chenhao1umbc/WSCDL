@@ -238,7 +238,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
     # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
-    low_rank = N * opts.mu * D0.reshape(D0.shape[-2], D0.shape[-1]*K0).norm(p='nuc')
+    low_rank = N * opts.mu * D0.reshape(-1, K0).norm(p='nuc')
     cost = fidelity + sparse + label + low_rank
     return cost
 
@@ -262,7 +262,13 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     CK, NC = K * C, N * C
 
     # DconvS should be the shape of (N, CK, F,T)
-    DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3), padding=(255, opts.offset), groups=CK)
+    # DconvS = Func.conv2d(S.reshape(N, CK, 1, T), D.reshape(CK, 1, Dh, Dw).flip(2, 3), padding=(255, opts.offset), groups=CK)
+    DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev) # faster on GPU
+    Dr = D.reshape(CK, 1, Dh, Dw)
+    for ck in range(CK):
+        DconvS0[:, ck] = Func.conv1d(S.reshape(N,CK,1,T)[:,ck],Dr[ck].permute(1,0,2).flip(2),padding=opts.offset).squeeze()
+    DconvS = DconvS0.reshape(N, C, K, F, T)   # shape of [N,C,K,F,T]
+
     ycDcconvSc = (Y.reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
     ycpDcconvSc = ((1 - Y).reshape(NC, 1) * DconvS.reshape(NC, -1)).reshape(N, CK, F, T).sum(1)  # output shape of (N, F, T)
     DconvS = DconvS.sum(1)  # using the same name to save memory
@@ -282,9 +288,9 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
     label = (-1 * (1 - Y) * (exp_PtSnW + 1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
     # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
-    low_rank = N * opts.mu * D0.reshape(D0.shape[-2], D0.shape[-1] * K0).norm(p='nuc')
+    low_rank = N * opts.mu * D0.reshape(-1, K0).norm(p='nuc')
 
-    return fidelity.item(), sparse.item(), label.item()
+    return fidelity.item(), sparse.item(), label.item(), low_rank.item()
 
 
 def save_results(D, D0, S, S0, W, opts, loss):
