@@ -1323,7 +1323,7 @@ def updateS0_test(DD0SS0, X, opts):
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
         S0[:, k0, :] = solv_sck_test(S0.squeeze(), Tdk0, b.reshape(N, FT), k0, opts)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
-    return S0s
+    return S0
 
 
 def support_diff(S, Sold):
