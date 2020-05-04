@@ -20,8 +20,9 @@ plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
 
 # testing section
-D, D0, S, S0, W, opts, loss = torch.load('../[3, 2, 3, 0.1, 0.1, 0.01]DD0SS0Woptsloss200425_23_17_17.pt')
-X_test, Y_test = load_data(opts, data='val')
+D, D0, S, S0, W, opts, loss = torch.load('../[3, 2, 9, 1, 0.1, 1]DD0SS0Woptsloss200429_18_12_56.pt', map_location='cpu')
+opts.dev = 'cpu'
+X_test, Y_test = load_data(opts, data='test')
 _, _, S_t, S0_t, _ = init(X_test, opts)
 acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy, recall and precision are : ', acc.acc, acc.recall, acc.precision)

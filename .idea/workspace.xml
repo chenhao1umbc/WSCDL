@@ -30,7 +30,8 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../AASP" />
-    <property name="settings.editor.selected.configurable" value="pyconsole" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/utils.py" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -156,28 +157,28 @@
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>
     <state width="1335" height="786" key="GridCell.Tab.-1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821488717" />
-    <state width="1078" height="768" key="GridCell.Tab.0.bottom" timestamp="1588438745153">
+    <state width="1180" height="768" key="GridCell.Tab.0.bottom" timestamp="1588612262689">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1078" height="768" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1588438745153" />
+    <state width="1180" height="768" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1588612262689" />
     <state width="824" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.bottom/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1078" height="768" key="GridCell.Tab.0.center" timestamp="1588438745151">
+    <state width="1180" height="768" key="GridCell.Tab.0.center" timestamp="1588612262686">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1078" height="768" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1588438745151" />
+    <state width="1180" height="768" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1588612262686" />
     <state width="824" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.center/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1078" height="768" key="GridCell.Tab.0.left" timestamp="1588438745150">
+    <state width="1180" height="768" key="GridCell.Tab.0.left" timestamp="1588612262685">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1078" height="768" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1588438745150" />
+    <state width="1180" height="768" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1588612262685" />
     <state width="824" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578317" />
     <state width="1335" height="786" key="GridCell.Tab.0.left/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
-    <state width="1078" height="768" key="GridCell.Tab.0.right" timestamp="1588438745152">
+    <state width="1180" height="768" key="GridCell.Tab.0.right" timestamp="1588612262687">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1078" height="768" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1588438745152" />
+    <state width="1180" height="768" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1588612262687" />
     <state width="824" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821578318" />
     <state width="1335" height="786" key="GridCell.Tab.0.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821497612" />
     <state width="1335" height="786" key="GridCell.Tab.1.bottom" timestamp="1582821487760">
@@ -200,10 +201,10 @@
     </state>
     <state width="1335" height="786" key="GridCell.Tab.1.right/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821477838" />
     <state width="1335" height="786" key="GridCell.Tab.1.right/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1582821487760" />
-    <state x="296" y="231" key="SettingsEditor" timestamp="1586869918597">
+    <state x="642" y="324" key="SettingsEditor" timestamp="1588603502785">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="296" y="231" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1586869918597" />
+    <state x="642" y="324" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1588603502785" />
     <state width="759" height="479" key="XDebugger.FullValuePopup" timestamp="1586718038862">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -218,25 +219,9 @@
     <state x="724" y="227" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586268619043" />
     <state x="696" y="404" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1582821410374" />
     <state x="696" y="1484" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1583427448679" />
-    <state x="616" y="271" width="672" height="678" key="search.everywhere.popup" timestamp="1586869913031">
+    <state x="616" y="271" width="672" height="678" key="search.everywhere.popup" timestamp="1588603484234">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="616" y="271" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1586869913031" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils2.py</url>
-          <line>241</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils2.py</url>
-          <line>235</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <state x="616" y="271" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1588603484234" />
   </component>
 </project>
