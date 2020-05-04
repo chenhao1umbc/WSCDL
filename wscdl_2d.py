@@ -7,14 +7,21 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=2, K=3)
 opts.transpose, opts.shuffle, opts.show_details = False, False, True
 X, Y = load_data(opts, data='mix_train')
-opts.Dh, opts.Dw = 256, 9
+opts.Dh, opts.Dw, opts.batch_size = 256, 9, 100
 opts.lamb, opts.eta, opts.mu = 0.1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
 
-
 # training section
-X , Y = X[:5], Y[:5]
-D, D0, S, S0, W = init(X, opts)
-D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
+loss =  torch.tensor([], device=opts.dev)
+for epoch in range(opts.maxiter):
+    for indx in range(X.shape[0]//opts.batch_size + 1):
+        x, y = X[opts.batch_size*indx:opts.batch_size*(indx+1)], Y[opts.batch_size*indx:opts.batch_size*(indx+1)]
+        if epoch == 0 :
+            D, D0, S, S0, W = init(x, opts)
+        else:
+            _, _, S, S0, _ = init(x, opts)
+        D, D0, S, S0, W, loss0 = train(D, D0, S, S0, W, x, y, opts)
+        loss = torch.cat((loss, loss0[-1]))
+
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
 # D, D0, S, S0, W, opts, loss = torch.load('DD0SS0Woptsloss.pt')
