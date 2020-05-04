@@ -1315,9 +1315,9 @@ def updateS0_test(DD0SS0, X, opts):
             R0[:, kk0] = Func.conv1d(S0[:, kk0], D0r[kk0].permute(1, 0, 2).flip(2), padding=opts.offset).squeeze()
         R = R0.sum(1)
 
+        Tdk0 = toeplitz_dck(dk0, [Dh, Dw, T])  # shape of [FT, T]
         # dk0convsck0=Func.conv2d(snk0.unsqueeze(1),dk0.reshape(1,1,Dh,Dw).flip(2,3),padding=(255,opts.offset)).squeeze()
         dk0convsnk0 = (Tdk0 @ snk0.permute(0, 2, 1)).reshape(N, F, T)
-        Tdk0 = toeplitz_dck(dk0, [Dh, Dw, T])  # shape of [FT, T]
         b = X - DconvS_NFT - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
