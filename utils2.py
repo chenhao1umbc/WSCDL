@@ -664,7 +664,6 @@ def updateD(DD0SS0W, X, Y, opts):
     for kk0 in range(K0):
         R0[:, kk0] = Func.conv1d(S0[:, kk0], D0r[kk0].permute(1, 0, 2).flip(2), padding=opts.offset).squeeze()
     R = R0.sum(1)
-    Tdk0 = toeplitz_dck(dk0, [Dh, Dw, T])  # shape of [FT, T]
 
     Crange = torch.tensor(range(C))
     NC_1, FT = N * (C - 1), F*T
