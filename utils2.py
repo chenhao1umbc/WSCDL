@@ -57,7 +57,7 @@ class OPT:
             if not silent: print('\nRunning on CPU')
 
 
-def load_data(opts, data='train', seed=0):
+def load_data(opts, data='train', fold=0):
     """
     This function will load the preprocessed AASP dataset, train and val are in one set, test is the other dataset
     :param opts: only need teh cpu or gpu info
@@ -68,10 +68,21 @@ def load_data(opts, data='train', seed=0):
         # x, y = torch.load(route+'aasp_test_80by150.pt')
         mat = sio.loadmat(route+'test_256by200.mat')
         x, y = mat['rs'], mat['labels']
-    else:
+
+    if data =='train':
         # x, y = torch.load(route + 'aasp_train_80by150.pt')
         mat = sio.loadmat(route+'train_256by200.mat')
         x, y = mat['rs'], mat['labels']
+
+    "This part will make all the mixture data into one pool"
+    if data == 'mix_train' or data == 'mix_val' or data == 'mix_test' :
+        mat = sio.loadmat(route + 'test_256by200.mat')
+        x, y = mat['rs'], mat['labels']
+        mat = sio.loadmat(route + 'train_256by200.mat')
+        xx, yy = mat['rs'], mat['labels']
+        x = np.concatenate((x, xx))
+        y = np.concatenate((y, yy))
+
     n, f, t = x.shape
     if opts.shuffle:
         np.random.seed(opts.seed)
@@ -93,6 +104,32 @@ def load_data(opts, data='train', seed=0):
     if data == 'train' : return xtr, ytr
     if data == 'val' : return xval, yval   # validation
     if data == 'test': return  X, Y  # testing
+
+    _08N = int(0.8*n)
+    xtr, ytr, xval, yval= dataloader(X[:_08N], Y[:_08N], fold)
+    if data == 'mix_train': return xtr, ytr
+    if data == 'mix_val': return xval, yval
+    if data == 'mix_test': return X[_08N:], Y[_08N:]
+
+
+def dataloader(X, Y, fold):
+    """
+    This function will shuffle the data with given random seed
+    :param X: 882 sample, 80% for training, 20% for validation
+    :param Y: labels
+    :param fold: random seed number
+    :return: xtr, ytr, xval, yval
+    """
+    N = X.shape[0]
+    _08N = int(0.8*N)
+    np.random.seed(fold)
+    nn = np.arange(N)
+    np.random.shuffle(nn)
+    X, Y = X[nn], Y[nn]
+    xtr, ytr = X[:_08N], Y[:_08N]
+    xval, yval = X[_08N:], Y[_08N]
+    return xtr, ytr, xval, yval
+
 
 
 def init(X, opts):

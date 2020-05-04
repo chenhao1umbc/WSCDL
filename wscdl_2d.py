@@ -6,7 +6,7 @@ from utils2 import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=2, K=3)
 opts.transpose, opts.shuffle, opts.show_details = False, False, True
-X, Y = load_data(opts)
+X, Y = load_data(opts, data='mix_train')
 opts.Dh, opts.Dw = 256, 9
 opts.lamb, opts.eta, opts.mu = 0.1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
 
