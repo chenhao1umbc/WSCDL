@@ -1317,13 +1317,13 @@ def updateS0_test(DD0SS0, X, opts):
 
         Tdk0 = toeplitz_dck(dk0, [Dh, Dw, T])  # shape of [FT, T]
         # dk0convsck0=Func.conv2d(snk0.unsqueeze(1),dk0.reshape(1,1,Dh,Dw).flip(2,3),padding=(255,opts.offset)).squeeze()
-        dk0convsnk0 = (Tdk0 @ snk0.permute(0, 2, 1)).reshape(N, F, T)
+        dk0convsck0 = (Tdk0 @ snk0.permute(0, 2, 1)).reshape(N, F, T)
         b = X - DconvS_NFT - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
         S0[:, k0, :] = solv_sck_test(S0.squeeze(), Tdk0, b.reshape(N, FT), k0, opts)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
-    return S0
+    return S0s
 
 
 def support_diff(S, Sold):
