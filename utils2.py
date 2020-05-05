@@ -48,7 +48,7 @@ class OPT:
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, False, False  # n is number of examples per combination for toy data
         self.common_term = True*K0  # if common term exist
-        self.shape = '1d' # input data is 1d or 2d, 1d could be vectorized 2d data
+        self.shape, self.batch_size = '1d', 100 # input data is 1d or 2d, 1d could be vectorized 2d data
         if torch.cuda.is_available():
             self.dev = 'cuda'
             if not silent: print('\nRunning on GPU')
@@ -161,7 +161,7 @@ def init(X, opts):
     return D, D0, S, S0, W
 
 
-def train(D, D0, S, S0, W, X, Y, opts):
+def train(X, Y, opts):
     """
     This function is the main training body of the algorithm, with showing a lot of details
     :param D: initial value, D, shape of [C, K, Dh, Dw]
@@ -175,43 +175,54 @@ def train(D, D0, S, S0, W, X, Y, opts):
     :return: D, D0, S, S0, W, loss
     """
     loss, threshold, opts.offset = torch.tensor([], device=opts.dev), 5e-4, (opts.Dw-1)//2
-    loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-    print('The initial loss function value is :%3.4e' % loss[-1])
     t, t1 = time.time(), time.time()
-    S_numel, S0_numel = S.numel(), S0.numel()
     for i in range(opts.maxiter):
-        t0 = time.time()
-        S = updateS([D, D0, S, S0, W], X, Y, opts)
-        if opts.show_details:
-            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-            print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
+        for indx in range(X.shape[0] // opts.batch_size + 1):
+            x, y = X[opts.batch_size * indx:opts.batch_size * (indx + 1)], \
+                   Y[opts.batch_size * indx:opts.batch_size * (indx + 1)]
+            if x.nelement() == 0: continue  # opts.batch_size==N, x is null
+            if i == 0:
+                D, D0, S, S0, W = init(x, opts)
+                S_numel, S0_numel = S.numel(), S0.numel()
+            if i > 0 and S.shape[0] != x.shape[0]:  # if the last batch size is small
+                _, _, S, S0, _ = init(x, opts)
+                S_numel, S0_numel = S.numel(), S0.numel()
 
-        S0 = updateS0([D, D0, S, S0], X, Y, opts) if opts.common_term else S0
-        if opts.show_details:
-            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-            print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
-            print('check sparsity, None-zero percentage is : %1.4f' % (1-(S0==0).sum().item()/S0_numel))
+            loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
+            if i == 0 and indx ==0: print('The initial loss function value is :%3.4e' % loss[-1])
 
-        D = updateD([D, D0, S, S0, W], X, Y, opts)
-        if opts.show_details:
-            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-            print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
+            t0 = time.time()
+            S = updateS([D, D0, S, S0, W], x, y, opts)
+            if opts.show_details:
+                loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
+                print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
+                print('loss function value is %3.4e:' %loss[-1])
+                print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
 
-        D0 = updateD0([D, D0, S, S0], X, Y, opts) if opts.common_term else D0
-        if opts.show_details:
-            loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-            print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
+            S0 = updateS0([D, D0, S, S0], x, y, opts) if opts.common_term else S0
+            if opts.show_details:
+                loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
+                print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
+                print('loss function value is %3.4e:' %loss[-1])
+                print('check sparsity, None-zero percentage is : %1.4f' % (1-(S0==0).sum().item()/S0_numel))
 
-        W = updateW([S, W], Y, opts)
-        loss = torch.cat((loss, loss_fun(X, Y, D, D0, S, S0, W, opts).reshape(1)))
-        if opts.show_details:
-            print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
-            print('loss function value is %3.4e:' %loss[-1])
+            D = updateD([D, D0, S, S0, W], x, y, opts)
+            if opts.show_details:
+                loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
+                print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
+                print('loss function value is %3.4e:' %loss[-1])
+
+            D0 = updateD0([D, D0, S, S0], x, y, opts) if opts.common_term else D0
+            if opts.show_details:
+                loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
+                print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
+                print('loss function value is %3.4e:' %loss[-1])
+
+            W = updateW([S, W], y, opts)
+            loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
+            if opts.show_details:
+                print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
+                print('loss function value is %3.4e:' %loss[-1])
 
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-6]) / loss[-6]) < threshold: break
@@ -221,8 +232,8 @@ def train(D, D0, S, S0, W, X, Y, opts):
             if i%3 == 0 : print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
         torch.cuda.empty_cache()
 
-    print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
-    print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
+        print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
+        print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
     return D, D0, S, S0, W, loss
 
 
