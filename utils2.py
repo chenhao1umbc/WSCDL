@@ -69,7 +69,7 @@ def load_data(opts, data='train', fold=0):
         mat = sio.loadmat(route+'test_256by200.mat')
         x, y = mat['rs'], mat['labels']
 
-    if data =='train':
+    if data =='train' or data == 'val':
         # x, y = torch.load(route + 'aasp_train_80by150.pt')
         mat = sio.loadmat(route+'train_256by200.mat')
         x, y = mat['rs'], mat['labels']
@@ -1187,7 +1187,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     acc_all = OPT(silent=True)
     acc_all.acc = acc
     acc_all.recall = recall(Y, y_hat)
-    acc_all.precision = precision(Y, y_hat)
+    acc_all.f1 = f1(Y, y_hat)
     return acc_all, 1/(1+exp_PtSnW), S, S0, loss
 
 
@@ -1396,13 +1396,13 @@ def recall(y, yh):
     :param yh: predicted N by C
     :return: recall_score
     """
-    s = 0
-    N, C = y.shape
-    yc = np.array(y.cpu())
-    yhc = np.array(yh.cpu())
+    # N, C = y.shape
+    # s = 0
     # for i in range(C):
     #     s = s + metrics.recall_score(yc[:,i], yhc[:,i])
     # res =s/C
+    yc = np.array(y.cpu())
+    yhc = np.array(yh.cpu())
     res = metrics.recall_score(yc.flatten(), yhc.flatten())
     return res
 
@@ -1414,13 +1414,19 @@ def precision(y, yh):
     :param yh: predicted N by C
     :return: precision_score
     """
-    s = 0
-    N, C = y.shape
     yc = np.array(y.cpu())
     yhc = np.array(yh.cpu())
-    # for i in range(C):
-    #     s = s + metrics.precision_score(yc[:,i], yhc[:,i])
-    # res = s/C
     res = metrics.precision_score(yc.flatten(), yhc.flatten())
     return res
 
+def f1(y, yh):
+    """
+    calculate the recall score for a matrix
+    :param y: N by C
+    :param yh: predicted N by C
+    :return: precision_score
+    """
+    yc = np.array(y.cpu())
+    yhc = np.array(yh.cpu())
+    res = metrics.f1_score(yc.flatten(), yhc.flatten())
+    return res

@@ -6,12 +6,11 @@ from utils2 import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=2, K=3)
 opts.transpose, opts.shuffle, opts.show_details = False, False, True
-opts.Dh, opts.Dw, opts.batch_size = 256, 9, 3
+opts.Dh, opts.Dw, opts.batch_size = 256, 15, -1
 opts.lamb, opts.eta, opts.mu = 0.1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
 
 # training section
-X, Y = load_data(opts, data='mix_train')
-# X, Y = X[:5], Y[:5]
+X, Y = load_data(opts, data='train')
 D, D0, S, S0, W, loss = train(X, Y, opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
@@ -20,10 +19,10 @@ plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
 # testing section
 D, D0, S, S0, W, opts, loss = torch.load('../[3, 2, 9, 1, 0.1, 1]DD0SS0Woptsloss200429_18_12_56.pt', map_location='cpu')
 opts.dev = 'cpu'
-X_test, Y_test = load_data(opts, data='test')
+X_test, Y_test = load_data(opts, data='val')
 _, _, S_t, S0_t, _ = init(X_test, opts)
 acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
-print('\nThe test data accuracy, recall and precision are : ', acc.acc, acc.recall, acc.precision)
+print('\nThe test data accuracy, recall and precision are : ', acc.acc, acc.recall, acc.f1)
 plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
 print('done')
 
