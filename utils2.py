@@ -175,11 +175,12 @@ def train(X, Y, opts):
     :return: D, D0, S, S0, W, loss
     """
     loss, threshold, opts.offset = torch.tensor([], device=opts.dev), 5e-4, (opts.Dw-1)//2
+    batch_size = opts.batch_size if opts.batch_size > 0 else X.shape[0]
     t, t1 = time.time(), time.time()
     for i in range(opts.maxiter):
-        for indx in range(X.shape[0] // opts.batch_size + 1):
-            x, y = X[opts.batch_size * indx:opts.batch_size * (indx + 1)], \
-                   Y[opts.batch_size * indx:opts.batch_size * (indx + 1)]
+        for indx in range(X.shape[0] // batch_size + 1):
+            x, y = X[batch_size * indx:batch_size * (indx + 1)], \
+                   Y[batch_size * indx:batch_size * (indx + 1)]
             if x.nelement() == 0: continue  # opts.batch_size==N, x is null
             if i == 0:
                 D, D0, S, S0, W = init(x, opts)
@@ -230,10 +231,11 @@ def train(X, Y, opts):
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             if i%3 == 0 : print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
-        torch.cuda.empty_cache()
 
+        torch.cuda.empty_cache()
         print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
-        print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
+
+    print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
     return D, D0, S, S0, W, loss
 
 
