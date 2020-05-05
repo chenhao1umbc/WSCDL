@@ -224,6 +224,7 @@ def train(X, Y, opts):
             if opts.show_details:
                 print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
                 print('loss function value is %3.4e:' %loss[-1])
+            torch.cuda.empty_cache()
 
         if opts.show_details:
             if i > 3 and abs((loss[-1] - loss[-6]) / loss[-6]) < threshold: break
@@ -232,9 +233,7 @@ def train(X, Y, opts):
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
             if i%3 == 0 : print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
 
-        torch.cuda.empty_cache()
-        print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
-
+    print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
     print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
     return D, D0, S, S0, W, loss
 
