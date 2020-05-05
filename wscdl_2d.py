@@ -6,11 +6,12 @@ from utils2 import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=2, K=3)
 opts.transpose, opts.shuffle, opts.show_details = False, False, True
-opts.Dh, opts.Dw, opts.batch_size = 256, 9, 700
+opts.Dh, opts.Dw, opts.batch_size = 256, 9, 3
 opts.lamb, opts.eta, opts.mu = 0.1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
 
 # training section
 X, Y = load_data(opts, data='mix_train')
+# X, Y = X[:5], Y[:5]
 D, D0, S, S0, W, loss = train(X, Y, opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
