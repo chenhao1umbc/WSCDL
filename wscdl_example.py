@@ -8,7 +8,7 @@ opts = OPT()
 opts.snr = 10
 opts.lamb = 2.7 # for sparsity penalty
 opts.eta = 3 # for label penalty
-opts.mu = 0  # for low rank penalty
+opts.mu = 0.1  # for low rank penalty
 opts.show_details = False  # default as true
 
 # training section
