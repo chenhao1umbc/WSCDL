@@ -339,7 +339,7 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     torch.cuda.empty_cache()
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
-    S_tik = torch.cat((S.squeeze().mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    S_tik = torch.cat((S.squeeze(3).mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
