@@ -898,7 +898,6 @@ def updateD0(DD0SS0, X, Y, opts):
     #                      padding=(255, 1), groups=CK).reshape(N, C, K, F, T).sum(2)
     DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)
     Dr = D.reshape(CK, 1, Dh, Dw)
-
     for ck in range(CK):
         DconvS0[:, ck] = Func.conv1d(S.reshape(N,CK,1,T)[:,ck], Dr[ck].permute(1,0,2).flip(2),padding=opts.offset).squeeze()
     DconvS_NFT = DconvS0.sum(1)
@@ -1283,7 +1282,7 @@ def updateS_test(DD0SS0, X, opts):
         b = X - R - (DconvS_NFT - dck_conv_sck)  # shape of [N, F, T]
         torch.cuda.empty_cache()
 
-        S[:, c, k, :] = solv_sck_test(S[:, c, :].squeeze(), Tdck, b.reshape(N, FT), k, opts)
+        S[:, c, k, :] = solv_sck_test(S[:, c, :].squeeze(2), Tdck, b.reshape(N, FT), k, opts)
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
@@ -1376,7 +1375,7 @@ def updateS0_test(DD0SS0, X, opts):
         b = X - DconvS_NFT - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
-        S0[:, k0, :] = solv_sck_test(S0.squeeze(), Tdk0, b.reshape(N, FT), k0, opts)
+        S0[:, k0, :] = solv_sck_test(S0.squeeze(2), Tdk0, b.reshape(N, FT), k0, opts)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
 
