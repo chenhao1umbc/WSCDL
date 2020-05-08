@@ -284,7 +284,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     torch.cuda.empty_cache()
 
     # using Y_hat is not stable because of log(), 1-Y_hat could be 0
-    S_tik = torch.cat((S.squeeze().mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    S_tik = torch.cat((S.squeeze(3).mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S_tik * W).sum(2).exp()   # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
@@ -430,7 +430,7 @@ def updateS(DD0SS0W, X, Y, opts):
         # l00 = loss_fun(X, Y, D, D0, S, S0, W, opts)
         # l0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         # l1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
-        S[:, c, k, :] = solv_sck(S[:, c, :].squeeze(), wc, yc, Tdck, b, k, opts)
+        S[:, c, k, :] = solv_sck(S[:, c, :].squeeze(2), wc, yc, Tdck, b, k, opts)
         # ll0 = loss_fun_special(X, Y, D, D0, S, S0, W, opts)
         # ll1 = loss_Sck_special(Tdck, b, S[:, c, :].squeeze(), sck.squeeze(), wc, wc[k], yc, opts)
         # print('Overall loss for fidelity, sparse, label, differences: %1.7f, %1.7f, %1.7f' %(l0[0]-ll0[0], l0[1]-ll0[1], l0[2]-ll0[2]))
@@ -1040,7 +1040,7 @@ def updateW(SW, Y, opts):
     for c in range(C):
         # print('Before bpgm wc loss is : %1.3e'
         #       % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
-        W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :].squeeze(), Y[:, c], opts.delta)
+        W[c, :] = solv_wc(W[c, :].clone(), S[:, c, :].squeeze(2), Y[:, c], opts.delta)
         # print('After bpgm wc loss is : %1.3e'
         #       % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
@@ -1122,7 +1122,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     :return: D, D0, S, S0, W, loss
     """
     N, C = Y.shape
-    S_tik = torch.cat((S.squeeze().mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    S_tik = torch.cat((S.squeeze(3).mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
@@ -1181,7 +1181,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
                 break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
     N, C = Y.shape
-    S_tik = torch.cat((S.squeeze().mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
+    S_tik = torch.cat((S.squeeze(3).mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
     exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     y_hat = 1 / (1 + exp_PtSnW)

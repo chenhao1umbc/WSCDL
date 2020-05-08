@@ -4,9 +4,9 @@ The default data type is torch.tensor with precision float32
 
 from utils2 import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-opts = OPT(C=16, K0=1, K=2)
+opts = OPT(C=16, K0=1, K=1)
 opts.transpose, opts.shuffle, opts.show_details = False, False, True
-opts.Dh, opts.Dw, opts.batch_size = 256, 15, -1
+opts.Dh, opts.Dw, opts.batch_size = 256, 15, 3
 opts.lamb, opts.eta, opts.mu = 1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
 
 # training section
