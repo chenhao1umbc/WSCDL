@@ -43,7 +43,7 @@ class OPT:
     def __init__(self, C=4, K0=1, K=1, Dh=256, Dw=3,\
                  mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
         self.C, self.K, self.K0, self.Dh, self.Dw = C, K, K0, Dh, Dw
-        self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.01
+        self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.0
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, False, False  # n is number of examples per combination for toy data
@@ -132,7 +132,7 @@ def dataloader(X, Y, fold):
 
 
 
-def init(X, opts, Y=0):
+def init(X, opts, init=0):
     """
     This function will generate the initial value for D D0 S S0 and W
     :param X: training data with shape of [N, F,T]
@@ -143,7 +143,7 @@ def init(X, opts, Y=0):
         S0 is 4-d tensor [N, K0, F, T]
         D0 is 3-d tensor [K0, F, M]
         X is 3-d tensor [N, F, T], training Data, could be in GPU
-        Y is a matrix [N, C] \in {0,1}, training labels
+        init is a indicator using different initializations
         W is a matrix [C, K+1], where K is per-class atoms
     :return: D, D0, S, S0, W
     """
@@ -153,7 +153,7 @@ def init(X, opts, Y=0):
         N, F, T = X.shape
     D = torch.rand(opts.C, opts.K, opts.Dh,opts.Dw, device=opts.dev)
     D0 = torch.rand(opts.K0, opts.Dh, opts.Dw, device=opts.dev)
-    if Y is not 0 :
+    if init is not 0 :
         print('good intialization')
         "d is the shape of [16,1,256, 15]"
         d = torch.load('good_intialization.pt').to(opts.dev)
@@ -189,10 +189,10 @@ def train(X, Y, opts):
                    Y[batch_size * indx:batch_size * (indx + 1)]
             if x.nelement() == 0: continue  # opts.batch_size==N, x is null
             if i == 0:
-                D, D0, S, S0, W = init(x, opts, y)
+                D, D0, S, S0, W = init(x, opts, opts.init)
                 S_numel, S0_numel = S.numel(), S0.numel()
             if i > 0 and S.shape[0] != x.shape[0]:  # if the last batch size is small
-                _, _, S, S0, _ = init(x, opts, y)
+                _, _, S, S0, _ = init(x, opts, opts.init)
                 S_numel, S0_numel = S.numel(), S0.numel()
 
             loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
