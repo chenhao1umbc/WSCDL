@@ -1299,7 +1299,7 @@ def solv_sck_test(sc, Tdck, b, k, delta, lamb, lamb2):
     """
     maxiter, correction, threshold = 500, 0.7, 1e-5
     Mw = delta * correction # correction is help to make the loss monotonically decreasing
-    dev = sc.dev
+    dev = sc.device
     T = sc.shape[2]
     # 'skc update will lead sc change'
     sck = sc[:, k, :].clone()  # shape of [N, T]
