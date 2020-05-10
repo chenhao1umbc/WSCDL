@@ -1169,14 +1169,14 @@ def test(D, D0, S, S0, W, X, Y, opts):
             if i > 3 and abs((loss[-1] - loss[-3]) / loss[-3]) < threshold:
                 print('break condition loss value diff satisfied')
                 break
-            if support_diff(S, Sold) < 0.005:
+            if support_diff(S, Sold) < 0.003:
                 print('break condition support diff satisfied')
                 break
         else:
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold:
                 print('break condition loss value diff satisfied')
                 break
-            if support_diff(S, Sold) < 0.005:
+            if support_diff(S, Sold) < 0.003:
                 print('break condition support diff satisfied')
                 break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))
