@@ -44,6 +44,7 @@ class OPT:
                  mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
         self.C, self.K, self.K0, self.Dh, self.Dw = C, K, K0, Dh, Dw
         self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.0
+        self.lamb0 = 0.1 * self.lamb  # seperate lamb for the common term
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, False, False  # n is number of examples per combination for toy data
@@ -145,7 +146,7 @@ def init(X, opts, init=0):
         X is 3-d tensor [N, F, T], training Data, could be in GPU
         init is a indicator using different initializations
         W is a matrix [C, K+1], where K is per-class atoms
-    :return: D, D0, S, S0, W
+    :return: D, D0, S, S0, Wsudo apt install firefox
     """
     if opts.transpose:
         N, T, F = X.shape
@@ -262,7 +263,6 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     C, K, *_ = D.shape
     CK, NC = K*C, N*C
 
-
     # "DconvS should be the shape of (N, CK, F,T)  not fast on GPU"
     # DconvS = Func.conv2d(S.reshape(N, CK, 1, T) ,D.reshape(CK, 1, Dh, Dw).flip(2,3), padding=(255,1), groups=CK)
     DconvS0 = torch.zeros(N, CK, F, T, device=opts.dev)  # faster on GPU
@@ -292,7 +292,7 @@ def loss_fun(X, Y, D, D0, S, S0, W, opts):
     fidelity1 = torch.norm(X - R - DconvS)**2
     fidelity2 = torch.norm(X - R - ycDcconvSc) ** 2
     fidelity = fidelity1 + fidelity2 + torch.norm(ycpDcconvSc) ** 2
-    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
+    sparse = opts.lamb * S.abs().sum() + opts.lamb0*S0.abs().sum()
     label = (-1 * (1 - Y)*(exp_PtSnW+1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
     # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
     low_rank = N * opts.mu * D0.reshape(-1, K0).norm(p='nuc')
@@ -347,7 +347,7 @@ def loss_fun_special(X, Y, D, D0, S, S0, W, opts):
     fidelity1 = torch.norm(X - R - DconvS) ** 2
     fidelity2 = torch.norm(X - R - ycDcconvSc) ** 2
     fidelity = fidelity1 + fidelity2 + torch.norm(ycpDcconvSc) ** 2
-    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
+    sparse = opts.lamb * S.abs().sum() + opts.lamb0 * S0.abs().sum()
     label = (-1 * (1 - Y) * (exp_PtSnW + 1e-38).log() + (exp_PtSnW + 1).log()).sum() * opts.eta
     # label = -1 * opts.eta * (Y * (Y_hat + 3e-38).log() + (1 - Y) * (_1_Y_hat + 3e-38).log()).sum()
     low_rank = N * opts.mu * D0.reshape(-1, K0).norm(p='nuc')
@@ -648,7 +648,7 @@ def updateS0(DD0SS0, X, Y, opts):
 
         torch.cuda.empty_cache()
         # print(loss_S0(Tdk0, snk0.squeeze(), b, opts.lamb))
-        S0[:, k0, :] = solv_snk0(snk0.squeeze(), MS0_diag, MS0_inv, opts.delta, 2*Tdk0, b, opts.lamb)
+        S0[:, k0, :] = solv_snk0(snk0.squeeze(), MS0_diag, MS0_inv, opts.delta, 2*Tdk0, b, opts.lamb0)
         # print(loss_S0(Tdk0, S0[:, k0, :].squeeze(), b, opts.lamb))
     return S0
 
@@ -1231,7 +1231,7 @@ def loss_fun_test(X, D, D0, S, S0, opts):
     torch.cuda.empty_cache()
 
     fidelity = torch.norm(X - R - DconvS_NFT) ** 2
-    sparse = opts.lamb * (S.abs().sum() + S0.abs().sum())
+    sparse = opts.lamb * S.abs().sum() + opts.lamb0 * S0.abs().sum()
     l2 = opts.lamb2 * (S.norm() ** 2 + S0.norm() ** 2)
     cost = fidelity + sparse + l2
     return cost
@@ -1282,24 +1282,24 @@ def updateS_test(DD0SS0, X, opts):
         b = X - R - (DconvS_NFT - dck_conv_sck)  # shape of [N, F, T]
         torch.cuda.empty_cache()
 
-        S[:, c, k, :] = solv_sck_test(S[:, c, :].squeeze(2), Tdck, b.reshape(N, FT), k, opts)
+        S[:, c, k, :] = solv_sck_test(S[:, c, :].squeeze(2), Tdck, b.reshape(N, FT), k, opts.delta, opts.lamb, opts.lamb2)
         if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
     return S
 
 
-def solv_sck_test(sc, Tdck, b, k, opts):
+def solv_sck_test(sc, Tdck, b, k, delta, lamb, lamb2):
     """
     This function solves snck for all N, using BPGM
     :param sc: shape of [N, K, T]
     :param Tdck: shape of [FT, m=T]
     :param b: shape of [N, FT]
     :param k: integer, which atom to update
+    :param lamb2: default as 0, adjustment sparse coding, if needed
     :return: sck
     """
     maxiter, correction, threshold = 500, 0.7, 1e-5
-    Mw = opts.delta * correction # correction is help to make the loss monotonically decreasing
-    lamb, lamb2 = opts.lamb, opts.lamb2
-    dev = opts.dev
+    Mw = delta * correction # correction is help to make the loss monotonically decreasing
+    dev = sc.dev
     T = sc.shape[2]
     # 'skc update will lead sc change'
     sck = sc[:, k, :].clone()  # shape of [N, T]
@@ -1375,7 +1375,7 @@ def updateS0_test(DD0SS0, X, opts):
         b = X - DconvS_NFT - R + dk0convsck0
         torch.cuda.empty_cache()
         # print(loss_S0(2*Tdk0_t.t(), snk0, b, opts.lamb))
-        S0[:, k0, :] = solv_sck_test(S0.squeeze(2), Tdk0, b.reshape(N, FT), k0, opts)
+        S0[:, k0, :] = solv_sck_test(S0.squeeze(2), Tdk0, b.reshape(N, FT), k0, opts.delta, opts.lamb0, opts.lamb2)
         # print(loss_S0(2*Tdk0_t.t(), S0[:, k0, :], b, opts.lamb))
     return S0
 
