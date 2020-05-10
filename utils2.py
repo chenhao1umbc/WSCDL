@@ -44,7 +44,7 @@ class OPT:
                  mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
         self.C, self.K, self.K0, self.Dh, self.Dw = C, K, K0, Dh, Dw
         self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.0
-        self.lamb0 = 0.1  # seperate lamb for the common term
+        self.lamb0, self.init = 0.1, 0  # seperate lamb for the common term
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, False, False  # n is number of examples per combination for toy data
