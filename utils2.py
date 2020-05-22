@@ -1145,7 +1145,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     :param opts: options of hyper-parameters
     :return: acc, Y_hat
     """
-    loss, threshold = torch.tensor([], device=opts.dev), 1e-5
+    loss, threshold = torch.tensor([], device=opts.dev), 5e-4
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
     print('The initial loss function value is %3.4e:' % loss[-1])
     S_numel, S0_numel = S.numel(), S0.numel()
