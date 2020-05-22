@@ -29,7 +29,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../AASP" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/utils.py" />
@@ -137,10 +137,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1588709679660" />
-    <state x="667" y="303" key="FileChooserDialogImpl" timestamp="1588886400075">
+    <state x="667" y="303" key="FileChooserDialogImpl" timestamp="1589631254988">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="667" y="303" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1588886400075" />
+    <state x="667" y="303" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1589631254988" />
     <state width="1335" height="786" key="GridCell.Tab.-1.bottom" timestamp="1582821488717">
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>

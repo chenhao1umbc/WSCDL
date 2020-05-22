@@ -128,7 +128,7 @@ def dataloader(X, Y, fold):
     np.random.shuffle(nn)
     X, Y = X[nn], Y[nn]
     xtr, ytr = X[:_08N], Y[:_08N]
-    xval, yval = X[_08N:], Y[_08N]
+    xval, yval = X[_08N:], Y[:_08N]
     return xtr, ytr, xval, yval
 
 
