@@ -133,7 +133,7 @@ def dataloader(X, Y, fold):
 
 
 
-def init(X, opts, init=0):
+def init(X, opts, init='good'):
     """
     This function will generate the initial value for D D0 S S0 and W
     :param X: training data with shape of [N, F,T]
@@ -154,8 +154,7 @@ def init(X, opts, init=0):
         N, F, T = X.shape
     D = torch.rand(opts.C, opts.K, opts.Dh,opts.Dw, device=opts.dev)
     D0 = torch.rand(opts.K0, opts.Dh, opts.Dw, device=opts.dev)
-    if init is not 0 :
-        print('good intialization')
+    if init == 'good' :
         "d is the shape of [16,1,256, 15]"
         d = torch.load('good_intialization.pt').to(opts.dev)
         for i in range(opts.K): D[:,i] = d[:,0]
@@ -182,6 +181,7 @@ def train(X, Y, opts):
     :return: D, D0, S, S0, W, loss
     """
     loss, threshold, opts.offset = torch.tensor([], device=opts.dev), 5e-4, (opts.Dw-1)//2
+    "if batch_size == -1, it means using all data"
     batch_size = opts.batch_size if opts.batch_size > 0 else X.shape[0]
     t, t1 = time.time(), time.time()
     for i in range(opts.maxiter):
@@ -189,9 +189,11 @@ def train(X, Y, opts):
             x, y = X[batch_size * indx:batch_size * (indx + 1)], \
                    Y[batch_size * indx:batch_size * (indx + 1)]
             if x.nelement() == 0: continue  # opts.batch_size==N, x is null
-            if i == 0:
+            if i == 0 and indx == 0:
                 D, D0, S, S0, W = init(x, opts, opts.init)
                 S_numel, S0_numel = S.numel(), S0.numel()
+                if opts.init == 'good':
+                    print('good intialization')
             if i > 0 and S.shape[0] != x.shape[0]:  # if the last batch size is small
                 _, _, S, S0, _ = init(x, opts, opts.init)
                 S_numel, S0_numel = S.numel(), S0.numel()
