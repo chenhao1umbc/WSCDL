@@ -132,7 +132,6 @@ def dataloader(X, Y, fold):
     return xtr, ytr, xval, yval
 
 
-
 def init(X, opts, init='good'):
     """
     This function will generate the initial value for D D0 S S0 and W
@@ -192,10 +191,11 @@ def train(X, Y, opts):
             if i == 0 and indx == 0:
                 D, D0, S, S0, W = init(x, opts, opts.init)
                 S_numel, S0_numel = S.numel(), S0.numel()
-                if opts.init == 'good':
+                if opts.init == 'good' :
                     print('good intialization')
-            if i > 0 and S.shape[0] != x.shape[0]:  # if the last batch size is small
-                _, _, S, S0, _ = init(x, opts, opts.init)
+            elif S.shape[0] != x.shape[0]:  # if the last batch size is small
+                S = torch.zeros(x.shape[0],opts.C,opts.K,1,x.shape[-1],device=opts.dev)
+                S0 = torch.zeros(x.shape[0],opts.K0,1,x.shape[-1],device=opts.dev)
                 S_numel, S0_numel = S.numel(), S0.numel()
 
             loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
