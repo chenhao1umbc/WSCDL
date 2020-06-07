@@ -48,7 +48,7 @@
     <option name="myUseExistingConsole" value="true" />
   </component>
   <component name="RunManager">
-    <configuration name="main_2d" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="temp" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="WSCDL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -60,7 +60,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main_2d.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/temp.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -71,7 +71,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main_2d" />
+        <item itemvalue="Python.temp" />
       </list>
     </recent_temporary>
   </component>
@@ -126,10 +126,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="636" y="218" width="589" height="472" key="#Notifications/0.0.1920.1080@0.0.1920.1080" timestamp="1590677338616" />
-    <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1591498731017">
+    <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1591499149599">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1591498731017" />
+    <state x="600" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1591499149599" />
     <state x="446" y="310" key="FileChooserDialogImpl" timestamp="1590983329287">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -150,22 +150,22 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state width="1211" height="669" key="GridCell.Tab.-1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1590676918420" />
-    <state width="1365" height="806" key="GridCell.Tab.0.bottom" timestamp="1591498915854">
+    <state width="1365" height="806" key="GridCell.Tab.0.bottom" timestamp="1591499128057">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1365" height="806" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1591498915854" />
-    <state width="1365" height="806" key="GridCell.Tab.0.center" timestamp="1591498915851">
+    <state width="1365" height="806" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1591499128057" />
+    <state width="1365" height="806" key="GridCell.Tab.0.center" timestamp="1591499128054">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1365" height="806" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1591498915851" />
-    <state width="1365" height="806" key="GridCell.Tab.0.left" timestamp="1591498915850">
+    <state width="1365" height="806" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1591499128054" />
+    <state width="1365" height="806" key="GridCell.Tab.0.left" timestamp="1591499128052">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1365" height="806" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1591498915850" />
-    <state width="1365" height="806" key="GridCell.Tab.0.right" timestamp="1591498915853">
+    <state width="1365" height="806" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1591499128052" />
+    <state width="1365" height="806" key="GridCell.Tab.0.right" timestamp="1591499128056">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1365" height="806" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1591498915853" />
+    <state width="1365" height="806" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1591499128056" />
     <state width="1211" height="669" key="GridCell.Tab.1.bottom" timestamp="1590676907565">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -199,6 +199,10 @@
     </state>
     <state x="724" y="227" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1586268619043" />
     <state x="696" y="1484" key="com.intellij.ide.util.TipDialog/0.1080.1920.1080/0.0.1920.1080@0.1080.1920.1080" timestamp="1583427448679" />
+    <state x="694" y="238" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1591499126336">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="694" y="238" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1080@0.0.1920.1080" timestamp="1591499126336" />
     <state x="616" y="271" width="672" height="678" key="search.everywhere.popup" timestamp="1590755003374">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
