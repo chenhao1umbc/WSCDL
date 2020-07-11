@@ -739,9 +739,9 @@ def updateD(DD0SS0W, X, Y, opts):
         dck = D[c, k, :]  # shape of [Dh, Dw]
         sck = S[:, c, k, :]  # shape of [N, 1, T]
         Tsck_core = toeplitz_sck_core(sck.squeeze(), [Dh, Dw, T])  # shape of [N, T, Dw], supposed to be [N, T*Dh, Dw*Dh]
-        Md_core = (Tsck_core.abs().permute(0,2,1) @ Tsck_core.abs()).sum(2).sum(0)  # shape of [Dw]
+        Md_core = (Tsck_core.abs().permute(0,2,1) @ Tsck_core.abs()).sum(2).sum(0) + 1e-38 # shape of [Dw]
         Md = Md_core.repeat(Dh)  # shape of [Dh * Dw]
-        Md_inv = (Md + 1e-38) ** (-1)  # shape of [Dh * Dw]
+        Md_inv = Md ** (-1)  # shape of [Dh * Dw]
 
         # dck_conv_sck = Func.conv2d(sck.unsqueeze(1),
         #                            dck.reshape(1, 1, Dh, Dw).flip(2, 3), padding=(255, 1)).squeeze()  # shape of [N,F,T]

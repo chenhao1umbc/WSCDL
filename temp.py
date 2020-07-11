@@ -9,7 +9,7 @@ opts.init, opts.shuffle, opts.show_details = 'good', False, True
 opts.Dh, opts.Dw, opts.batch_size = 256, 15, 3
 opts.lamb, opts.eta, opts.mu = 1, 0.1, 0.01 # for sparsity penalty, label penalty, low rank penalty
 
-# training section
+## training section
 X, Y = load_data(opts, data='mix_train')
 D, D0, S, S0, W, loss = train(X, Y, opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
