@@ -1546,6 +1546,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('None zeros of sparse coefficients')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
+    plt.tight_layout()
 
     plt.figure()
     plt.subplot(211)
@@ -1560,6 +1561,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('None zeros of sparse coefficients - common part')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
+    plt.tight_layout()
 
     plt.figure()
     plt.subplot(121)
@@ -1572,6 +1574,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('Given data')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
+    plt.tight_layout()
 
     plt.figure()
     plt.subplot(121)
@@ -1584,6 +1587,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('Given data, zoomed-in')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
+    plt.tight_layout()
 
     if ft != 0:
         plt.figure()
@@ -1617,13 +1621,13 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
             plt.ylabel('Magnitude')
     # plot labels
     plt.figure()
-    plt.imshow(Y.cpu().numpy(), aspect='auto')
+    plt.imshow(Y.cpu().numpy(), aspect='auto', interpolation='None')
     plt.title('True labels')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
 
     plt.figure()
-    plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', interpolation='None')
     plt.title('Reconstructed labels')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
@@ -1631,7 +1635,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.figure()
     Y_hat[Y_hat>0.5] = 1
     Y_hat[Y_hat<=0.5] = 0
-    plt.imshow(Y_hat.cpu().numpy(), aspect='auto')
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', interpolation='None')
     plt.title('Reconstructed labels after thresholding')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
