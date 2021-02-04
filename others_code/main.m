@@ -52,8 +52,8 @@ for i=1:runs
     [rec(i), prec(i)] = prec_rec(y_hat, valY)
 
     % this part is for the test data  
-    rt = '/home/chenhao1/Hpython/data/';
-%     rt = '/extra/chenhao1/Hpython/data';
+%     rt = '/home/chenhao1/Hpython/data/';  % pensees
+    rt = '/extra/chenhao1/data_sets/AASP/';  % spss6
     load([rt,'test_256by200.mat'])
     X = permute(rs, [2,3,1]);
     x = reshape(X, 256*200, 702);
