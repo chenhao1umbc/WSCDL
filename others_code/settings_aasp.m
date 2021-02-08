@@ -13,7 +13,7 @@ option.display=0;%display the words and probablities;
 %%%%%%load data%%%
 % datastr='synspect_2cluster';
 % load([datastr,'.mat']);
-% rt = '/home/chenhao1/Hpython/data/'; % pensees
+% rt = '/home/chenhao1/Hpython/data/aasp/'; % pensees
 rt = '/extra/chenhao1/data_sets/AASP/'; % spss6
 load([rt,'train_256by200.mat'])
 X = permute(rs, [2,3,1]);

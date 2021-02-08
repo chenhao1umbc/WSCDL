@@ -40,7 +40,7 @@ class OPT:
     lamb is the coeff of sparsity
      nu is the coeff of cross-entropy loss
      """
-    def __init__(self, C=4, K0=1, K=1, Dh=256, Dw=3,\
+    def __init__(self, C=4, K0=1, K=1, Dh=128, Dw=3,\
                  mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
         self.C, self.K, self.K0, self.Dh, self.Dw = C, K, K0, Dh, Dw
         self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.0
@@ -66,25 +66,20 @@ def load_data(opts, data='train', fold=0):
     """
     route = '../data/aasp/'
     if data == 'test':  # x, y are numpy double arrays
-        # x, y = torch.load(route+'aasp_test_80by150.pt')
-        mat = sio.loadmat(route+'test_256by200.mat')
-        x, y = mat['rs'], mat['labels']
+        # mat = sio.loadmat(route+'test_256by200.mat')
+        # x, y = mat['rs'], mat['labels']
+        mat = sio.loadmat(route+'test_128_222.mat')  # normalized
+        x, y = mat['data'], mat['label']
+        x = np.moveaxis(x, -1, 0) # shape of [n_sample, f, t]
 
-    if data =='train' or data == 'val':
-        # x, y = torch.load(route + 'aasp_train_80by150.pt')
-        mat = sio.loadmat(route+'train_256by200.mat')
-        x, y = mat['rs'], mat['labels']
+    else : # data =='train' or data == 'val'
+        # mat = sio.loadmat(route+'train_256by200.mat')
+        # x, y = mat['rs'], mat['labels']
+        mat = sio.loadmat(route+'train_128_880.mat')  # normalized
+        x, y = mat['data'], mat['label']
+        x = np.moveaxis(x, -1, 0) # shape of [n_sample, f, t]
 
-    "This part will make all the mixture data into one pool"
-    if data == 'mix_train' or data == 'mix_val' or data == 'mix_test' :
-        mat = sio.loadmat(route + 'test_256by200.mat')
-        x, y = mat['rs'], mat['labels']
-        mat = sio.loadmat(route + 'train_256by200.mat')
-        xx, yy = mat['rs'], mat['labels']
-        x = np.concatenate((x, xx))
-        y = np.concatenate((y, yy))
-
-    n, f, t = x.shape
+    n, f, t = x.shape  # shape of [n_sample, f, t]
     if opts.shuffle:
         np.random.seed(opts.seed)
         nn = np.arange(x.shape[0])
@@ -93,8 +88,8 @@ def load_data(opts, data='train', fold=0):
     X = torch.from_numpy(x).float().to(opts.dev)  # to GPU or CPU
     Y = torch.from_numpy(y).float().to(opts.dev)  # to GPU or CPU
 
-    # standardization
-    X = (X - X.mean())/X.var().sqrt()
+    # # standardization
+    # X = (X - X.mean())/X.var().sqrt()
 
     if opts.transpose:  X = X.permute(0, 2, 1)
 
@@ -105,12 +100,6 @@ def load_data(opts, data='train', fold=0):
     if data == 'train' : return xtr, ytr
     if data == 'val' : return xval, yval   # validation
     if data == 'test': return  X, Y  # testing
-
-    _08N = int(0.8*n)
-    xtr, ytr, xval, yval= dataloader(X[:_08N], Y[:_08N], fold)
-    if data == 'mix_train': return xtr, ytr
-    if data == 'mix_val': return xval, yval
-    if data == 'mix_test': return X[_08N:], Y[_08N:]
 
 
 def dataloader(X, Y, fold):
@@ -236,10 +225,14 @@ def train(X, Y, opts):
             torch.cuda.empty_cache()
 
         if opts.show_details:
-            if i > 3 and abs((loss[-1] - loss[-6]) / loss[-6]) < threshold: break
+            if i > 3 and abs((loss[-1] - loss[-6]) / loss[-6]) < threshold: 
+                print('loss is not going down-- break')
+                break
             print('In the %1.0f epoch, the training time is :%3.2f \n' % (i, time.time() - t0))
         else:
-            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold: break
+            if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold:
+                print('loss is not going down-- break')
+                break
             if i%3 == 0 : print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
 
     print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
@@ -459,7 +452,7 @@ def toeplitz_dck(dck, Dh_Dw_T):
     for i in range(T):
         indx[i, :] = torch.arange(ind1-i, ind2-i)
     indx = indx.repeat(Dh,1)  #shape of [Dh*T, T]
-    ind0 = torch.arange(0, Dh*dck_padded0.shape[1], dck_padded0.shape[1]).repeat(200,1).t().reshape(Dh*T,1)
+    ind0 = torch.arange(0, Dh*dck_padded0.shape[1], dck_padded0.shape[1]).repeat(T,1).t().reshape(Dh*T,1)
     indx = indx + ind0
     tx = dck_padded0.view(-1)[indx]
     return tx

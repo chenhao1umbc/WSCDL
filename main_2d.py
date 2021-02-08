@@ -7,12 +7,13 @@ from utils2 import *
 #%%
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=1, K=3)
-opts.init, opts.shuffle, opts.show_details = 'good', False, True
-opts.Dh, opts.Dw, opts.batch_size = 256, 15, -1
-opts.lamb, opts.lamb0, opts.eta, opts.mu = 10, 1, 1, 0.1 #sparsity, label, low rank
+# opts.dev = 'cpu'
+opts.init, opts.shuffle, opts.show_details =  'rand', False, True
+opts.Dh, opts.Dw, opts.batch_size = 128, 15, -1
+opts.lamb, opts.lamb0, opts.eta, opts.mu = 1, 0.1, 1, 0.1 #sparsity, label, low rank
 
 #%% training section
-X, Y = load_data(opts, data='train')
+X, Y = load_data(opts, data='train') # shape of [n_sample, f, t]
 D, D0, S, S0, W, loss = train(X, Y, opts)
 if opts.save_results: save_results(D, D0, S, S0, W, opts, loss)
 plot_result(X, Y, D, D0, S, S0, W, ft=0, loss=loss, opts=opts)
