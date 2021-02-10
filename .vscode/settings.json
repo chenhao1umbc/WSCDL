@@ -1,3 +1,8 @@
 {
-    "python.pythonPath": "/home/chenhao1/miniconda3/bin/python"
+    "python.pythonPath": "/home/chenhao1/miniconda3/bin/python",
+    "pylance.reportUnboundVariable":{
+        "Off":"none",
+        "Basic":"none",
+        "Strict":"warning"
+    }
 }
