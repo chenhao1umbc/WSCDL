@@ -41,7 +41,7 @@ class OPT:
      nu is the coeff of cross-entropy loss
      """
     def __init__(self, C=4, K0=1, K=1, Dh=128, Dw=3,\
-                 mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=500, silent=False):
+                 mu=0.1, eta=0.1, lamb=0.1, delta=0.9, maxiter=200, silent=False):
         self.C, self.K, self.K0, self.Dh, self.Dw = C, K, K0, Dh, Dw
         self.mu, self.eta, self.lamb, self.delta, self.lamb2 = mu, eta, lamb, delta, 0.0
         self.lamb0, self.init = 0.1, 0  # seperate lamb for the common term
@@ -853,7 +853,7 @@ def acc_newton(P, q):  # both shape of [M]
     qq = q*q
     if (qq == 0).sum() > 1:
         psi_new = 0  # q is too small
-        print('acc_newton happenend')
+        print('acc_newton psi_new=0 happenend')
         # input()
     else:
         for i in range(maxiter):
@@ -1143,7 +1143,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     """
     loss, threshold = torch.tensor([], device=opts.dev), 5e-4
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
-    print('The initial loss function value is %3.4e:' % loss[-1])
+    print('Sparse coding initial loss function value is %3.4e:' % loss[-1])
     S_numel, S0_numel = S.numel(), S0.numel()
     S, S0 = S.clone(), S0.clone()
     for i in range(opts.maxiter):
@@ -1172,7 +1172,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
             if i > 3 and abs((loss[-1] - loss[-2]) / loss[-2]) < threshold:
                 print('break condition loss value diff satisfied')
                 break
-            if support_diff(S, Sold) < 0.003:
+            if support_diff(S, Sold) < 0.001:
                 print('break condition support diff satisfied')
                 break
             if i%3 == 0 : print('In the %1.0f epoch, the sparse coding time is :%3.2f' % ( i, time.time() - t0 ))

@@ -27,12 +27,12 @@ for Dw in [5, 3, 7, 10]:
                     save_results(D, D0, S, S0, W, opts, loss)
                     _, _, S_t, S0_t, _ = init(X_val, opts)
                     acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_val, Y_val, opts)
-                    print('\nThe test data accuracy, recall and precision are : ', acc.acc, acc.recall, acc.f1)
+                    print('The validation accuracy, recall and precision are : ', acc.acc, acc.recall, acc.f1)
 
 
 #%% just validation section, supposed that training is done
 D, D0, S, S0, W, opts, loss = torch.load(
-    '../saved_dicts/[3, 1, 5, 1, 1, 0.1]DD0SS0Woptsloss.pt')
+    '../saved_dicts/[3, 1, 5, 0.1, 1, 0.1]DD0SS0Woptsloss.pt')
 X_val, Y_val = load_data(opts, data='val')
 _, _, S_t, S0_t, _ = init(X_val, opts, init='rand')
 acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_val, Y_val, opts)
