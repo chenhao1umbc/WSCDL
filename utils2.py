@@ -121,7 +121,7 @@ def dataloader(X, Y, fold):
     return xtr, ytr, xval, yval
 
 
-def init(X, opts, init='good'):
+def init(X, opts, init='rand'):
     """
     This function will generate the initial value for D D0 S S0 and W
     :param X: training data with shape of [N, F,T]
@@ -360,7 +360,8 @@ def save_results(D, D0, S, S0, W, opts, loss):
     :param W: The pre-trained projection, shape of [C, K]
     """
     param = str([opts.K, opts.K0, opts.Dw, opts.lamb, opts.eta , opts.mu])
-    torch.save([D, D0, S, S0, W, opts, loss], '../'+param+'DD0SS0Woptsloss'+tt().strftime("%y%m%d_%H_%M_%S")+'.pt')
+    time_stap = tt().strftime("%y%m%d_%H_%M_%S")
+    torch.save([D, D0, S, S0, W, opts, loss], '../saved_dicts/'+param+'DD0SS0Woptsloss.pt')
 
 
 def updateS(DD0SS0W, X, Y, opts):
