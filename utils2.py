@@ -359,7 +359,7 @@ def save_results(D, D0, S, S0, W, opts, loss):
     :param S0: initial value, shape of [N,K0,T]
     :param W: The pre-trained projection, shape of [C, K]
     """
-    param = str([opts.K, opts.K0, opts.Dw, opts.lamb, opts.eta , opts.mu])
+    param = str([opts.K, opts.K0, opts.Dw, opts.lamb, opts.lamb0, opts.eta , opts.mu])
     time_stap = tt().strftime("%y%m%d_%H_%M_%S")
     torch.save([D, D0, S, S0, W, opts, loss], '../saved_dicts/'+param+'DD0SS0Woptsloss.pt')
 
@@ -855,8 +855,7 @@ def acc_newton(P, q):  # both shape of [M]
     qq = q*q
     if (qq == 0).sum() > 1:
         psi_new = 0  # q is too small
-        print('acc_newton psi_new=0 happenend')
-        # input()
+        # print('acc_newton psi_new=0 happenend')
     else:
         for i in range(maxiter):
             f_grad = -2 * ((P+psi)**(-3) * qq).sum()

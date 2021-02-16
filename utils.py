@@ -1669,7 +1669,7 @@ def test(D, D0, S, S0, W, X, Y, opts):
     """
     loss, threshold = torch.tensor([], device=opts.dev), 1e-5
     loss = torch.cat((loss, loss_fun_test(X, D, D0, S, S0, opts).reshape(1)))
-    print('The initial loss function value is %3.4e:' % loss[-1])
+    print('Sparse coding initial loss function value is %3.4e:' % loss[-1])
     S_numel, S0_numel = S.numel(), S0.numel()
     S, S0 = S.clone(), S0.clone()
     for i in range(opts.maxiter):
