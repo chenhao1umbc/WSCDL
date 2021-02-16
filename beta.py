@@ -22,12 +22,14 @@ for Dw in [5, 3, 7, 10]:
         for lamb_ratio in [0.5, 0.1, 0.05, 0.01]:
             for eta in [0.1, 1, 10, 0.01]:
                 for mu in [0.1, 1, 10, 0.01]:
-                    opts.lamb, opts.lamb0, opts.eta, opts.mu = lamb, lamb_ratio*lamb, eta, mu 
+                    opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
+                                        Dw, lamb, lamb_ratio*lamb, eta, mu 
                     D, D0, S, S0, W, loss = train(X, Y, opts)
                     save_results(D, D0, S, S0, W, opts, loss)
                     _, _, S_t, S0_t, _ = init(X_val, opts)
                     acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_val, Y_val, opts)
-                    print('The validation accuracy, recall and precision are : ', acc.acc, acc.recall, acc.f1)
+                    print('The validation accuracy, recall and precision are : ',\
+                             acc.acc, acc.recall, acc.f1)
 
 
 #%% just validation section, supposed that training is done
@@ -39,6 +41,5 @@ acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_val, Y_val, opts)
 print('\nThe test data accuracy, recall and precision are : ', acc.acc, acc.recall, acc.f1)
 plot_result(X_val, Y_val, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
 print('done')
-
 
 # %%

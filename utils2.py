@@ -545,7 +545,8 @@ def loss_Sck(Tdck, b, sc, sck, wc, wkc, yc, opts):
     sparse = opts.lamb * sck.abs().sum()
     label = opts.eta * g_sck_wc
     loss = fidelity + sparse + label
-    if label < 0 or torch.isnan(label).sum() > 0: print(stop)
+    if label < 0 or torch.isnan(label).sum() > 0: 
+        print('NaN happened in loss Sck, when calc. labels')
     return loss
 
 
@@ -574,7 +575,8 @@ def loss_Sck_special(Tdck, b, sc, sck, wc, wkc, yc, opts):
     fidelity = 2*(Tdck@sck.t() - b.t()).norm()**2
     sparse = opts.lamb * sck.abs().sum()
     label = opts.eta * g_sck_wc
-    if label <0 or torch.isnan(label).sum()>0 :print(stop)
+    if label <0 or torch.isnan(label).sum()>0 :
+        print('NaN happened in loss Sck_special, when calc. labels')
     return fidelity.item(), sparse.item(), label.item()
 
 
@@ -865,7 +867,7 @@ def acc_newton(P, q):  # both shape of [M]
             else:
                 psi = psi_new.clone()
     dck = -((P + psi_new)**(-1)) * q
-    if torch.isnan(dck).sum() > 0: print(inf_nan_happenned)
+    if torch.isnan(dck).sum() > 0: print('inf_nan_happenned in update dck')
     return dck
 
 
@@ -925,7 +927,7 @@ def updateD0(DD0SS0, X, Y, opts):
         # print('D0 loss function value before update is %3.2e:' %loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
         D0[k0, :] = solv_dck0(dk0, Md, Md_inv, opts.delta, 2*Tsnk0_core, b, D0, opts.mu * N, k0)
         # print('D0 loss function value after update is %3.2e:' % loss_D0(2*Tsnk0_t, dk0, b, D0, opts.mu*N))
-        if torch.isnan(D0).sum() + torch.isinf(D0).sum() > 0: print(inf_nan_happenned)
+        if torch.isnan(D0).sum() + torch.isinf(D0).sum() > 0: print('inf_nan_happenned in update D0')
     return D0
 
 
@@ -1040,7 +1042,7 @@ def updateW(SW, Y, opts):
         # print('After bpgm wc loss is : %1.3e'
         #       % loss_W(S[:, c, :, :].clone().unsqueeze(1), W[c, :].reshape(1, -1), Y[:, c].reshape(N, -1)))
         # print('the loss_W for updating W %1.3e' %loss_W(S, W, Y))
-    if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print(inf_nan_happenned)
+    if torch.isnan(W).sum() + torch.isinf(W).sum() > 0: print('inf_nan_happenned in update W')
     return W
 
 
@@ -1279,7 +1281,7 @@ def updateS_test(DD0SS0, X, opts):
         torch.cuda.empty_cache()
 
         S[:, c, k, :] = solv_sck_test(S[:, c, :].squeeze(2), Tdck, b.reshape(N, FT), k, opts.delta, opts.lamb, opts.lamb2)
-        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print(inf_nan_happenned)
+        if torch.isnan(S).sum() + torch.isinf(S).sum() >0 : print('inf_nan_happenned in update S')
     return S
 
 
