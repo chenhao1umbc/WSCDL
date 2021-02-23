@@ -1,5 +1,5 @@
 """demo"""
-
+#%%
 from utils import *
 opts = OPT()
 
@@ -73,3 +73,5 @@ if torch.cuda.is_available():
     print('Without for-loop time is:', time.time() - t)
 
 
+
+# %%

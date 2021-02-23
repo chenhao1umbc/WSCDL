@@ -21,7 +21,7 @@ X, Y = load_data(opts, data='train') # shape of [n_sample, f, t]
 X_val, Y_val = load_data(opts, data='val')
 
 #%% training section
-for Dw in [3, 5, 7, 10]:
+for Dw in [3, 5, 7, 11]:
     for lamb in [0.1, 0.01, 0.001]:
         for lamb_ratio in [0.5, 0.1, 0.01]:
             for eta in [0.1, 0.01, 1]:
