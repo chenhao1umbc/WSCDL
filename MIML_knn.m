@@ -5,18 +5,22 @@ clc
 addpath('./MLkNN')
 
 % load training data
-load('/home/chenhao1/Hpython/data/aasp/train_128_880.mat')
-tr_data = reshape(data, [128*128, 880]);
-tr_data = tr_data';
-label(label==0) = -1;
-tr_label = label';  %
+load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
+tr_data = zeros(800,50000);
+for i= 1:800
+    tr_data(i, :) = squeeze(X(i, :));
+end
+Y(Y==0) = -1;
+tr_label = Y';
 
 % laod testing data
-load('/home/chenhao1/Hpython/data/aasp/test_128_222.mat')
-te_data = reshape(data, [128*128, 222]);
-te_data = te_data';
-label(label==0) = -1;
-te_label = label';
+load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_te.mat')
+te_data = zeros(200,50000);
+for i= 1:200
+    tr_data(i, :) = squeeze(X(i, :));
+end
+Y(Y==0) = -1;
+te_label = Y';
 
 %% run MIML knn 
 k = 7;
