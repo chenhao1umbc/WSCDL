@@ -13,12 +13,12 @@ from utils2 import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=16, K0=1, K=2)
 opts.init, opts.shuffle, opts.show_details = 'rand', False, False
-opts.Dh, opts.Dw, opts.batch_size = 128, 5, -1
+opts.Dh, opts.Dw, opts.batch_size = 100, 5, -1
 opts.lamb, opts.lamb0, opts.eta, opts.mu = 1, 0.1, 1, 0.1 #sparsity, label, low rank
 
 #%% load data
-X, Y = load_data(opts, data='train') # shape of [n_sample, f, t]
-X_val, Y_val = load_data(opts, data='val')
+X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
+X_val, Y_val, yy_val = load_data(opts, data='val')
 
 #%% training section
 for Dw in [3, 5, 7, 11]:
