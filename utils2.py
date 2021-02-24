@@ -58,13 +58,15 @@ class OPT:
             if not silent: print('\nRunning on CPU')
 
 
-def load_data(opts, data='test', fold=0):
+def load_data(opts, data='test', route=''):
     """
     This function will load the preprocessed AASP dataset, train and val are in one set, test is the other dataset
     :param opts: only need teh cpu or gpu info
     :return: training, validation or testing data
     """
-    route = '../data/ESC10/'
+    if route == '':
+        route = '../data/ESC10/'
+        
     if data == 'test':  
         mat = sio.loadmat(route+'esc10_te.mat')  # normalized
         x, y, yy = mat['X'], mat['Y'], mat['yy']
