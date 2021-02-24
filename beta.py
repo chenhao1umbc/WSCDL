@@ -11,9 +11,9 @@ from utils2 import *
 
 #%% Init parameters
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-opts = OPT(C=16, K0=1, K=2)
+opts = OPT(C=10, K0=1, K=2)
 opts.init, opts.shuffle, opts.show_details = 'rand', False, False
-opts.Dh, opts.Dw, opts.batch_size = 100, 5, -1
+opts.Dh, opts.Dw, opts.batch_size = 100, 25, -1
 opts.lamb, opts.lamb0, opts.eta, opts.mu = 1, 0.1, 1, 0.1 #sparsity, label, low rank
 
 #%% load data
@@ -21,15 +21,16 @@ X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
 X_val, Y_val, yy_val = load_data(opts, data='val')
 
 #%% training section
-for Dw in [3, 5, 7, 11]:
+for Dw in [15, 21, 25, 29, 35]:
     for lamb in [0.1, 0.01, 0.001]:
-        for lamb_ratio in [0.5, 0.1, 0.01]:
+        for lamb_ratio in [1, 0.5, 0.1 ]:
             for eta in [0.1, 0.01, 1]:
                 for mu in [0.1, 0.01, 1]:
                     opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
                                         Dw, lamb, lamb_ratio*lamb, eta, mu 
                     D, D0, S, S0, W, loss = train(X, Y, opts)
                     save_results(D, D0, S, S0, W, opts, loss)
+                    
                     _, _, St, S0t, _ = init(X_val, opts)
                     acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_val, Y_val, opts)
                     print('The validation accuracy, recall and precision are : ',\

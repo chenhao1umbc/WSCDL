@@ -30,4 +30,24 @@ print('The validation accuracy, recall and precision are : ',\
             acc.acc, acc.recall, acc.f1)
 
 
+# %% check results
+fig= plt.figure()
+fig.set_size_inches(w=12, h=8)
+plt.imshow(y_hat.cpu(),aspect='auto', interpolation='None')
+plt.title('y_hat')
+
+fig= plt.figure()
+fig.set_size_inches(w=12, h=8)
+yt = y_hat.clone()
+thr = 0.3
+yt[yt>=thr] = 1
+yt[yt<thr] = 0
+plt.imshow(yt.cpu(),aspect='auto', interpolation='None')
+plt.title(f'y_hat with threshold {thr}')
+
+fig= plt.figure()
+fig.set_size_inches(w=12, h=8)
+plt.imshow(Y_val.cpu(),aspect='auto', interpolation='None')
+plt.title('Y')
+
 # %%
