@@ -198,33 +198,33 @@ def train(X, Y, opts):
             if opts.show_details:
                 loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
                 print('pass S, time is %3.2f' % (time.time() - t)); t = time.time()
-                print('loss function value is %3.4e:' %loss[-1])
+                print('loss function value is %3.4e' %loss[-1])
                 print('check sparsity, None-zero percentage is : %1.4f' % (1-(S==0).sum().item()/S_numel))
 
             S0 = updateS0([D, D0, S, S0], x, y, opts) if opts.common_term else S0
             if opts.show_details:
                 loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
                 print('pass S0, time is %3.2f' % (time.time() - t)); t = time.time()
-                print('loss function value is %3.4e:' %loss[-1])
+                print('loss function value is %3.4e' %loss[-1])
                 print('check sparsity, None-zero percentage is : %1.4f' % (1-(S0==0).sum().item()/S0_numel))
 
             D = updateD([D, D0, S, S0, W], x, y, opts)
             if opts.show_details:
                 loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
                 print('pass D, time is %3.2f' % (time.time() - t)); t = time.time()
-                print('loss function value is %3.4e:' %loss[-1])
+                print('loss function value is %3.4e' %loss[-1])
 
             D0 = updateD0([D, D0, S, S0], x, y, opts) if opts.common_term else D0
             if opts.show_details:
                 loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
                 print('pass D0, time is %3.2f' % (time.time() - t)); t = time.time()
-                print('loss function value is %3.4e:' %loss[-1])
+                print('loss function value is %3.4e' %loss[-1])
 
             W = updateW([S, W], y, opts)
             loss = torch.cat((loss, loss_fun(x, y, D, D0, S, S0, W, opts).reshape(1)))
             if opts.show_details:
                 print('pass W, time is %3.2f' % (time.time() - t)); t = time.time()
-                print('loss function value is %3.4e:' %loss[-1])
+                print('loss function value is %3.4e' %loss[-1])
             torch.cuda.empty_cache()
 
         if opts.show_details:
@@ -238,8 +238,8 @@ def train(X, Y, opts):
                 break
             if i%3 == 0 : print('In the %1.0f epoch, the training time is :%3.2f' % (i, time.time() - t0))
 
-    print('After %1.0f epochs, the loss function value is %3.4e:' % (i, loss[-1]))
-    print('All done, the total running time is :%3.2f \n' % (time.time() - t1))
+    print('After %1.0f epochs, the loss function value is %3.4e' % (i, loss[-1]))
+    print('All done, the total running time is %3.2f \n' % (time.time() - t1))
     return D, D0, S, S0, W, loss
 
 

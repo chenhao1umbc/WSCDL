@@ -7,18 +7,19 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=10, K0=1, K=2)
 opts.init, opts.shuffle, opts.show_details = 'rand', False, True
 opts.Dh, opts.Dw, opts.batch_size = 100, 25, -1
-opts.lamb, opts.lamb0, opts.eta, opts.mu = 1, 0.1, 1, 0.1 #sparsity, label, low rank
+opts.lamb, opts.lamb0, opts.eta, opts.mu = 0.1, 0.1, 1, 0.1 #sparsity, label, low rank
 
 #%% training section
 X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
 D, D0, S, S0, W, loss = train(X, Y, opts)
 
-#%% visualize learn atoms
+#%% visualize learned atoms
 for i in range(10):
     fig= plt.figure()
     fig.set_size_inches(w=12, h=8)
     d = D[i].permute(0,2,1).reshape(opts.Dh, opts.K*opts.Dw).cpu()
     plt.imshow(d, aspect='auto', interpolation='None')
+    plt.title(f'Class {i} atoms')
 
 
 #%% testing section
