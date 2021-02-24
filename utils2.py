@@ -58,48 +58,51 @@ class OPT:
             if not silent: print('\nRunning on CPU')
 
 
-def load_data(opts, data='train', fold=0):
+def load_data(opts, data='test', fold=0):
     """
     This function will load the preprocessed AASP dataset, train and val are in one set, test is the other dataset
     :param opts: only need teh cpu or gpu info
     :return: training, validation or testing data
     """
-    route = '../data/aasp/'
-    if data == 'test':  # x, y are numpy double arrays
-        # mat = sio.loadmat(route+'test_256by200.mat')
-        # x, y = mat['rs'], mat['labels']
-        mat = sio.loadmat(route+'test_128_222.mat')  # normalized
-        x, y = mat['data'], mat['label']
-        x = np.moveaxis(x, -1, 0) # shape of [n_sample, f, t]
+    route = '../data/ESC10/'
+    if data == 'test':  
+        mat = sio.loadmat(route+'esc10_te.mat')  # normalized
+        x, y, yy = mat['X'], mat['Y'], mat['yy']
 
-    else : # data =='train' or data == 'val'
-        # mat = sio.loadmat(route+'train_256by200.mat')
-        # x, y = mat['rs'], mat['labels']
-        mat = sio.loadmat(route+'train_128_880.mat')  # normalized
-        x, y = mat['data'], mat['label']
-        x = np.moveaxis(x, -1, 0) # shape of [n_sample, f, t]
+    else : # x shape of [n,f,t], y is bag label, yy is per instance label
+        mat = sio.loadmat(route+'esc10_tr.mat')  # normalized
+        x, y, yy = mat['X'], mat['Y'], mat['yy']
 
     n, f, t = x.shape  # shape of [n_sample, f, t]
     if opts.shuffle:
         np.random.seed(opts.seed)
         nn = np.arange(x.shape[0])
         np.random.shuffle(nn)
-        x, y = x[nn], y[nn]
-    X = torch.from_numpy(x).float().to(opts.dev)  # to GPU or CPU
-    Y = torch.from_numpy(y).float().to(opts.dev)  # to GPU or CPU
+        x, y, yy = x[nn], y[nn], yy[nn]
 
-    # # standardization
-    # X = (X - X.mean())/X.var().sqrt()
+    if opts.transpose:  x = np.moveaxis(x, 2, 1)
 
-    if opts.transpose:  X = X.permute(0, 2, 1)
+    if data == 'test': 
+        te = to_tensor(x, opts.dev), to_tensor(y, opts.dev), to_tensor(yy, opts.dev)
+        return  te  # testing
 
-    indx = torch.arange(n)
-    ind, ind2 = indx[indx%4 !=0], indx[indx%4 ==0]
-    xtr, ytr = X[ind, :], Y[ind, :]
-    xval, yval = X[::4, :], Y[::4, :]
-    if data == 'train' : return xtr, ytr
-    if data == 'val' : return xval, yval   # validation
-    if data == 'test': return  X, Y  # testing
+    elif data == 'train':
+        indx = torch.arange(n)
+        ind = indx[indx%4 !=0]
+        x_tr, y_tr, yy_tr = x[ind, :], y[ind, :], yy[ind]        
+        tr = to_tensor(x_tr, opts.dev), to_tensor(y_tr, opts.dev), to_tensor(yy_tr, opts.dev)
+        return tr
+
+    else:
+        indx = torch.arange(n)
+        ind2 = indx[indx%4 ==0]
+        x_val, y_val, yy_val = x[ind2, :], y[ind2, :], yy[ind2]
+        val = to_tensor(x_val, opts.dev), to_tensor(y_val, opts.dev), to_tensor(yy_val, opts.dev)
+        return val
+
+
+def to_tensor(x, dev):
+    return torch.from_numpy(x).float().to(dev)
 
 
 def dataloader(X, Y, fold):
