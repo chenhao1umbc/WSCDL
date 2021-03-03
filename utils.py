@@ -24,7 +24,7 @@ tt = datetime.datetime.now
 np.set_printoptions(linewidth=160)
 torch.set_printoptions(linewidth=160)
 torch.backends.cudnn.deterministic = True
-seed = 100
+seed = 10
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
@@ -43,6 +43,7 @@ class OPT:
         self.dataset, self.show_details, self.save_results = 0, True, True
         self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, True  # n is number of examples per combination for toy data
         self.common_term = True*K0  # if common term exist
+        self.savefig = False # save plots
         self.shape = '1d' # input data is 1d or 2d, 1d could be vectorized 2d data
         if torch.cuda.is_available():
             self.dev = 'cuda'
@@ -1547,7 +1548,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.tight_layout()
-    plt.savefig('figures/sparse_coefficients.eps', format='eps')
+    if opts.savefig : plt.savefig('figures/sparse_coefficients.eps', format='eps')
 
     plt.figure()
     plt.subplot(211)
@@ -1563,7 +1564,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.tight_layout()
-    plt.savefig('figures/common_coefficients.eps', format='eps')
+    if opts.savefig : plt.savefig('figures/common_coefficients.eps', format='eps')
 
     plt.figure()
     plt.subplot(121)
@@ -1577,7 +1578,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.tight_layout()
-    plt.savefig('figures/Reconstruted.eps', format='eps')
+    if opts.savefig : plt.savefig('figures/Reconstruted.eps', format='eps')
 
     plt.figure()
     plt.subplot(121)
@@ -1591,7 +1592,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     plt.tight_layout()
-    plt.savefig('figures/Reconstruted_zoomed.eps', format='eps')
+    if opts.savefig : plt.savefig('figures/Reconstruted_zoomed.eps', format='eps')
 
     if ft != 0:
         plt.figure()
@@ -1600,7 +1601,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
         plt.xlabel('Epoch index')
         plt.ylabel('Magnitude')
         plt.grid()
-        plt.savefig('figures/Loss_function.eps', format='eps')
+        if opts.savefig : plt.savefig('figures/Loss_function.eps', format='eps')
         if opts.show_details:
             l = loss.clone()
             l[:]= torch.log(torch.tensor(-1.0))
@@ -1616,7 +1617,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
         plt.legend(['Learned feature', 'Ground truth'])
         plt.xlabel('Time index')
         plt.ylabel('Magnitude')
-        plt.savefig('figures/comm_feat.eps', format='eps')
+        if opts.savefig : plt.savefig('figures/comm_feat.eps', format='eps')
 
         for i in range(4):
             plt.figure()
@@ -1626,21 +1627,21 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
             plt.legend(['Learned feature', 'Ground truth'])
             plt.xlabel('Time index')
             plt.ylabel('Magnitude')
-            plt.savefig(f'figures/feature{i}.eps', format='eps')
+            if opts.savefig : plt.savefig(f'figures/feature{i}.eps', format='eps')
     # plot labels
     plt.figure()
     plt.imshow(Y.cpu().numpy(), aspect='auto', interpolation='None')
     plt.title('True labels')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
-    plt.savefig('figures/true_labels.eps', format='eps')
+    if opts.savefig : plt.savefig('figures/true_labels.eps', format='eps')
 
     plt.figure()
     plt.imshow(Y_hat.cpu().numpy(), aspect='auto', interpolation='None')
     plt.title('Reconstructed labels')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
-    plt.savefig('figures/rec_labels.eps', format='eps')
+    if opts.savefig : plt.savefig('figures/rec_labels.eps', format='eps')
 
     plt.figure()
     Y_hat[Y_hat>0.5] = 1
@@ -1649,7 +1650,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.title('Reconstructed labels after thresholding')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
-    plt.savefig('figures/rec_labels_thr.eps', format='eps')
+    if opts.savefig : plt.savefig('figures/rec_labels_thr.eps', format='eps')
     # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)
     # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up in a new figure
 

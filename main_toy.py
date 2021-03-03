@@ -6,17 +6,21 @@ from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 opts = OPT()
 opts.snr = 10
-opts.lamb = 2.7 # for sparsity penalty
-opts.eta = 3 # for label penalty
-opts.mu = 0.1  # for low rank penalty
+opts.lamb = 5 # for sparsity penalty
+opts.eta = 10 # for label penalty
+opts.mu = 10  # for low rank penalty
+opts.savefig = False # save plots
 opts.show_details = False  # default as true
 
 #%% training section
 X, Y, opts.ft = load_toy(opts)  # opts.ft saved all the true features
+X, Y = X[4*opts.n:], Y[4*opts.n:]
 D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
-# plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
+plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
 
+# %%
+seed
 #%% testing section
 X_test, Y_test, _ = load_toy(opts, test='cv')
 _, _, S_t, S0_t, _ = init(X_test, opts)
