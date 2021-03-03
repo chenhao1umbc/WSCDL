@@ -5,26 +5,22 @@ clc
 addpath(genpath('./MIMLBoost_MIMLSVM'))
 
 % load training data
-load('/home/chenhao1/Hpython/data/aasp/train_128_880.mat')
-tr_data = reshape(data, [128*128, 880]);
-temp = tr_data';  % shape of [n_sample, n_dimension]
-tr_data = cell(880,1);
-for i= 1:880
-    tr_data{i} = temp(i, :);
+load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
+tr_data = cell(800,1);
+for i= 1:800
+    tr_data{i} = squeeze(X_bag(i, 1:5, :));
 end
-label(label==0) = -1;
-tr_label = label';
+Y(Y==0) = -1;
+tr_label = Y';
 
 % laod testing data
-load('/home/chenhao1/Hpython/data/aasp/test_128_222.mat')
-te_data = reshape(data, [128*128, 222]);
-temp = te_data';  % shape of [n_sample, n_dimension]
-te_data = cell(222,1);
-for i= 1:222
-    te_data{i} = temp(i, :);
+load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_te.mat')
+te_data = cell(200,1);
+for i= 1:200
+    te_data{i} = squeeze(X_bag(i, 1:5, :));
 end
-label(label==0) = -1;
-te_label = label';
+Y(Y==0) = -1;
+te_label = Y';
 
 %% run MIML svm 
 % for details please refer ./MIMLBoost_MIMLSVM/sample.m
