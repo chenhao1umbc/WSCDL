@@ -5,7 +5,7 @@ close all;
 addpath('WSCADL-YOU_master')
 
 %% run toy data  --tested it works fine
-% run setting
+% run setting_toy
 % acc = zeros(5, 1); 
 % for i=1:runs
 %     permidx(i,:)=randperm(No_spect);
