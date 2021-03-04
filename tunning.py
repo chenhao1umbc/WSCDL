@@ -50,13 +50,52 @@ fig.set_size_inches(w=12, h=8)
 plt.imshow(Y_val.cpu(),aspect='auto', interpolation='None')
 plt.title('Y')
 
-# %%
+# %% analysis result
 record = torch.load('tunning.pt')
-root = 'tunning_'
-names_pool = ('7', '15_21', '25_2', '25', '29', '29_2', '35', '35_2', '45')
-for n in names_pool:
-    record = record + torch.load(root+n+'.pt')
+n = len(record)
+res = torch.rand(n, 3)
+param = torch.rand(n,5)
+for i,v in enumerate(record):
+    res[i] = torch.tensor(v[0])
+    param[i] = torch.tensor(v[1])
+value, index = res.max(0)
+print('max vlaues :', value)
 
-# %%
-torch.save(record, 'tunning.pt')
+for i in index:
+    print([i], param[i])
+
+               
+# a function of given parameters to return the result tensors
+def get_result(res, param, Dw=0, lamb=0, lamb0=0, eta=0, mu=0):
+    """ if Dw, lamb etc. is 0, that means coresponding column are all selected
+        otherwise Dw etc. is a value from its pool,e.g.
+        pool_Dw = [ 7., 15., 21., 25., 29., 35., 45.]
+        Dw = 7. or Dw=15.
+
+        param has the shape of [n_record, 5]
+        each of the 5 columns means [Dw, lamb, lamb0, eta, mu]
+
+        res has the shape of [[n_record, 5]]
+        each of the 3 columns means [acc, recall, F1]
+    """
+    # find the indecies of given param
+    n = param.shape[0]
+    idx = torch.arange(n)
+    if Dw!=0 : 
+        res_ind = idx[param[:,0] == Dw]
+    else:
+        res_ind = idx.clone()
+
+    if lamb!=0: res_ind = np.intersect1d(idx[param[:,1] == lamb], res_ind)
+    if lamb0 !=0: res_ind = np.intersect1d(idx[param[:,2] == lamb0], res_ind)
+    if eta !=0: res_ind = np.intersect1d(idx[param[:,3] == eta], res_ind)
+    if mu !=0: res_ind = np.intersect1d(idx[param[:,4] == mu], res_ind)
+
+    return res[res_ind], res_ind
+
+r, idx = get_result(res, param, Dw=0, lamb=0.1, lamb0=0.1, eta=0.01, mu=0.1)
+print(r)
+print(param[idx])
+
+
 # %%
