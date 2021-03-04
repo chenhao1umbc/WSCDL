@@ -19,14 +19,12 @@ D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
 
-# %%
-seed
 #%% testing section
 X_test, Y_test, _ = load_toy(opts, test='cv')
 _, _, S_t, S0_t, _ = init(X_test, opts)
 acc, y_hat, S_t, S0_t, loss_t = test(D, D0, S_t, S0_t, W, X_test, Y_test, opts)
 print('\nThe test data accuracy is : ', acc.acc)
-# plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
+plot_result(X_test, Y_test, D, D0, S_t, S0_t, W, ft=0, loss=loss_t, opts=opts)
 print('done')
 
 # %%

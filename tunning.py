@@ -51,3 +51,12 @@ plt.imshow(Y_val.cpu(),aspect='auto', interpolation='None')
 plt.title('Y')
 
 # %%
+record = torch.load('tunning.pt')
+root = 'tunning_'
+names_pool = ('7', '15_21', '25_2', '25', '29', '29_2', '35', '35_2', '45')
+for n in names_pool:
+    record = record + torch.load(root+n+'.pt')
+
+# %%
+torch.save(record, 'tunning.pt')
+# %%
