@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, "lib")
 
 # from DeepMIML.lib.cocodemo import COCODataset, COCODataLayer
-from DeepMIML.lib.deepmiml.deepmiml import DeepMIML
+from Deep_MIML_repr.deepmiml import DeepMIML
 from DeepMIML.lib.deepmiml.utils import save_keras_model
 from Deep_MIML_repr.vgg_16 import VGG_16
 
@@ -24,19 +24,16 @@ L = 80
 K = 20
 model_name = "miml_vgg_16"
 
-# crate data layer
-# dataset = COCODataset("data/coco", "train", "2014")
-# data_layer = COCODataLayer(dataset, batch_size=batch_size)
-
 # vgg_model_path = "models/imagenet/vgg/vgg16_weights.h5"
 base_model = VGG_16()
 base_model = Sequential(layers=base_model.layers[: -7])
-base_model.add(Convolution2D(512, 1, 1, activation="relu"))
+base_model.add(Convolution2D(512, 1, activation="relu"))
 base_model.add(Dropout(0.5))
-#%%
+
 deepmiml = DeepMIML(L=L, K=K, base_model=base_model)
 # deepmiml.model.summary()
 
+#%%
 print("Compiling Deep MIML Model...")
 deepmiml.model.compile(optimizer="adadelta", loss=loss, metrics=["accuracy"])
 
