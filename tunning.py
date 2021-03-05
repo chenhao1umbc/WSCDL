@@ -97,5 +97,5 @@ r, idx = get_result(res, param, Dw=0, lamb=0.1, lamb0=0.1, eta=0.01, mu=0.1)
 print(r)
 print(param[idx])
 
-
+#TODO lamb0 is and eta are on the boundary, lamb0 gets larger, eta gets smaller to see the result
 # %%
