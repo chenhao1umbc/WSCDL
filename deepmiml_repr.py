@@ -1,8 +1,9 @@
 #%% load package
+import tensorflow as tf
 from __future__ import print_function
-from keras.models import Sequential
-from keras.layers import Dropout
-from keras.layers.convolutional import Convolution2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dropout
+from tensorflow. keras.layers import Convolution2D
 import sys
 sys.path.insert(0, "lib")
 

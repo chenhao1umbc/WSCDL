@@ -1,7 +1,7 @@
-from keras import backend as K
-from keras.models import Sequential
-from keras.layers.core import Reshape, Permute, Activation
-from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from tensorflow.keras import backend as K
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Reshape, Permute, Activation
+from tensorflow.keras.layers import Convolution2D, MaxPooling2D
 
 
 MIML_FIRST_LAYER_NAME = "miml/first_layer"
