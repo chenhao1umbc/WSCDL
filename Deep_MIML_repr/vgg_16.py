@@ -75,5 +75,6 @@ def VGG_16(weights_path=None):
 
     if weights_path:
         model.load_weights(weights_path)
+        print('VGG16 weights are successfully loaded')
 
     return model
