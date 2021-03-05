@@ -1,7 +1,7 @@
 import os.path as osp
 
-from cocodemo.coco_dataset import COCODataset
-from cocodemo.coco_data_layer import COCODataLayer
+# from cocodemo.coco_dataset import COCODataset
+# from cocodemo.coco_data_layer import COCODataLayer
 
 
 def get_coco_cls_names():

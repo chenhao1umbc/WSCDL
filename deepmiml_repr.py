@@ -6,10 +6,10 @@ from keras.layers.convolutional import Convolution2D
 import sys
 sys.path.insert(0, "lib")
 
-from lib.cocodemo import COCODataset, COCODataLayer
-from lib.deepmiml.deepmiml import DeepMIML
-from lib.deepmiml.utils import save_keras_model
-from lib.cocodemo.vgg_16 import VGG_16
+# from DeepMIML.lib.cocodemo import COCODataset, COCODataLayer
+from DeepMIML.lib.deepmiml.deepmiml import DeepMIML
+from DeepMIML.lib.deepmiml.utils import save_keras_model
+from DeepMIML.lib.cocodemo.vgg_16 import VGG_16
 
 #%%
 loss = "binary_crossentropy"
@@ -20,15 +20,15 @@ K = 20
 model_name = "miml_vgg_16"
 
 # crate data layer
-dataset = COCODataset("data/coco", "train", "2014")
-data_layer = COCODataLayer(dataset, batch_size=batch_size)
+# dataset = COCODataset("data/coco", "train", "2014")
+# data_layer = COCODataLayer(dataset, batch_size=batch_size)
 
 vgg_model_path = "models/imagenet/vgg/vgg16_weights.h5"
 base_model = VGG_16(vgg_model_path)
 base_model = Sequential(layers=base_model.layers[: -7])
 base_model.add(Convolution2D(512, 1, 1, activation="relu"))
 base_model.add(Dropout(0.5))
-
+#%%
 deepmiml = DeepMIML(L=L, K=K, base_model=base_model)
 # deepmiml.model.summary()
 
