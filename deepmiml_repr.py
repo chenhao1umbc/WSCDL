@@ -41,6 +41,27 @@ deepmiml.model.fit_generator(data_layer.generate(),
         samples_per_epoch=samples_per_epoch,
         nb_epoch=nb_epoch)
 
-save_keras_model(deepmiml.model, "outputs/{}/{}".format(dataset.name, model_name))
-# %%
-tensorflow.keras.applications.VGG16()
+# save_keras_model(deepmiml.model, "outputs/{}/{}".format(dataset.name, model_name))
+
+
+#%% test part
+model = deepmiml.model
+print("Compiling Deep MIML Model...")
+model.compile(optimizer="adadelta", loss="binary_crossentropy")
+
+# # crate data layer
+# dataset = COCODataset("data/coco", "val", "2014")
+# data_layer = COCODataLayer(dataset, batch_size=batch_size)
+
+print("Start Predicting...")
+num_images = dataset.num_images
+y_pred = np.zeros((num_images, dataset.num_classes))
+y_gt = np.zeros((num_images, dataset.num_classes))
+for i in range(0, num_images, batch_size):
+        if i // batch_size % 10 == 0:
+                print("[progress] ({}/{})".format(i, num_images))
+        x_val_mini, y_val_mini = data_layer.get_data(i, i + batch_size)
+        y_pred_mini = model.predict(x_val_mini)
+        y_pred[i: i + batch_size] = y_pred_mini
+        y_gt[i: i + batch_size] = y_val_mini
+evaluate(dataset.classes, y_gt, y_pred, threshold_value=0.5)
