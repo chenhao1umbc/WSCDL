@@ -1,10 +1,7 @@
 """This file is to reproduce the result of deepMIML with tensorflow.keras and python 3.8
 This code is based on DeepMIML.demo.demo_train_miml_vgg.py
 """
-
 #%% load package
-import tensorflow as tf
-from __future__ import print_function
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dropout
 from tensorflow. keras.layers import Convolution2D
@@ -31,7 +28,7 @@ base_model.add(Convolution2D(512, 1, activation="relu"))
 base_model.add(Dropout(0.5))
 
 deepmiml = DeepMIML(L=L, K=K, base_model=base_model)
-# deepmiml.model.summary()
+deepmiml.model.summary()
 
 #%%
 print("Compiling Deep MIML Model...")
