@@ -1,3 +1,7 @@
+"""This file is to reproduce the result of deepMIML with tensorflow.keras and python 3.8
+This code is based on DeepMIML.demo.demo_train_miml_vgg.py
+"""
+
 #%% load package
 import tensorflow as tf
 from __future__ import print_function
@@ -10,7 +14,7 @@ sys.path.insert(0, "lib")
 # from DeepMIML.lib.cocodemo import COCODataset, COCODataLayer
 from DeepMIML.lib.deepmiml.deepmiml import DeepMIML
 from DeepMIML.lib.deepmiml.utils import save_keras_model
-from DeepMIML.lib.cocodemo.vgg_16 import VGG_16
+from Deep_MIML_repr.vgg_16 import VGG_16
 
 #%%
 loss = "binary_crossentropy"
@@ -24,8 +28,8 @@ model_name = "miml_vgg_16"
 # dataset = COCODataset("data/coco", "train", "2014")
 # data_layer = COCODataLayer(dataset, batch_size=batch_size)
 
-vgg_model_path = "models/imagenet/vgg/vgg16_weights.h5"
-base_model = VGG_16(vgg_model_path)
+# vgg_model_path = "models/imagenet/vgg/vgg16_weights.h5"
+base_model = VGG_16()
 base_model = Sequential(layers=base_model.layers[: -7])
 base_model.add(Convolution2D(512, 1, 1, activation="relu"))
 base_model.add(Dropout(0.5))
