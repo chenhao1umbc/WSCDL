@@ -8,7 +8,6 @@ labels = 'alert,clearthroat,cough,doorknock,doorslam,drawer,keyboard,' \
 #%%
 from utils2 import *
 
-
 #%% Init parameters
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=10, K0=1, K=2)
@@ -55,7 +54,7 @@ for Dw in [15, 21, 25, 29, 35]:
                     D, D0, S, S0, W, loss = train(X, Y, opts)
                     save_results(D, D0, S, S0, W, opts, loss)
 
-                    res = torch.load(res, 'tunning.pt')
+                    res = torch.load('tunning.pt')
                     _, _, St, S0t, _ = init(X_val, opts)
                     acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_val, Y_val, opts)
                     print('The validation accuracy, recall and precision are : ',\
