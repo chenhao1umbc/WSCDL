@@ -26,7 +26,7 @@ addpath('WSCADL-YOU_master')
 % end
 
 %% run aasp
-run settings_aasp
+run settings
 runs = 3;
 acc = zeros(runs, 1); 
 rec = zeros(runs, 1); 
@@ -50,19 +50,17 @@ for i=1:runs
     y_hat = get_signal_label(w{i}, valX, option);  % newly written function get the predicted signal labels
     acc(i) = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
     [rec(i), prec(i)] = prec_rec(y_hat, valY)
-
-    % this part is for the test data  
-%     rt = '/home/chenhao1/Hpython/data/';  % pensees
-    rt = '/extra/chenhao1/data_sets/AASP/';  % spss6
-    load([rt,'test_256by200.mat'])
-    X = permute(rs, [2,3,1]);
-    x = reshape(X, 256*200, 702);
-    x = x./sqrt(sum(x.*x, 1));
-    X_test = reshape(x, 256, 200, 702);
-    Y_test = labels;
-    wtx = wtimesx(w{i},X_test,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
-    y_hat_test = get_signal_label(w{i}, X_test, option);  % newly written function get the predicted signal labels
-    test_acc = sum((y_hat_test - Y_test) == 0, 'all')/numel(y_hat_test)
-    [test_recall, test_prec] = prec_rec(y_hat_test, Y_test)
 end
+
+
+load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
+X = permute(rs, [2,3,1]);
+x = reshape(X, 256*200, 702);
+x = x./sqrt(sum(x.*x, 1));
+X_test = reshape(x, 256, 200, 702);
+Y_test = labels;
+wtx = wtimesx(w{i},X_test,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
+y_hat_test = get_signal_label(w{i}, X_test, option);  % newly written function get the predicted signal labels
+test_acc = sum((y_hat_test - Y_test) == 0, 'all')/numel(y_hat_test)
+[test_recall, test_prec] = prec_rec(y_hat_test, Y_test)
 

@@ -30,5 +30,3 @@ smooth = 0;
 % test
 [HammingLoss,RankingLoss,OneError,Coverage,Average_Precision,Outputs,Pre_Labels]= ...
     MLKNN_test(tr_data,tr_label,te_data,te_label,k,Prior,PriorN,Cond,CondN);
-
-Average_Precision
