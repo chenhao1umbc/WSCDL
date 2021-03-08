@@ -98,4 +98,10 @@ print(r)
 print(param[idx])
 
 #TODO lamb0 is and eta are on the boundary, lamb0 gets larger, eta gets smaller to see the result
-# %%
+# %% compare with others' result
+route = '/home/chenhao1/Matlab/WSCDL/'
+res = sio.loadmat(route+'res_knn.mat')
+res = res['Pre_Labels']
+res[res==-1]=0
+res = res.T
+metrics.f1_score(Y_test.cpu().flatten(), res.flatten())
