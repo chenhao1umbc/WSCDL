@@ -6,49 +6,8 @@ from utils2 import *
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=10, K0=1, K=2)
 opts.init, opts.shuffle, opts.show_details = 'rand', False, True
-opts.Dh, opts.Dw, opts.batch_size = 100, 25, -1
-opts.lamb, opts.lamb0, opts.eta, opts.mu = 0.1, 0.1, 1, 0.1 #sparsity, label, low rank
-
-#%% training section
-X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
-D, D0, S, S0, W, loss = train(X, Y, opts)
-
-#%% visualize learned atoms
-for i in range(10):
-    fig= plt.figure()
-    fig.set_size_inches(w=12, h=8)
-    d = D[i].permute(0,2,1).reshape(opts.Dh, opts.K*opts.Dw).cpu()
-    plt.imshow(d, aspect='auto', interpolation='None')
-    plt.title(f'Class {i} atoms')
-
-
-#%% testing section
-X_val, Y_val, yy_val = load_data(opts, data='val')
-_, _, St, S0t, _ = init(X_val, opts)
-acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_val, Y_val, opts)
-print('The validation accuracy, recall and precision are : ',\
-            acc.acc, acc.recall, acc.f1)
-
-
-# %% check results
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-plt.imshow(y_hat.cpu(),aspect='auto', interpolation='None')
-plt.title('y_hat')
-
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-yt = y_hat.clone()
-thr = 0.3
-yt[yt>=thr] = 1
-yt[yt<thr] = 0
-plt.imshow(yt.cpu(),aspect='auto', interpolation='None')
-plt.title(f'y_hat with threshold {thr}')
-
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-plt.imshow(Y_val.cpu(),aspect='auto', interpolation='None')
-plt.title('Y')
+opts.Dh, opts.Dw, opts.batch_size = 100, 29, -1
+opts.lamb, opts.lamb0, opts.eta, opts.mu = 0.1, 0.1, 0.01, 0.1 #sparsity, label, low rank
 
 # %% analysis result
 record = torch.load('tunning.pt')
@@ -56,13 +15,14 @@ n = len(record)
 res = torch.rand(n, 3)
 param = torch.rand(n,5)
 for i,v in enumerate(record):
-    res[i] = torch.tensor(v[0])
-    param[i] = torch.tensor(v[1])
+    res[i] = torch.tensor(v[0])  # [n, acc, recall, f1]
+    param[i] = torch.tensor(v[1]) # [n, Dw, lamb, lamb0, eta, mu]
 value, index = res.max(0)
-print('max vlaues :', value)
+print('max acc, recall, f1, vlaues :', value, '\n')
 
-for i in index:
-    print([i], param[i])
+for i, v in enumerate(index):
+    print(f"max {['acc', 'recall', 'f1'][i]} index and vlaues :", res[v])
+    print([v], param[v], '\n')
 
                
 # a function of given parameters to return the result tensors
@@ -97,7 +57,7 @@ r, idx = get_result(res, param, Dw=0, lamb=0.1, lamb0=0.1, eta=0.01, mu=0.1)
 print(r)
 print(param[idx])
 
-#TODO lamb0 is and eta are on the boundary, lamb0 gets larger, eta gets smaller to see the result
+
 # %% compare with others' result
 route = '/home/chenhao1/Matlab/WSCDL/'
 res = sio.loadmat(route+'res_knn.mat')
@@ -105,3 +65,39 @@ res = res['Pre_Labels']
 res[res==-1]=0
 res = res.T
 metrics.f1_score(Y_test.cpu().flatten(), res.flatten())
+
+
+
+#%% visualize learned atoms
+param = str([opts.K, opts.K0, opts.Dw, opts.lamb, opts.lamb0, opts.eta , opts.mu])
+D, D0, S, S0, W, opts, loss = \
+    torch.load('../saved_dicts/'+param+'DD0SS0Woptsloss.pt', map_location='cpu')
+
+for i in range(10):
+    fig= plt.figure()
+    fig.set_size_inches(w=4, h=6)
+    d = D[i].permute(0,2,1).reshape(opts.Dh, opts.K*opts.Dw).cpu()
+    plt.imshow(d, aspect='auto', interpolation='None')
+    plt.title(f'Class {i} atoms')
+
+
+
+# %% check results
+fig= plt.figure()
+fig.set_size_inches(w=12, h=8)
+plt.imshow(y_hat.cpu(),aspect='auto', interpolation='None')
+plt.title('y_hat')
+
+fig= plt.figure()
+fig.set_size_inches(w=12, h=8)
+yt = y_hat.clone()
+thr = 0.3
+yt[yt>=thr] = 1
+yt[yt<thr] = 0
+plt.imshow(yt.cpu(),aspect='auto', interpolation='None')
+plt.title(f'y_hat with threshold {thr}')
+
+fig= plt.figure()
+fig.set_size_inches(w=12, h=8)
+plt.imshow(Y_val.cpu(),aspect='auto', interpolation='None')
+plt.title('Y')
