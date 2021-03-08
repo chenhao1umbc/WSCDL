@@ -2,7 +2,6 @@
 This code is based on DeepMIML.demo.demo_train_miml_vgg.py
 """
 #%% load package
-import tensorflow
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dropout
 from tensorflow. keras.layers import Convolution2D
@@ -64,4 +63,4 @@ for i in range(0, num_images, batch_size):
         y_pred_mini = model.predict(x_val_mini)
         y_pred[i: i + batch_size] = y_pred_mini
         y_gt[i: i + batch_size] = y_val_mini
-evaluate(dataset.classes, y_gt, y_pred, threshold_value=0.5)
+(y_gt, y_pred, threshold_value=0.5)
