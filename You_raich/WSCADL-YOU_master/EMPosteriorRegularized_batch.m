@@ -16,7 +16,7 @@ function [ w,post,rllharr,garr] = EMPosteriorRegularized_batch(w,X,Y,Nvec,EMiter
 %     end
 % end
 %%%%Supervised dictionary learning algorithm using EM
-count=1;
+curr_iter=1;
 step=1;
 rllharr=zeros(1,EMiterations*Miterations);
 garr=zeros(1,EMiterations*Miterations);
@@ -25,8 +25,9 @@ garr=zeros(1,EMiterations*Miterations);
 win=floor(size(w,1)/F);
 eps=1e-10;
 tempidx=randperm(B,5);
+fprintf('Start trainig model\n')
 
-while(count<=EMiterations*Miterations)
+while(curr_iter<=EMiterations*Miterations)
     wold = w;
     if strcmp(option.priorType,'conv')
         wxold_cell=WconvX(X,wold,option.addone,option.conv);
@@ -53,11 +54,11 @@ while(count<=EMiterations*Miterations)
     const=0;
     for j=1:Miterations
         if option.addone
-            rllharr(count)=-sum(pyn)/B+0.5*lam*sum(sum(sum(wold(1:end-1,:).^2,3),2));
+            rllharr(curr_iter)=-sum(pyn)/B+0.5*lam*sum(sum(sum(wold(1:end-1,:).^2,3),2));
         else
-            rllharr(count)=-sum(pyn)/B+0.5*lam*sum(sum(sum(wold.^2,3),2));
+            rllharr(curr_iter)=-sum(pyn)/B+0.5*lam*sum(sum(sum(wold.^2,3),2));
         end
-        garr(count)=Gtilde(post,X,wold,cprob_cell,const,option,lambda,gamma,lam);
+        garr(curr_iter)=Gtilde(post,X,wold,cprob_cell,const,option,lambda,gamma,lam);
 %         step=10*step;
         [w, step, ~]=MaximizationStep(X,wold,wxold_cell,cprob_cell,const,post,lambda,gamma,step,option,lam);
     end
@@ -67,8 +68,8 @@ while(count<=EMiterations*Miterations)
 %             break;
 %         end
                                  
-        if (rem(count, option.dsiter)==0)
-            count
+        if (rem(curr_iter, option.dsiter)==0)
+            curr_iter
             if option.display
             %%%%%%%%%%%%display dictionary words at each iteration%%%%%%
                cnt=1;
@@ -108,7 +109,12 @@ while(count<=EMiterations*Miterations)
                pause(0.1);
             end
         end
-        count=count+1;
+        %check convergence
+        if curr_iter >3 && (abs(rllharr(curr_iter) -rllharr(curr_iter-1))/ abs(rllharr(curr_iter)) <1e-3)
+            fprintf('loss change is too small and stop tranining\n')
+            break
+        end
+        curr_iter=curr_iter+1;
 end
 
 end
