@@ -62,29 +62,43 @@ else
 end
 
 %%
+winsize_pool=[5, 15, 25, 35, 50];
+lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
+N_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];%sparsity constraints;
+
 acc = zeros(runs, 1); 
 rec = zeros(runs, 1); 
 prec = zeros(runs, 1); 
-l = [0.1 0.01 0.001];
+
 for i=1:runs
-    lamb = l(i);
-    permidx(i,:)=randperm(No_spect);
-    trainY = Y(permidx(i,1:no_train),:);
-    trainX = X(:,:,permidx(i,1:no_train));
+    permidx=randperm(No_spect);
+    trainY = Y(permidx(1:no_train),:);
+    trainX = X(:,:,permidx(1:no_train));
     trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
     wini=1e-3*randn(no_para,C,K);
     
-    [ w{i},~,rllharr{i},garr{i}] = EMPosteriorRegularized_batch(...
-        wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,option,lamb);
+    valX = X(:,:,permidx(no_train+1:end));
+    valY = Y(permidx(no_train+1:end),:);
     
-    % this part is newly added to see the signal level accuracy result
-    valX = X(:,:,permidx(i,no_train+1:end));
-    valY = Y(permidx(i,no_train+1:end),:);
-    wtx = wtimesx(w{i},valX,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
-    y_hat = get_signal_label(w{i}, valX, option);  % newly written function get the predicted signal labels
-    acc(i) = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
-    [rec(i), prec(i)] = prec_rec(y_hat, valY)
-end
+    for lamb = lamb_pool
+        for winsize = winsize_pool
+            for N = N_pool
+lamb
+winsize
+N
+[ w,~,loss,garr] = EMPosteriorRegularized_batch(...
+    wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,option,lamb);
+
+% this part is newly added to see the signal level accuracy result
+wtx = wtimesx(w,valX,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
+y_hat = get_signal_label(w, valX, option);  % newly written function get the predicted signal labels
+acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
+[rec, prec] = prec_rec(y_hat, valY)
+
+            end % end of N loop
+        end % end of winsize loop
+    end % end of lamb
+end % end of runs
 
 %% test
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
