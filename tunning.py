@@ -52,10 +52,20 @@ def get_result(res, param, Dw=0, lamb=0, lamb0=0, eta=0, mu=0):
     if mu !=0: res_ind = np.intersect1d(idx[param[:,4] == mu], res_ind)
 
     return res[res_ind], res_ind
-
-r, idx = get_result(res, param, Dw=0, lamb=0.1, lamb0=0.1, eta=0.01, mu=0.1)
+"Dw=29, lamb=0.1, lamb0=0.1, eta=0.01, mu=0.1"
+"Dw=21, lamb=0.1, lamb0=1, eta=0.001, mu=1"
+r, idx = get_result(res, param, Dw=0, lamb=0.1, lamb0=1, eta=0.001, mu=0.1)
 print(r)
 print(param[idx])
+
+for i in range(5):
+    if param[idx][:, i].unique().shape[0] >1 :
+        which_is_0 = i
+        break
+fig = plt.figure()
+fig.set_size_inches(w=6, h=4)
+index = param[idx][:, which_is_0].sort()[1]
+plt.plot(param[idx][:, which_is_0].sort()[0], r[:, -1][index], '-x')
 
 
 # %% compare with others' result
