@@ -33,7 +33,7 @@ vgg_model_path = "../data/vgg16_weights_tf_dim_ordering_tf_kernels.h5"
 base_model = VGG_16(vgg_model_path)
 model = Sequential(layers=ZeroPadding2D((1,1),input_shape=(100, 500, 1)))
 model.add(Convolution2D(3, 1, activation="relu"))
-model.add(Sequential(base_model.layers[1: -7]))
+model.add(Sequential(base_model.layers[1: -32])) # originally -7 in the paper, but model too large
 model.add(Convolution2D(512, 1, activation="relu"))
 model.add(Dropout(0.5))
 
