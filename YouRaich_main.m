@@ -3,6 +3,7 @@
 clear;
 close all;
 addpath(genpath('You_raich'))
+rng(0)
 
 %% run toy data  --tested it works fine
 % run setting_toy
@@ -38,7 +39,7 @@ option.estepType1='chain';%'tree' for e-step;
 option.addone=1;%add bias term;
 option.conv=1;%or'fft' for convolution method;
 option.display=0;%display the words and probablities; 
-option.dsiter=3;% display for every 1000 iteration;
+option.dsiter= 10; % display for every 1000 iteration;
 %%%%%%load data%%%
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
 X = permute(X, [2,3,1]);
@@ -62,9 +63,9 @@ else
 end
 
 %%
-winsize_pool=[5, 15, 25, 35, 50];
 lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
-N_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];%sparsity constraints;
+winsize_pool=[5, 15, 25, 35, 50];
+N_pool=[1e-4, 10, 1, 0.1, 0.01, 1e-3, 1e-4];%sparsity constraints;
 
 acc = zeros(runs, 1); 
 rec = zeros(runs, 1); 
@@ -83,9 +84,7 @@ for i=1:runs
     for lamb = lamb_pool
         for winsize = winsize_pool
             for N = N_pool
-lamb
-winsize
-N
+
 [ w,~,loss,garr] = EMPosteriorRegularized_batch(...
     wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,option,lamb);
 
@@ -93,7 +92,7 @@ N
 wtx = wtimesx(w,valX,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
 y_hat = get_signal_label(w, valX, option);  % newly written function get the predicted signal labels
 acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
-[rec, prec] = prec_rec(y_hat, valY)
+[rec, prec] = prec_rec(valY, y_hat)
 
             end % end of N loop
         end % end of winsize loop
@@ -107,5 +106,5 @@ Y_test = Y;
 wtx = wtimesx(w{i},X_test,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
 y_hat_test = get_signal_label(w{i}, X_test, option);  % newly written function get the predicted signal labels
 test_acc = sum((y_hat_test - Y_test) == 0, 'all')/numel(y_hat_test)
-[test_recall, test_prec] = prec_rec(y_hat_test, Y_test)
+[test_recall, test_prec] = prec_rec(Y_test, y_hat_test)
 

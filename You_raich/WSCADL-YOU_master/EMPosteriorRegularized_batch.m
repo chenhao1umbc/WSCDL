@@ -112,6 +112,7 @@ while(curr_iter<=EMiterations*Miterations)
         %check convergence
         if curr_iter >3 && (abs(rllharr(curr_iter) -rllharr(curr_iter-1))/ abs(rllharr(curr_iter)) <1e-3)
             fprintf('loss change is too small and stop tranining\n')
+            curr_iter
             break
         end
         curr_iter=curr_iter+1;
