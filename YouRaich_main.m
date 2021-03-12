@@ -52,7 +52,7 @@ K=1;
 gamma=0;
 runs=1;
 perc=0.75;  % perc * n_samples for training, default as 0.75
-EMiterations=20;
+EMiterations = 200;
 Miterations=1;
 no_train=ceil(perc*No_spect);
 no_test=No_spect-no_train;
@@ -115,7 +115,6 @@ acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
     end % end of lamb
 end % end of runs
 
-5, 10, 20, 50, 100, 200
 
 %% test
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
