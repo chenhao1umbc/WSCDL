@@ -7,10 +7,24 @@ function [res] = wconx(w, opt )
 px = opt.px;
 myfunc = opt.myfunc;
 
-w = reshape(w, [opt.F, opt.winsize, opt.C]);
+if opt.addone
+    ww = w(1:end-1, :);
+    bias = w(end, :);
+else
+    ww = w;
+end
+
+w = reshape(ww, [opt.F, opt.winsize, opt.C]);
 ker = single(w);  % for faster computation
 pker = py.torch.tensor(py.numpy.array(ker));
 
 r = myfunc.conv(px, pker);  % located in myfunc.py
-res = double(r); % back to matlab data
+res = double(r); % back to matlab data, shape of [T, C, n_batch]
+
+if opt.addone
+for i= 1:opt.C
+    res(:, i, :) = bias(i) + res(:, i, :);
+end
+end
+
 end
