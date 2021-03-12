@@ -1,6 +1,7 @@
 % This is a comstomized version for performance comparison
 % modified with main_demo.m
 clear;
+clc
 close all;
 addpath(genpath('You_raich'))
 rng(0)
@@ -50,8 +51,8 @@ C=size(Y,2);
 K=1;
 gamma=0;
 runs=1;
-perc=0.1;  % perc * n_samples for training, default as 0.75
-EMiterations=200;
+perc=0.75;  % perc * n_samples for training, default as 0.75
+EMiterations=20;
 Miterations=1;
 no_train=ceil(perc*No_spect);
 no_test=No_spect-no_train;
@@ -59,12 +60,15 @@ no_test=No_spect-no_train;
 opt.C = C;
 opt.F = F;
 opt.T = T;
+myfunc = py.importlib.import_module('myconv');
+py.importlib.reload(myfunc);
+opt.myfunc = myfunc; % added the myfunc to option 
 
 
 %%
 lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
-winsize_pool=[30, 50, 100, 10];
-N_pool=[1e-4, 10, 1, 0.1, 0.01, 1e-3, 1e-4];%sparsity constraints;
+winsize_pool=[30, 50, 100, 150];
+N_pool=[5, 10, 20, 50, 100, 200];%sparsity constraints;
 
 acc = zeros(runs, 1); 
 rec = zeros(runs, 1); 
@@ -77,6 +81,11 @@ for i=1:runs
     
     valX = X(:,:,permidx(no_train+1:end));
     valY = Y(permidx(no_train+1:end),:);
+
+    x = permute(trainX, [3, 1, 2]);
+    px = py.torch.tensor(py.numpy.array(x));
+    px = px.cuda().float();
+    opt.px = px; % added the myfunc to option
     
     for lamb = lamb_pool
         for winsize = winsize_pool
@@ -85,6 +94,7 @@ lamb
 winsize
 N
 opt.winsize = winsize;
+opt.px = px; % opt.px will be changed in validation
 trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
 if opt.addone
     no_para=F*winsize+1;
@@ -96,7 +106,7 @@ wini=1e-3*randn(no_para,C,K);
     wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,opt,lamb);
 
 % this part is newly added to see the signal level accuracy result
-y_hat = get_signal_label(w, valX, opt);  % newly written function get the predicted signal labels
+y_hat = get_signal_label(w, valX, opt);  % opt.px will be changed
 acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
 [rec, prec] = prec_rec(valY, y_hat)
 
@@ -105,7 +115,7 @@ acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
     end % end of lamb
 end % end of runs
 
-
+5, 10, 20, 50, 100, 200
 
 %% test
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')

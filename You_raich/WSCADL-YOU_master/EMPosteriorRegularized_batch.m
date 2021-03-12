@@ -27,15 +27,6 @@ eps=1e-10;
 tempidx=randperm(B,5);
 fprintf('Start trainig model\n')
 
-myfunc = py.importlib.import_module('myconv');
-py.importlib.reload(myfunc);
-option.myfunc = myfunc; % added the myfunc to option 
-
-x = permute(X, [3, 1, 2]);
-px = py.torch.tensor(py.numpy.array(x));
-px = px.cuda().float();
-option.px = px; % added the myfunc to option 
-
 while(curr_iter<=EMiterations*Miterations)
     wold = w;
     if strcmp(option.priorType,'conv')

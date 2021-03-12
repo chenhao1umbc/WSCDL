@@ -2,7 +2,8 @@
 function [p,wx_in_k]=PriorOneBag(W,X,option)
 if strcmp(option.priorType,'conv')
 %     wx_in_k = wtx(W,X,option.addone);
-    wx = WconvX(X,W,option.addone,option.conv);
+%     wx = WconvX(X,W,option.addone,option.conv);
+    wx=wconx(W, option);
 else
     wx = wtimesx(W,X,option.addone);
 end
