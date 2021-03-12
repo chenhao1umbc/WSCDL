@@ -74,7 +74,6 @@ for i=1:runs
     permidx=randperm(No_spect);
     trainY = Y(permidx(1:no_train),:);
     trainX = X(:,:,permidx(1:no_train));
-    trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
     
     valX = X(:,:,permidx(no_train+1:end));
     valY = Y(permidx(no_train+1:end),:);
@@ -86,6 +85,7 @@ lamb
 winsize
 N
 opt.winsize = winsize;
+trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
 if opt.addone
     no_para=F*winsize+1;
 else
