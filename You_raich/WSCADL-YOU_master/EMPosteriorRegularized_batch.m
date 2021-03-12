@@ -27,10 +27,20 @@ eps=1e-10;
 tempidx=randperm(B,5);
 fprintf('Start trainig model\n')
 
+myfunc = py.importlib.import_module('myconv');
+py.importlib.reload(myfunc);
+option.myfunc = myfunc; % added the myfunc to option 
+
+x = permute(X, [3, 1, 2]);
+px = py.torch.tensor(py.numpy.array(x));
+px = px.cuda().float();
+option.px = px; % added the myfunc to option 
+
 while(curr_iter<=EMiterations*Miterations)
     wold = w;
     if strcmp(option.priorType,'conv')
-        wxold_cell=WconvX(X,wold,option.addone,option.conv);
+%         wxold_cell=WconvX(X,wold,option.addone,option.conv);
+        wxold_cell=wconx(wold, option);
     else
         for i=1:B
              wxold_cell(:,:,i) = wtimesx(wold,X(1,:,i)',option.addone);
@@ -209,7 +219,8 @@ end
 function [llh, grad]=Gtilde(p,X,w,clusterProb_cell,const,option,lambda,gamma,lam)
 llh_part=0;
 if strcmp(option.priorType,'conv')
-    wX=WconvX(X,w,option.addone,option.conv);
+%     wX=WconvX(X,w,option.addone,option.conv);
+    wX=wconx(w, option);
 else
      for i=1:size(X,3)
           wX(:,:,i) = wtimesx(wold,X(1,:,i)',option.addone);

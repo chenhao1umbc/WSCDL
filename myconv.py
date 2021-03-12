@@ -9,11 +9,12 @@ import torch
 import torch.nn.functional as Func
 def conv(x, ker):
     if torch.cuda.is_available():
-        #x = x.cuda()  # shape of [ F, T, n_batch]
         ker = ker.cuda() # shape of [ F, win_size, n_kernels]
-    x = x.permute(1,2,0)[:,None] # shape [n_batch, 1,  F, T]
-    ker = ker.permute(1,2,0)[:, None]  # shape of [n_kernels, 1, F, win_size]
-    # res has shape of [n_batch, n_kernels, F, T]
-    res = Func.conv2d(x, ker, padding=(0, ker.shape[-1]//2)) 
+    
+    x = x[:, None] # x shape [n_batch, 1,  F, T]
+    ker = ker.permute(2,0,1)[:, None]  # shape of [n_kernels, 1, F, win_size]
 
-    return res.cpu()
+    # res has shape of [n_batch, n_kernels, 1, T+padding]
+    res = Func.conv2d(x, ker, padding=(0, (ker.shape[-1]-1))) 
+
+    return res.T.squeeze().cpu().numpy()

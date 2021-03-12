@@ -33,13 +33,13 @@ lamb=1e-4;
 N=10;%sparsity constraints;
 snr=10000;
 %%%%setting parameters%%%%%%%
-option.method='batch';%'online';
-option.priorType='conv';%'times';
-option.estepType1='chain';%'tree' for e-step;
-option.addone=0;%add bias term;
-option.conv=1;%or'fft' for convolution method;
-option.display=0;%display the words and probablities; 
-option.dsiter= 10; % display for every 1000 iteration;
+opt.method='batch';%'online';
+opt.priorType='conv';%'times';
+opt.estepType1='chain';%'tree' for e-step;
+opt.addone=0;%add bias term;
+opt.conv=1;%or'fft' for convolution method;
+opt.display=0;%display the words and probablities; 
+opt.dsiter= 10; % display for every 1000 iteration;
 %%%%%%load data%%%
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
 X = permute(X, [2,3,1]);
@@ -56,6 +56,9 @@ Miterations=1;
 no_train=ceil(perc*No_spect);
 no_test=No_spect-no_train;
 
+opt.C = C;
+opt.F = F;
+opt.T = T;
 
 
 %%
@@ -73,7 +76,6 @@ for i=1:runs
     trainX = X(:,:,permidx(1:no_train));
     trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
     
-    
     valX = X(:,:,permidx(no_train+1:end));
     valY = Y(permidx(no_train+1:end),:);
     
@@ -83,17 +85,18 @@ for i=1:runs
 lamb
 winsize
 N
-if option.addone
+opt.winsize = winsize;
+if opt.addone
     no_para=F*winsize+1;
 else
     no_para=F*winsize;
 end
 wini=1e-3*randn(no_para,C,K);
 [ w,~,loss,garr] = EMPosteriorRegularized_batch(...
-    wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,option,lamb);
+    wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,opt,lamb);
 
 % this part is newly added to see the signal level accuracy result
-y_hat = get_signal_label(w, valX, option);  % newly written function get the predicted signal labels
+y_hat = get_signal_label(w, valX, opt);  % newly written function get the predicted signal labels
 acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
 [rec, prec] = prec_rec(valY, y_hat)
 
@@ -104,29 +107,12 @@ end % end of runs
 
 
 
-w = reshape(wini, 100,30, 10);
-x = X;
-ker = w;
-px = py.torch.tensor(py.numpy.array(x));
-px = px.cuda().float();
-pker = py.torch.tensor(py.numpy.array(ker));
-pker = pker.float();
-myfunc = py.importlib.import_module('myconv');
-py.importlib.reload(myfunc);
-tic
-res = myfunc.conv(px, pker);
-res = double(res);
-toc
-
-
-
-
 %% test
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
 X_test = permute(X, [2,3,1]);
 Y_test = Y;
-wtx = wtimesx(w{i},X_test,option);  % this function was originally defined in EMPosteriorRegularized_batch.m file
-y_hat_test = get_signal_label(w{i}, X_test, option);  % newly written function get the predicted signal labels
+wtx = wtimesx(w{i},X_test,opt);  % this function was originally defined in EMPosteriorRegularized_batch.m file
+y_hat_test = get_signal_label(w{i}, X_test, opt);  % newly written function get the predicted signal labels
 test_acc = sum((y_hat_test - Y_test) == 0, 'all')/numel(y_hat_test)
 [test_recall, test_prec] = prec_rec(Y_test, y_hat_test)
 
