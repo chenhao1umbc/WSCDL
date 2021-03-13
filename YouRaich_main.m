@@ -117,7 +117,7 @@ end % end of runs
 
 
 %% test
-load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_tr.mat')
+load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_te.mat')
 X_test = permute(X, [2,3,1]);
 Y_test = Y;
 wtx = wtimesx(w{i},X_test,opt);  % this function was originally defined in EMPosteriorRegularized_batch.m file
