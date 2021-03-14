@@ -78,11 +78,31 @@ for i in range(0, num_images, batch_size):
 
 
 #%%
-with open('/home/chenhao1/Matlab/WSCDL/you_raich.txt', 'r') as f:
-    res = f.readlines()
+route = '/home/chenhao1/Matlab/WSCDL/'
+with open(route+'you_raich.txt') as f:
+    d = f.readlines()
 
-count = 0
-for i, s in enumerate(res):
-    if s == 'rec =\n':
-        count += 1
-        print(res[i+2])
+acc = []
+rec = []
+prec = []
+
+for i, v in enumerate(d):
+    if v == 'acc =\n':
+        vv = d[i+2]
+        acc.append(float(vv[4:9]))
+
+    if v == 'prec =\n':
+        vv = d[i+2]
+        prec.append(float(vv[4:9]))
+
+    if v == 'rec =\n':
+        vv = d[i+2]
+        rec.append(float(vv[4:9]))
+
+r = torch.rand(144, 3)
+r[:,0] = torch.tensor(acc)
+r[:,1] = torch.tensor(rec)
+r[:,2] = torch.tensor(prec)
+res = torch.rand(144, 4)
+res[:,:3] = r
+res[:,3] = 2/(1/r[:,1] + 1/r[:,2])
