@@ -54,7 +54,7 @@ def get_result(res, param, Dw=0, lamb=0, lamb0=0, eta=0, mu=0):
     return res[res_ind], res_ind
 "Dw=29, lamb=0.1, lamb0=0.1, eta=0.01, mu=0.1"
 "Dw=21, lamb=0.1, lamb0=1, eta=0.001, mu=1"
-r, idx = get_result(res, param, Dw=0, lamb=0.1, lamb0=1, eta=0.001, mu=0.1)
+r, idx = get_result(res, param, Dw=21, lamb=0.1, lamb0=1, eta=0.001, mu=0)
 print(r)
 print(param[idx])
 

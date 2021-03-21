@@ -44,11 +44,11 @@ X_val, Y_val, yy_val = load_data(opts, data='val')
 #%% training section 
 # lamb0 is and eta are on the boundary, lamb0 gets larger, eta gets smaller to see the result
 res = [] 
-for Dw in [15, 21, 25, 29, 35]:
+for Dw in [21]:
     for lamb in [0.1, 0.01, 0.001, 0.5]:
         for lamb_ratio in [10]:
-            for eta in [0.001]:
-                for mu in [0.1, 0.01, 1]:
+            for eta in [0.001, 0.0001]:
+                for mu in [10, 1]:
                     opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
                                         Dw, lamb, lamb_ratio*lamb, eta, mu 
                     D, D0, S, S0, W, loss = train(X, Y, opts)
