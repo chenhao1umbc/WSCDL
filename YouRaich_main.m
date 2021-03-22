@@ -60,13 +60,14 @@ no_test=No_spect-no_train;
 opt.C = C;
 opt.F = F;
 opt.T = T;
+opt.K = K;
 myfunc = py.importlib.import_module('myconv');
 py.importlib.reload(myfunc);
 opt.myfunc = myfunc; % added the myfunc to option 
 
 
 %%
-lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
+lamb_pool=[1, 0.1, 0.01, 1e-3, 1e-4];
 winsize_pool=[30, 50, 100, 150];
 N_pool=[5, 10, 20, 50, 100, 200];%sparsity constraints;
 

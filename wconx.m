@@ -14,7 +14,7 @@ else
     ww = w;
 end
 
-w = reshape(ww, [opt.F, opt.winsize, opt.C]);
+w = reshape(ww, [opt.F, opt.winsize, opt.C*opt.K]);
 ker = single(w);  % for faster computation
 pker = py.torch.tensor(py.numpy.array(ker));
 
