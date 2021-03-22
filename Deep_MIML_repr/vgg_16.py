@@ -40,7 +40,7 @@ def VGG_16(weights_path=None):
     model.add(Convolution2D(128, 3, activation='relu'))
     model.add(ZeroPadding2D((1,1)))
     model.add(Convolution2D(128, 3, activation='relu'))
-    model.add(MaxPooling2D((2,2), strides=(2,2)))
+    model.add(MaxPooling2D((2,2), strides=(2,2)))  #-28
 
     model.add(ZeroPadding2D((1,1)))
     model.add(Convolution2D(256, 3, activation='relu'))
@@ -48,7 +48,7 @@ def VGG_16(weights_path=None):
     model.add(Convolution2D(256, 3, activation='relu'))
     model.add(ZeroPadding2D((1,1)))
     model.add(Convolution2D(256, 3, activation='relu'))
-    model.add(MaxPooling2D((2,2), strides=(2,2)))
+    model.add(MaxPooling2D((2,2), strides=(2,2))) #-21
 
     model.add(ZeroPadding2D((1,1)))
     model.add(Convolution2D(512, 3, activation='relu'))
@@ -56,7 +56,7 @@ def VGG_16(weights_path=None):
     model.add(Convolution2D(512, 3, activation='relu'))
     model.add(ZeroPadding2D((1,1)))
     model.add(Convolution2D(512, 3, activation='relu'))
-    model.add(MaxPooling2D((2,2), strides=(2,2)))
+    model.add(MaxPooling2D((2,2), strides=(2,2))) # -14
 
     model.add(ZeroPadding2D((1,1)))
     model.add(Convolution2D(512, 3, activation='relu'))
@@ -64,7 +64,7 @@ def VGG_16(weights_path=None):
     model.add(Convolution2D(512, 3, activation='relu'))
     model.add(ZeroPadding2D((1,1)))
     model.add(Convolution2D(512, 3, activation='relu'))
-    model.add(MaxPooling2D((2,2), strides=(2,2)))
+    model.add(MaxPooling2D((2,2), strides=(2,2)))  #-7
 
     model.add(Flatten())
     model.add(Dense(4096, activation='relu'))
