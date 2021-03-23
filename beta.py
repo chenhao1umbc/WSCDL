@@ -46,7 +46,7 @@ X_val, Y_val, yy_val = load_data(opts, data='val')
 res = [] 
 for Dw in [21]:
     for lamb in [0.1, 0.01, 0.001, 0.5]:
-        for lamb_ratio in [10]:
+        for lamb_ratio in [1, 0.5, 0.1, 10]:
             for eta in [0.001, 0.0001]:
                 for mu in [10, 1]:
                     opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
