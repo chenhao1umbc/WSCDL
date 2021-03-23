@@ -47,7 +47,7 @@ class OPT:
         self.lamb0, self.init = 0.1, 0  # seperate lamb for the common term
         self.maxiter, self.plot, self.snr = maxiter, False, 20
         self.dataset, self.show_details, self.save_results = 0, True, True
-        self.seed, self.n, self.shuffle, self.transpose = 0, 50, False, False  # n is number of examples per combination for toy data
+        self.seed, self.n, self.shuffle, self.transpose = 0, 50, True, False  # n is number of examples per combination for toy data
         self.common_term = True*K0  # if common term exist
         self.shape, self.batch_size = '1d', 100 # input data is 1d or 2d, 1d could be vectorized 2d data
         if torch.cuda.is_available():
@@ -77,9 +77,7 @@ def load_data(opts, data='test', route=''):
 
     n, f, t = x.shape  # shape of [n_sample, f, t]
     if opts.shuffle:
-        np.random.seed(opts.seed)
-        nn = np.arange(x.shape[0])
-        np.random.shuffle(nn)
+        nn = torch.randperm(x.shape[0])
         x, y, yy = x[nn], y[nn], yy[nn]
 
     if opts.transpose:  x = np.moveaxis(x, 2, 1)

@@ -1,138 +1,106 @@
 """This is the main file to run Weakly supervised supervised dictionary learning
 The default data type is torch.tensor with precision float32
+This file is used for training and validation
+
+labels = 'alert,clearthroat,cough,doorknock,doorslam,drawer,keyboard,' \
+         'keys,laughter,mouse,pageturn,pendrop,phone,printer,speech,switch'
 """
 #%%
 from utils2 import *
+
+#%% Init parameters
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 opts = OPT(C=10, K0=1, K=2)
-opts.init, opts.shuffle, opts.show_details = 'rand', False, True
-opts.Dh, opts.Dw, opts.batch_size = 100, 29, -1
-opts.lamb, opts.lamb0, opts.eta, opts.mu = 0.1, 0.1, 0.01, 0.1 #sparsity, label, low rank
+opts.init, opts.shuffle, opts.show_details = 'rand', True, False
+opts.Dh, opts.Dw, opts.batch_size = 100, 25, -1
+opts.lamb, opts.lamb0, opts.eta, opts.mu = 1, 0.1, 1, 0.1 #sparsity, label, low rank
 
-# %% analysis result
-record = torch.load('tunning.pt')
-n = len(record)
-res = torch.rand(n, 3)
-param = torch.rand(n,5)
-for i,v in enumerate(record):
-    res[i] = torch.tensor(v[0])  # [n, acc, recall, f1]
-    param[i] = torch.tensor(v[1]) # [n, Dw, lamb, lamb0, eta, mu]
-value, index = res.max(0)
-print('max acc, recall, f1, vlaues :', value, '\n')
+#%% load data
+X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
+X_val, Y_val, yy_val = load_data(opts, data='val')
 
-for i, v in enumerate(index):
-    print(f"max {['acc', 'recall', 'f1'][i]} index and vlaues :", res[v])
-    print([v], param[v], '\n')
+# #%% training section first run
+# res = []
+# for Dw in [15, 21, 25, 29, 35]:
+#     for lamb in [0.1, 0.01, 0.001, 0.5]:
+#         for lamb_ratio in [1, 0.5, 0.1 ]:
+#             for eta in [0.1, 0.01, 1]:
+#                 for mu in [0.1, 0.01, 1]:
+#                     opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
+#                                         Dw, lamb, lamb_ratio*lamb, eta, mu 
+#                     D, D0, S, S0, W, loss = train(X, Y, opts)
+#                     save_results(D, D0, S, S0, W, opts, loss)
 
-               
-# a function of given parameters to return the result tensors
-def get_result(res, param, Dw=0, lamb=0, lamb0=0, eta=0, mu=0):
-    """ if Dw, lamb etc. is 0, that means coresponding column are all selected
-        otherwise Dw etc. is a value from its pool,e.g.
-        pool_Dw = [ 7., 15., 21., 25., 29., 35., 45.]
-        Dw = 7. or Dw=15.
+#                     _, _, St, S0t, _ = init(X_val, opts)
+#                     acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_val, Y_val, opts)
+#                     print('The validation accuracy, recall and precision are : ',\
+#                              acc.acc, acc.recall, acc.f1)
+#                     print('with parameters as : ', opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu)
+#                     print('\n')
+#                     res.append(((acc.acc, acc.recall, acc.f1),(opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu)))
+#                     torch.save(res, 'tunning.pt')
 
-        param has the shape of [n_record, 5]
-        each of the 5 columns means [Dw, lamb, lamb0, eta, mu]
 
-        res has the shape of [[n_record, 5]]
-        each of the 3 columns means [acc, recall, F1]
-    """
-    # find the indecies of given param
-    n = param.shape[0]
-    idx = torch.arange(n)
-    if Dw!=0 : 
-        res_ind = idx[param[:,0] == Dw]
-    else:
-        res_ind = idx.clone()
+#%% training section 
+# lamb0 is and eta are on the boundary, lamb0 gets larger, eta gets smaller to see the result
+# res = [] 
+# for Dw in [21]:
+#     for lamb in [0.1, 0.01, 0.001, 0.5]:
+#         for lamb_ratio in [1, 0.5, 0.1, 10]:
+#             for eta in [0.001, 0.0001]:
+#                 for mu in [10, 1]:
+#                     opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
+#                                         Dw, lamb, lamb_ratio*lamb, eta, mu 
+#                     D, D0, S, S0, W, loss = train(X, Y, opts)
+#                     save_results(D, D0, S, S0, W, opts, loss)
 
-    if lamb!=0: res_ind = np.intersect1d(idx[param[:,1] == lamb], res_ind)
-    if lamb0 !=0: res_ind = np.intersect1d(idx[param[:,2] == lamb0], res_ind)
-    if eta !=0: res_ind = np.intersect1d(idx[param[:,3] == eta], res_ind)
-    if mu !=0: res_ind = np.intersect1d(idx[param[:,4] == mu], res_ind)
+#                     res = torch.load('tunning.pt')
+#                     _, _, St, S0t, _ = init(X_val, opts)
+#                     acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_val, Y_val, opts)
+#                     print('The validation accuracy, recall and precision are : ',\
+#                              acc.acc, acc.recall, acc.f1)
+#                     print('with parameters as : ', opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu)
+#                     print('\n')
+#                     res.append(((acc.acc, acc.recall, acc.f1),(opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu)))
+#                     torch.save(res, 'tunning.pt')
 
-    return res[res_ind], res_ind
+#%% after rough tunning the followings are the best ones
 "Dw=29, lamb=0.1, lamb0=0.1, eta=0.01, mu=0.1"
 "Dw=21, lamb=0.1, lamb0=1, eta=0.001, mu=1"
 "Dw=21, lamb=0.1, lamb0=0.1, eta=0.001, mu=1"
-r, idx = get_result(res, param, Dw=21, lamb=0.1, lamb0=0.1, eta=0.001, mu=1)
-print(r)
-print(param[idx])
+res = []
 
-for i in range(5):
-    if param[idx][:, i].unique().shape[0] >1 :
-        which_is_0 = i
-        break
-fig = plt.figure()
-fig.set_size_inches(w=6, h=4)
-index = param[idx][:, which_is_0].sort()[1]
-plt.plot(param[idx][:, which_is_0].sort()[0], r[:, -1][index], '-x')
+for runs in range(5):
+    X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
+    X_val, Y_val, yy_val = load_data(opts, data='val')
+    for Dw in [21, 29]:
+        for lamb in [0.1, 0.01]:
+            for lamb_ratio in [1, 0.1]:
+                for eta in [0.001]:
+                    for mu in [0.1, 1]:
+                        opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
+                                            Dw, lamb, lamb_ratio*lamb, eta, mu 
+                        D, D0, S, S0, W, loss = train(X, Y, opts)
+                        save_results(D, D0, S, S0, W, opts, loss)
 
+                        # res = torch.load('tunning.pt')
+                        _, _, St, S0t, _ = init(X_val, opts)
+                        acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_val, Y_val, opts)
+                        print('The validation accuracy, recall and precision are : ',\
+                                acc.acc, acc.recall, acc.f1)
+                        print('with parameters as : ', opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu)
+                        print('\n')
+                        res.append(((acc.acc, acc.recall, acc.f1),(opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu)))
+                        torch.save(res, 'tunning.pt')
 
-# %% compare with others' result
-route = '/home/chenhao1/Matlab/WSCDL/'
-# res = sio.loadmat(route+'res_knn.mat')
-# res = res['Pre_Labels']
-# res[res==-1]=0
-# res = res.T
-# metrics.f1_score(Y_test.cpu().flatten(), res.flatten())
+#%% just validation section, supposed that training is done
+D, D0, S, S0, W, opts, loss = torch.load(
+    '../saved_dicts/[3, 1, 5, 0.1, 0.01, 1, 0.1]DD0SS0Woptsloss.pt')
+X_val, Y_val = load_data(opts, data='val')
+_, _, St, S0t, _ = init(X_val, opts, init='rand')
+acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_val, Y_val, opts)
+print('\nThe test data accuracy, recall and precision are : ', acc.acc, acc.recall, acc.f1)
+plot_result(X_val, Y_val, D, D0, St, S0t, W, ft=0, loss=loss_t, opts=opts)
+print('done')
 
-with open(route+'you_raich_0.txt') as f:
-    data =f.readlines()
-rec = []
-prec = []
-count = 0
-for i, d in enumerate(data):
-    if d == 'rec =\n':
-        rec.append(float(data[i+2][4:10]))
-        count += 1
-
-    if d == 'prec =\n':
-        prec.append(float(data[i+2][4:10]))
-        if count == 10:
-            print(rec[-1])
-            print(prec[-1])
-
-rec, prec = torch.tensor(rec), torch.tensor(prec)
-f1 = 2/(1/rec+1/prec)
-v, i = f1.sort()
-# best lamb, winzize, N
-# 10, 30, 200
-# 10, 100, 10
-# 10, 50, 50
-
-
-
-#%% visualize learned atoms
-param = str([opts.K, opts.K0, opts.Dw, opts.lamb, opts.lamb0, opts.eta , opts.mu])
-D, D0, S, S0, W, opts, loss = \
-    torch.load('../saved_dicts/'+param+'DD0SS0Woptsloss.pt', map_location='cpu')
-
-for i in range(10):
-    fig= plt.figure()
-    fig.set_size_inches(w=4, h=6)
-    d = D[i].permute(0,2,1).reshape(opts.Dh, opts.K*opts.Dw).cpu()
-    plt.imshow(d, aspect='auto', interpolation='None')
-    plt.title(f'Class {i} atoms')
-
-
-
-# %% check results
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-plt.imshow(y_hat.cpu(),aspect='auto', interpolation='None')
-plt.title('y_hat')
-
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-yt = y_hat.clone()
-thr = 0.3
-yt[yt>=thr] = 1
-yt[yt<thr] = 0
-plt.imshow(yt.cpu(),aspect='auto', interpolation='None')
-plt.title(f'y_hat with threshold {thr}')
-
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-plt.imshow(Y_val.cpu(),aspect='auto', interpolation='None')
-plt.title('Y')
+# %%
