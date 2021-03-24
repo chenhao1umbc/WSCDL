@@ -10,7 +10,7 @@ opts.Dh, opts.Dw, opts.batch_size = 100, 29, -1
 opts.lamb, opts.lamb0, opts.eta, opts.mu = 0.1, 0.1, 0.01, 0.1 #sparsity, label, low rank
 
 # %% analysis result
-record = torch.load('tunning.pt')
+record = torch.load('tunning_rough.pt')
 n = len(record)
 res = torch.rand(n, 3)
 param = torch.rand(n,5)
@@ -69,6 +69,19 @@ index = param[idx][:, which_is_0].sort()[1]
 plt.plot(param[idx][:, which_is_0].sort()[0], r[:, -1][index], '-x')
 
 
+#%%
+record = torch.load('tunning.pt')
+res = torch.zeros(80, 3)
+para = torch.zeros(80, 5)
+for i,r in enumerate(record):
+    res[i] = torch.tensor(r[0])
+    para[i] = torch.tensor(r[1])
+
+res = res.reshape(5, 16, -1).mean(0)
+para = para.reshape(5, 16, -1).mean(0)
+v, i = res.sort()
+"Dw=29, lamb=0.1, lamb0=0.1, eta=0.001, mu=0.1 is the best" 
+
 # %% compare with others' result
 route = '/home/chenhao1/Matlab/WSCDL/'
 # res = sio.loadmat(route+'res_knn.mat')
@@ -117,22 +130,7 @@ for i in range(10):
 
 
 
-# %% check results
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-plt.imshow(y_hat.cpu(),aspect='auto', interpolation='None')
-plt.title('y_hat')
 
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-yt = y_hat.clone()
-thr = 0.3
-yt[yt>=thr] = 1
-yt[yt<thr] = 0
-plt.imshow(yt.cpu(),aspect='auto', interpolation='None')
-plt.title(f'y_hat with threshold {thr}')
 
-fig= plt.figure()
-fig.set_size_inches(w=12, h=8)
-plt.imshow(Y_val.cpu(),aspect='auto', interpolation='None')
-plt.title('Y')
+
+# %%

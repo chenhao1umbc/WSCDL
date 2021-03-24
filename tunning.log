@@ -1,0 +1,4064 @@
+
+Running on GPU
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :13.44
+In the 3 epoch, the training time is :13.38
+In the 6 epoch, the training time is :11.64
+In the 9 epoch, the training time is :10.60
+In the 12 epoch, the training time is :9.73
+In the 15 epoch, the training time is :9.40
+In the 18 epoch, the training time is :8.91
+In the 21 epoch, the training time is :8.88
+In the 24 epoch, the training time is :8.65
+In the 27 epoch, the training time is :8.46
+In the 30 epoch, the training time is :8.92
+In the 33 epoch, the training time is :8.36
+In the 36 epoch, the training time is :8.58
+In the 39 epoch, the training time is :8.38
+In the 42 epoch, the training time is :8.36
+In the 45 epoch, the training time is :8.38
+loss is not going down-- break
+After 48 epochs, the loss function value is 2.0161e+03
+All done, the total running time is 476.45 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :2.91
+In the 3 epoch, the sparse coding time is :2.80
+In the 6 epoch, the sparse coding time is :2.61
+In the 9 epoch, the sparse coding time is :2.70
+In the 12 epoch, the sparse coding time is :2.65
+In the 15 epoch, the sparse coding time is :2.67
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6745 0.61328125 0.5913370998116761
+with parameters as :  21 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :13.62
+In the 3 epoch, the training time is :13.18
+In the 6 epoch, the training time is :10.94
+In the 9 epoch, the training time is :9.74
+In the 12 epoch, the training time is :8.79
+In the 15 epoch, the training time is :8.50
+In the 18 epoch, the training time is :8.44
+In the 21 epoch, the training time is :8.10
+In the 24 epoch, the training time is :8.09
+loss is not going down-- break
+After 25 epochs, the loss function value is 2.6107e+03
+All done, the total running time is 261.17 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :2.95
+In the 3 epoch, the sparse coding time is :2.85
+In the 6 epoch, the sparse coding time is :3.00
+In the 9 epoch, the sparse coding time is :2.78
+In the 12 epoch, the sparse coding time is :2.92
+In the 15 epoch, the sparse coding time is :2.78
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.678 0.6419270833333334 0.6049079754601228
+with parameters as :  21 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :13.02
+In the 3 epoch, the training time is :12.29
+In the 6 epoch, the training time is :11.12
+In the 9 epoch, the training time is :10.64
+In the 12 epoch, the training time is :9.12
+In the 15 epoch, the training time is :9.99
+In the 18 epoch, the training time is :9.01
+In the 21 epoch, the training time is :9.23
+In the 24 epoch, the training time is :9.38
+In the 27 epoch, the training time is :8.94
+In the 30 epoch, the training time is :8.82
+In the 33 epoch, the training time is :8.39
+In the 36 epoch, the training time is :8.60
+loss is not going down-- break
+After 38 epochs, the loss function value is 1.7486e+03
+All done, the total running time is 390.35 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :3.01
+In the 3 epoch, the sparse coding time is :2.96
+In the 6 epoch, the sparse coding time is :2.68
+In the 9 epoch, the sparse coding time is :3.00
+In the 12 epoch, the sparse coding time is :2.67
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6305 0.5377604166666666 0.5277955271565494
+with parameters as :  21 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :13.32
+In the 3 epoch, the training time is :13.54
+In the 6 epoch, the training time is :11.86
+In the 9 epoch, the training time is :10.45
+In the 12 epoch, the training time is :9.52
+In the 15 epoch, the training time is :9.53
+In the 18 epoch, the training time is :9.29
+In the 21 epoch, the training time is :8.82
+In the 24 epoch, the training time is :9.31
+In the 27 epoch, the training time is :8.94
+In the 30 epoch, the training time is :9.07
+In the 33 epoch, the training time is :9.19
+In the 36 epoch, the training time is :9.12
+In the 39 epoch, the training time is :8.81
+loss is not going down-- break
+After 41 epochs, the loss function value is 2.3158e+03
+All done, the total running time is 431.24 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :3.20
+In the 3 epoch, the sparse coding time is :3.05
+In the 6 epoch, the sparse coding time is :2.67
+In the 9 epoch, the sparse coding time is :2.88
+In the 12 epoch, the sparse coding time is :2.84
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6615 0.55859375 0.5589576547231271
+with parameters as :  21 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :16.28
+In the 3 epoch, the training time is :14.11
+In the 6 epoch, the training time is :12.21
+In the 9 epoch, the training time is :10.84
+In the 12 epoch, the training time is :10.15
+In the 15 epoch, the training time is :10.12
+In the 18 epoch, the training time is :10.15
+In the 21 epoch, the training time is :9.72
+In the 24 epoch, the training time is :9.97
+In the 27 epoch, the training time is :9.89
+In the 30 epoch, the training time is :9.93
+In the 33 epoch, the training time is :9.60
+In the 36 epoch, the training time is :9.72
+In the 39 epoch, the training time is :9.60
+In the 42 epoch, the training time is :9.82
+In the 45 epoch, the training time is :9.32
+In the 48 epoch, the training time is :9.25
+In the 51 epoch, the training time is :9.35
+In the 54 epoch, the training time is :9.57
+In the 57 epoch, the training time is :9.38
+In the 60 epoch, the training time is :9.23
+In the 63 epoch, the training time is :9.20
+In the 66 epoch, the training time is :9.19
+In the 69 epoch, the training time is :8.89
+In the 72 epoch, the training time is :9.23
+In the 75 epoch, the training time is :9.65
+In the 78 epoch, the training time is :9.33
+In the 81 epoch, the training time is :9.50
+In the 84 epoch, the training time is :8.88
+In the 87 epoch, the training time is :9.16
+In the 90 epoch, the training time is :9.11
+In the 93 epoch, the training time is :9.26
+In the 96 epoch, the training time is :9.35
+In the 99 epoch, the training time is :9.23
+In the 102 epoch, the training time is :9.03
+In the 105 epoch, the training time is :9.25
+In the 108 epoch, the training time is :9.33
+In the 111 epoch, the training time is :9.44
+In the 114 epoch, the training time is :9.25
+In the 117 epoch, the training time is :9.45
+In the 120 epoch, the training time is :9.31
+In the 123 epoch, the training time is :9.14
+In the 126 epoch, the training time is :9.09
+In the 129 epoch, the training time is :9.16
+In the 132 epoch, the training time is :9.61
+In the 135 epoch, the training time is :9.03
+In the 138 epoch, the training time is :9.17
+In the 141 epoch, the training time is :9.46
+In the 144 epoch, the training time is :9.17
+In the 147 epoch, the training time is :8.73
+In the 150 epoch, the training time is :9.23
+In the 153 epoch, the training time is :9.34
+In the 156 epoch, the training time is :9.04
+In the 159 epoch, the training time is :9.00
+In the 162 epoch, the training time is :9.10
+In the 165 epoch, the training time is :9.22
+In the 168 epoch, the training time is :9.33
+In the 171 epoch, the training time is :9.14
+In the 174 epoch, the training time is :9.29
+In the 177 epoch, the training time is :9.06
+In the 180 epoch, the training time is :9.11
+In the 183 epoch, the training time is :9.02
+In the 186 epoch, the training time is :9.60
+In the 189 epoch, the training time is :8.52
+In the 192 epoch, the training time is :9.08
+In the 195 epoch, the training time is :8.80
+In the 198 epoch, the training time is :9.10
+loss is not going down-- break
+After 199 epochs, the loss function value is 1.0073e+03
+All done, the total running time is 1933.85 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :6.03
+In the 3 epoch, the sparse coding time is :4.33
+In the 6 epoch, the sparse coding time is :3.77
+In the 9 epoch, the sparse coding time is :3.21
+In the 12 epoch, the sparse coding time is :2.91
+In the 15 epoch, the sparse coding time is :3.23
+In the 18 epoch, the sparse coding time is :2.81
+In the 21 epoch, the sparse coding time is :3.10
+In the 24 epoch, the sparse coding time is :2.77
+In the 27 epoch, the sparse coding time is :2.94
+In the 30 epoch, the sparse coding time is :2.92
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6415 0.5377604166666666 0.5353208036292935
+with parameters as :  21 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :16.90
+In the 3 epoch, the training time is :13.06
+In the 6 epoch, the training time is :12.60
+In the 9 epoch, the training time is :11.10
+In the 12 epoch, the training time is :10.57
+In the 15 epoch, the training time is :10.83
+In the 18 epoch, the training time is :10.53
+In the 21 epoch, the training time is :10.70
+In the 24 epoch, the training time is :10.34
+In the 27 epoch, the training time is :10.18
+In the 30 epoch, the training time is :10.26
+In the 33 epoch, the training time is :9.82
+In the 36 epoch, the training time is :9.80
+In the 39 epoch, the training time is :9.67
+In the 42 epoch, the training time is :9.56
+In the 45 epoch, the training time is :9.69
+In the 48 epoch, the training time is :9.78
+In the 51 epoch, the training time is :9.73
+In the 54 epoch, the training time is :9.50
+In the 57 epoch, the training time is :9.31
+In the 60 epoch, the training time is :9.74
+In the 63 epoch, the training time is :9.30
+In the 66 epoch, the training time is :9.15
+In the 69 epoch, the training time is :9.25
+In the 72 epoch, the training time is :9.33
+In the 75 epoch, the training time is :9.43
+In the 78 epoch, the training time is :9.07
+In the 81 epoch, the training time is :9.05
+In the 84 epoch, the training time is :9.53
+In the 87 epoch, the training time is :9.38
+In the 90 epoch, the training time is :9.43
+In the 93 epoch, the training time is :8.95
+In the 96 epoch, the training time is :9.37
+In the 99 epoch, the training time is :9.03
+In the 102 epoch, the training time is :8.99
+In the 105 epoch, the training time is :8.93
+In the 108 epoch, the training time is :9.04
+In the 111 epoch, the training time is :8.68
+In the 114 epoch, the training time is :9.10
+In the 117 epoch, the training time is :8.87
+In the 120 epoch, the training time is :9.13
+In the 123 epoch, the training time is :9.09
+In the 126 epoch, the training time is :9.13
+In the 129 epoch, the training time is :9.20
+In the 132 epoch, the training time is :8.99
+loss is not going down-- break
+After 134 epochs, the loss function value is 1.5896e+03
+All done, the total running time is 1345.05 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :4.36
+In the 3 epoch, the sparse coding time is :3.45
+In the 6 epoch, the sparse coding time is :3.02
+In the 9 epoch, the sparse coding time is :3.24
+In the 12 epoch, the sparse coding time is :2.86
+In the 15 epoch, the sparse coding time is :3.03
+In the 18 epoch, the sparse coding time is :3.04
+In the 21 epoch, the sparse coding time is :2.90
+In the 24 epoch, the sparse coding time is :2.82
+In the 27 epoch, the sparse coding time is :2.83
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6275 0.5546875 0.5335003130870382
+with parameters as :  21 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :16.03
+In the 3 epoch, the training time is :14.05
+In the 6 epoch, the training time is :12.64
+In the 9 epoch, the training time is :11.12
+In the 12 epoch, the training time is :10.90
+In the 15 epoch, the training time is :10.74
+In the 18 epoch, the training time is :10.49
+In the 21 epoch, the training time is :10.00
+In the 24 epoch, the training time is :10.43
+In the 27 epoch, the training time is :9.80
+In the 30 epoch, the training time is :10.11
+In the 33 epoch, the training time is :10.38
+In the 36 epoch, the training time is :9.68
+In the 39 epoch, the training time is :9.66
+In the 42 epoch, the training time is :9.76
+In the 45 epoch, the training time is :9.30
+In the 48 epoch, the training time is :9.36
+In the 51 epoch, the training time is :9.38
+In the 54 epoch, the training time is :9.44
+In the 57 epoch, the training time is :9.49
+In the 60 epoch, the training time is :9.38
+In the 63 epoch, the training time is :9.24
+In the 66 epoch, the training time is :9.31
+In the 69 epoch, the training time is :9.55
+In the 72 epoch, the training time is :9.16
+In the 75 epoch, the training time is :9.36
+In the 78 epoch, the training time is :9.16
+In the 81 epoch, the training time is :9.25
+In the 84 epoch, the training time is :9.39
+In the 87 epoch, the training time is :9.48
+In the 90 epoch, the training time is :9.06
+In the 93 epoch, the training time is :9.14
+In the 96 epoch, the training time is :9.33
+In the 99 epoch, the training time is :9.31
+In the 102 epoch, the training time is :8.87
+In the 105 epoch, the training time is :9.73
+In the 108 epoch, the training time is :9.05
+In the 111 epoch, the training time is :8.95
+In the 114 epoch, the training time is :9.07
+In the 117 epoch, the training time is :9.20
+In the 120 epoch, the training time is :8.91
+In the 123 epoch, the training time is :8.86
+In the 126 epoch, the training time is :8.87
+In the 129 epoch, the training time is :8.90
+In the 132 epoch, the training time is :9.13
+In the 135 epoch, the training time is :8.72
+In the 138 epoch, the training time is :9.03
+In the 141 epoch, the training time is :9.11
+In the 144 epoch, the training time is :8.88
+In the 147 epoch, the training time is :8.82
+In the 150 epoch, the training time is :9.19
+In the 153 epoch, the training time is :9.20
+In the 156 epoch, the training time is :8.86
+In the 159 epoch, the training time is :9.06
+In the 162 epoch, the training time is :8.94
+In the 165 epoch, the training time is :9.42
+In the 168 epoch, the training time is :8.89
+In the 171 epoch, the training time is :8.76
+loss is not going down-- break
+After 173 epochs, the loss function value is 9.6925e+02
+All done, the total running time is 1707.62 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :4.12
+In the 3 epoch, the sparse coding time is :3.32
+In the 6 epoch, the sparse coding time is :3.38
+In the 9 epoch, the sparse coding time is :3.05
+In the 12 epoch, the sparse coding time is :2.95
+In the 15 epoch, the sparse coding time is :2.83
+In the 18 epoch, the sparse coding time is :3.10
+In the 21 epoch, the sparse coding time is :2.93
+In the 24 epoch, the sparse coding time is :2.76
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.64 0.5377604166666666 0.5342820181112548
+with parameters as :  21 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :15.89
+In the 3 epoch, the training time is :14.03
+In the 6 epoch, the training time is :13.02
+In the 9 epoch, the training time is :11.78
+In the 12 epoch, the training time is :10.95
+In the 15 epoch, the training time is :10.52
+In the 18 epoch, the training time is :10.11
+In the 21 epoch, the training time is :10.04
+In the 24 epoch, the training time is :9.86
+In the 27 epoch, the training time is :10.03
+In the 30 epoch, the training time is :9.98
+In the 33 epoch, the training time is :10.15
+In the 36 epoch, the training time is :9.68
+In the 39 epoch, the training time is :9.92
+In the 42 epoch, the training time is :9.51
+In the 45 epoch, the training time is :9.79
+In the 48 epoch, the training time is :9.68
+In the 51 epoch, the training time is :9.88
+In the 54 epoch, the training time is :9.52
+In the 57 epoch, the training time is :9.65
+In the 60 epoch, the training time is :9.88
+In the 63 epoch, the training time is :9.34
+In the 66 epoch, the training time is :9.17
+In the 69 epoch, the training time is :9.29
+In the 72 epoch, the training time is :9.48
+In the 75 epoch, the training time is :9.11
+In the 78 epoch, the training time is :9.09
+In the 81 epoch, the training time is :9.15
+In the 84 epoch, the training time is :9.21
+In the 87 epoch, the training time is :9.20
+In the 90 epoch, the training time is :9.10
+In the 93 epoch, the training time is :9.14
+loss is not going down-- break
+After 96 epochs, the loss function value is 1.5896e+03
+All done, the total running time is 998.13 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :3.81
+In the 3 epoch, the sparse coding time is :3.36
+In the 6 epoch, the sparse coding time is :2.92
+In the 9 epoch, the sparse coding time is :2.89
+In the 12 epoch, the sparse coding time is :2.64
+In the 15 epoch, the sparse coding time is :2.60
+In the 18 epoch, the sparse coding time is :2.89
+In the 21 epoch, the sparse coding time is :3.06
+In the 24 epoch, the sparse coding time is :2.73
+In the 27 epoch, the sparse coding time is :2.91
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6465 0.58203125 0.5584009993753903
+with parameters as :  21 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :12.33
+In the 3 epoch, the training time is :13.01
+In the 6 epoch, the training time is :11.48
+In the 9 epoch, the training time is :10.49
+In the 12 epoch, the training time is :9.66
+In the 15 epoch, the training time is :9.12
+In the 18 epoch, the training time is :9.08
+In the 21 epoch, the training time is :8.69
+In the 24 epoch, the training time is :8.55
+In the 27 epoch, the training time is :8.29
+In the 30 epoch, the training time is :8.37
+In the 33 epoch, the training time is :8.26
+In the 36 epoch, the training time is :8.24
+In the 39 epoch, the training time is :8.60
+In the 42 epoch, the training time is :8.51
+In the 45 epoch, the training time is :8.32
+In the 48 epoch, the training time is :8.29
+loss is not going down-- break
+After 50 epochs, the loss function value is 2.0032e+03
+All done, the total running time is 486.26 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :3.16
+In the 3 epoch, the sparse coding time is :2.97
+In the 6 epoch, the sparse coding time is :2.83
+In the 9 epoch, the sparse coding time is :2.87
+In the 12 epoch, the sparse coding time is :2.89
+In the 15 epoch, the sparse coding time is :2.74
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6785 0.62890625 0.6003729024238658
+with parameters as :  29 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :12.24
+In the 3 epoch, the training time is :13.29
+In the 6 epoch, the training time is :11.42
+In the 9 epoch, the training time is :9.88
+In the 12 epoch, the training time is :9.29
+In the 15 epoch, the training time is :9.15
+In the 18 epoch, the training time is :9.10
+In the 21 epoch, the training time is :8.80
+In the 24 epoch, the training time is :8.55
+In the 27 epoch, the training time is :8.41
+In the 30 epoch, the training time is :8.61
+In the 33 epoch, the training time is :8.37
+In the 36 epoch, the training time is :8.35
+loss is not going down-- break
+After 37 epochs, the loss function value is 2.5623e+03
+All done, the total running time is 376.43 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :2.87
+In the 3 epoch, the sparse coding time is :2.71
+In the 6 epoch, the sparse coding time is :2.74
+In the 9 epoch, the sparse coding time is :2.85
+In the 12 epoch, the sparse coding time is :2.86
+In the 15 epoch, the sparse coding time is :2.79
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.663 0.6145833333333334 0.5834363411619283
+with parameters as :  29 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :12.35
+In the 3 epoch, the training time is :12.55
+In the 6 epoch, the training time is :10.81
+In the 9 epoch, the training time is :10.38
+In the 12 epoch, the training time is :10.45
+In the 15 epoch, the training time is :9.45
+In the 18 epoch, the training time is :9.58
+In the 21 epoch, the training time is :9.12
+In the 24 epoch, the training time is :9.97
+In the 27 epoch, the training time is :9.33
+In the 30 epoch, the training time is :9.52
+In the 33 epoch, the training time is :9.61
+In the 36 epoch, the training time is :9.68
+In the 39 epoch, the training time is :9.20
+In the 42 epoch, the training time is :9.36
+In the 45 epoch, the training time is :8.90
+In the 48 epoch, the training time is :8.74
+In the 51 epoch, the training time is :9.00
+In the 54 epoch, the training time is :8.41
+In the 57 epoch, the training time is :8.92
+In the 60 epoch, the training time is :8.48
+loss is not going down-- break
+After 63 epochs, the loss function value is 1.7281e+03
+All done, the total running time is 635.63 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :3.50
+In the 3 epoch, the sparse coding time is :2.78
+In the 6 epoch, the sparse coding time is :2.88
+In the 9 epoch, the sparse coding time is :2.74
+In the 12 epoch, the sparse coding time is :2.93
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6505 0.5286458333333334 0.5373924553275976
+with parameters as :  29 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :13.82
+In the 3 epoch, the training time is :12.58
+In the 6 epoch, the training time is :12.86
+In the 9 epoch, the training time is :11.29
+In the 12 epoch, the training time is :10.78
+In the 15 epoch, the training time is :10.68
+In the 18 epoch, the training time is :9.66
+In the 21 epoch, the training time is :10.19
+In the 24 epoch, the training time is :9.25
+In the 27 epoch, the training time is :9.74
+In the 30 epoch, the training time is :8.79
+In the 33 epoch, the training time is :9.04
+In the 36 epoch, the training time is :8.78
+loss is not going down-- break
+After 38 epochs, the loss function value is 2.2837e+03
+All done, the total running time is 413.24 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :3.35
+In the 3 epoch, the sparse coding time is :3.11
+In the 6 epoch, the sparse coding time is :3.03
+In the 9 epoch, the sparse coding time is :2.92
+In the 12 epoch, the sparse coding time is :2.74
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.639 0.53125 0.5305591677503251
+with parameters as :  29 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :14.73
+In the 3 epoch, the training time is :14.13
+In the 6 epoch, the training time is :12.10
+In the 9 epoch, the training time is :11.71
+In the 12 epoch, the training time is :11.23
+In the 15 epoch, the training time is :10.81
+In the 18 epoch, the training time is :10.81
+In the 21 epoch, the training time is :10.33
+In the 24 epoch, the training time is :10.67
+In the 27 epoch, the training time is :10.34
+In the 30 epoch, the training time is :10.06
+In the 33 epoch, the training time is :10.02
+In the 36 epoch, the training time is :9.98
+In the 39 epoch, the training time is :10.06
+In the 42 epoch, the training time is :9.75
+In the 45 epoch, the training time is :9.63
+In the 48 epoch, the training time is :10.06
+In the 51 epoch, the training time is :10.01
+In the 54 epoch, the training time is :9.69
+In the 57 epoch, the training time is :9.75
+In the 60 epoch, the training time is :9.76
+In the 63 epoch, the training time is :9.77
+In the 66 epoch, the training time is :9.40
+In the 69 epoch, the training time is :9.52
+In the 72 epoch, the training time is :9.36
+In the 75 epoch, the training time is :9.34
+In the 78 epoch, the training time is :9.84
+In the 81 epoch, the training time is :9.73
+In the 84 epoch, the training time is :9.87
+In the 87 epoch, the training time is :9.93
+In the 90 epoch, the training time is :9.60
+In the 93 epoch, the training time is :9.61
+In the 96 epoch, the training time is :9.35
+In the 99 epoch, the training time is :9.56
+In the 102 epoch, the training time is :9.64
+In the 105 epoch, the training time is :9.34
+In the 108 epoch, the training time is :9.39
+In the 111 epoch, the training time is :9.45
+In the 114 epoch, the training time is :9.66
+In the 117 epoch, the training time is :9.44
+In the 120 epoch, the training time is :9.23
+In the 123 epoch, the training time is :9.52
+In the 126 epoch, the training time is :8.62
+In the 129 epoch, the training time is :9.47
+In the 132 epoch, the training time is :9.38
+In the 135 epoch, the training time is :9.54
+In the 138 epoch, the training time is :9.37
+In the 141 epoch, the training time is :9.50
+In the 144 epoch, the training time is :9.33
+In the 147 epoch, the training time is :9.07
+In the 150 epoch, the training time is :9.44
+In the 153 epoch, the training time is :8.90
+In the 156 epoch, the training time is :9.02
+In the 159 epoch, the training time is :9.52
+In the 162 epoch, the training time is :9.29
+In the 165 epoch, the training time is :9.41
+In the 168 epoch, the training time is :9.12
+In the 171 epoch, the training time is :9.15
+In the 174 epoch, the training time is :9.50
+In the 177 epoch, the training time is :9.28
+In the 180 epoch, the training time is :9.39
+In the 183 epoch, the training time is :9.30
+In the 186 epoch, the training time is :9.22
+In the 189 epoch, the training time is :8.83
+In the 192 epoch, the training time is :9.29
+In the 195 epoch, the training time is :9.24
+In the 198 epoch, the training time is :9.02
+After 199 epochs, the loss function value is 1.0241e+03
+All done, the total running time is 1982.57 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :4.88
+In the 3 epoch, the sparse coding time is :4.14
+In the 6 epoch, the sparse coding time is :3.42
+In the 9 epoch, the sparse coding time is :3.22
+In the 12 epoch, the sparse coding time is :3.25
+In the 15 epoch, the sparse coding time is :3.35
+In the 18 epoch, the sparse coding time is :2.78
+In the 21 epoch, the sparse coding time is :3.00
+In the 24 epoch, the sparse coding time is :2.81
+In the 27 epoch, the sparse coding time is :2.89
+In the 30 epoch, the sparse coding time is :2.92
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6175 0.6197916666666666 0.5544554455445545
+with parameters as :  29 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :17.27
+In the 3 epoch, the training time is :13.95
+In the 6 epoch, the training time is :13.40
+In the 9 epoch, the training time is :11.70
+In the 12 epoch, the training time is :11.86
+In the 15 epoch, the training time is :11.94
+In the 18 epoch, the training time is :10.23
+In the 21 epoch, the training time is :10.90
+In the 24 epoch, the training time is :10.14
+In the 27 epoch, the training time is :10.57
+In the 30 epoch, the training time is :10.18
+In the 33 epoch, the training time is :10.25
+In the 36 epoch, the training time is :10.31
+In the 39 epoch, the training time is :10.27
+In the 42 epoch, the training time is :9.69
+In the 45 epoch, the training time is :9.92
+In the 48 epoch, the training time is :9.67
+In the 51 epoch, the training time is :9.90
+In the 54 epoch, the training time is :9.98
+In the 57 epoch, the training time is :9.74
+In the 60 epoch, the training time is :9.70
+In the 63 epoch, the training time is :9.78
+In the 66 epoch, the training time is :9.76
+In the 69 epoch, the training time is :9.84
+In the 72 epoch, the training time is :9.50
+In the 75 epoch, the training time is :9.47
+In the 78 epoch, the training time is :9.45
+In the 81 epoch, the training time is :9.59
+In the 84 epoch, the training time is :9.73
+In the 87 epoch, the training time is :9.39
+In the 90 epoch, the training time is :9.65
+In the 93 epoch, the training time is :9.67
+In the 96 epoch, the training time is :9.58
+In the 99 epoch, the training time is :9.44
+In the 102 epoch, the training time is :9.41
+In the 105 epoch, the training time is :9.53
+In the 108 epoch, the training time is :9.48
+In the 111 epoch, the training time is :9.41
+In the 114 epoch, the training time is :9.25
+In the 117 epoch, the training time is :9.36
+In the 120 epoch, the training time is :9.60
+loss is not going down-- break
+After 123 epochs, the loss function value is 1.6203e+03
+All done, the total running time is 1290.46 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :4.69
+In the 3 epoch, the sparse coding time is :3.95
+In the 6 epoch, the sparse coding time is :3.46
+In the 9 epoch, the sparse coding time is :3.31
+In the 12 epoch, the sparse coding time is :3.17
+In the 15 epoch, the sparse coding time is :3.10
+In the 18 epoch, the sparse coding time is :3.32
+In the 21 epoch, the sparse coding time is :3.13
+In the 24 epoch, the sparse coding time is :3.02
+In the 27 epoch, the sparse coding time is :3.09
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6165 0.5768229166666666 0.5359951603145796
+with parameters as :  29 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6482e+03
+In the 0 epoch, the training time is :17.04
+In the 3 epoch, the training time is :14.51
+In the 6 epoch, the training time is :13.21
+In the 9 epoch, the training time is :11.52
+In the 12 epoch, the training time is :11.47
+In the 15 epoch, the training time is :10.61
+In the 18 epoch, the training time is :10.72
+In the 21 epoch, the training time is :10.22
+In the 24 epoch, the training time is :10.65
+In the 27 epoch, the training time is :10.08
+In the 30 epoch, the training time is :10.35
+In the 33 epoch, the training time is :10.30
+In the 36 epoch, the training time is :10.04
+In the 39 epoch, the training time is :10.26
+In the 42 epoch, the training time is :10.43
+In the 45 epoch, the training time is :9.99
+In the 48 epoch, the training time is :10.48
+In the 51 epoch, the training time is :9.96
+In the 54 epoch, the training time is :10.25
+In the 57 epoch, the training time is :10.08
+In the 60 epoch, the training time is :9.96
+In the 63 epoch, the training time is :9.71
+In the 66 epoch, the training time is :9.64
+In the 69 epoch, the training time is :9.49
+In the 72 epoch, the training time is :10.00
+In the 75 epoch, the training time is :9.72
+In the 78 epoch, the training time is :10.20
+In the 81 epoch, the training time is :9.69
+In the 84 epoch, the training time is :9.93
+In the 87 epoch, the training time is :9.77
+In the 90 epoch, the training time is :9.17
+In the 93 epoch, the training time is :9.59
+In the 96 epoch, the training time is :9.46
+In the 99 epoch, the training time is :9.59
+In the 102 epoch, the training time is :9.75
+In the 105 epoch, the training time is :9.70
+In the 108 epoch, the training time is :9.15
+In the 111 epoch, the training time is :9.37
+In the 114 epoch, the training time is :9.25
+In the 117 epoch, the training time is :9.36
+In the 120 epoch, the training time is :9.23
+In the 123 epoch, the training time is :9.37
+In the 126 epoch, the training time is :9.44
+In the 129 epoch, the training time is :9.05
+In the 132 epoch, the training time is :9.28
+In the 135 epoch, the training time is :9.29
+In the 138 epoch, the training time is :9.33
+In the 141 epoch, the training time is :9.19
+In the 144 epoch, the training time is :8.89
+In the 147 epoch, the training time is :9.12
+In the 150 epoch, the training time is :9.02
+In the 153 epoch, the training time is :9.15
+In the 156 epoch, the training time is :9.11
+In the 159 epoch, the training time is :8.76
+In the 162 epoch, the training time is :9.11
+In the 165 epoch, the training time is :9.00
+In the 168 epoch, the training time is :9.21
+In the 171 epoch, the training time is :9.46
+In the 174 epoch, the training time is :9.00
+loss is not going down-- break
+After 175 epochs, the loss function value is 1.0001e+03
+All done, the total running time is 1775.83 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :6.90
+In the 3 epoch, the sparse coding time is :5.72
+In the 6 epoch, the sparse coding time is :4.95
+In the 9 epoch, the sparse coding time is :4.53
+In the 12 epoch, the sparse coding time is :4.05
+In the 15 epoch, the sparse coding time is :3.80
+In the 18 epoch, the sparse coding time is :3.62
+In the 21 epoch, the sparse coding time is :3.54
+In the 24 epoch, the sparse coding time is :3.32
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.626 0.6393229166666666 0.5676300578034682
+with parameters as :  29 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.1882e+03
+In the 0 epoch, the training time is :18.04
+In the 3 epoch, the training time is :13.89
+In the 6 epoch, the training time is :13.11
+In the 9 epoch, the training time is :11.27
+In the 12 epoch, the training time is :10.65
+In the 15 epoch, the training time is :10.83
+In the 18 epoch, the training time is :11.19
+In the 21 epoch, the training time is :10.14
+In the 24 epoch, the training time is :10.33
+In the 27 epoch, the training time is :9.93
+In the 30 epoch, the training time is :9.76
+In the 33 epoch, the training time is :10.20
+In the 36 epoch, the training time is :10.23
+In the 39 epoch, the training time is :9.63
+In the 42 epoch, the training time is :9.76
+In the 45 epoch, the training time is :9.52
+In the 48 epoch, the training time is :9.35
+In the 51 epoch, the training time is :9.78
+In the 54 epoch, the training time is :10.07
+In the 57 epoch, the training time is :9.48
+In the 60 epoch, the training time is :9.41
+In the 63 epoch, the training time is :10.23
+In the 66 epoch, the training time is :9.92
+In the 69 epoch, the training time is :10.25
+In the 72 epoch, the training time is :9.93
+In the 75 epoch, the training time is :9.84
+In the 78 epoch, the training time is :9.90
+In the 81 epoch, the training time is :9.87
+In the 84 epoch, the training time is :9.79
+In the 87 epoch, the training time is :9.45
+In the 90 epoch, the training time is :9.65
+In the 93 epoch, the training time is :9.51
+In the 96 epoch, the training time is :9.68
+In the 99 epoch, the training time is :9.71
+loss is not going down-- break
+After 101 epochs, the loss function value is 1.5655e+03
+All done, the total running time is 1074.01 
+
+Sparse coding initial loss function value is 9.2000e+02:
+In the 0 epoch, the sparse coding time is :4.01
+In the 3 epoch, the sparse coding time is :3.53
+In the 6 epoch, the sparse coding time is :3.57
+In the 9 epoch, the sparse coding time is :3.06
+In the 12 epoch, the sparse coding time is :3.17
+In the 15 epoch, the sparse coding time is :3.16
+In the 18 epoch, the sparse coding time is :2.96
+In the 21 epoch, the sparse coding time is :2.70
+In the 24 epoch, the sparse coding time is :3.10
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6215 0.5377604166666666 0.52179406190777
+with parameters as :  29 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :11.75
+In the 3 epoch, the training time is :12.98
+In the 6 epoch, the training time is :10.19
+In the 9 epoch, the training time is :9.77
+In the 12 epoch, the training time is :9.73
+In the 15 epoch, the training time is :9.09
+In the 18 epoch, the training time is :8.93
+In the 21 epoch, the training time is :8.84
+In the 24 epoch, the training time is :8.38
+In the 27 epoch, the training time is :8.47
+In the 30 epoch, the training time is :8.32
+loss is not going down-- break
+After 33 epochs, the loss function value is 2.0317e+03
+All done, the total running time is 332.84 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :2.92
+In the 3 epoch, the sparse coding time is :2.72
+In the 6 epoch, the sparse coding time is :2.64
+In the 9 epoch, the sparse coding time is :2.61
+In the 12 epoch, the sparse coding time is :2.41
+In the 15 epoch, the sparse coding time is :2.46
+In the 18 epoch, the sparse coding time is :2.70
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6205 0.55078125 0.5271028037383177
+with parameters as :  21 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :13.20
+In the 3 epoch, the training time is :12.38
+In the 6 epoch, the training time is :10.95
+In the 9 epoch, the training time is :9.53
+In the 12 epoch, the training time is :9.12
+In the 15 epoch, the training time is :9.07
+In the 18 epoch, the training time is :9.19
+In the 21 epoch, the training time is :9.23
+In the 24 epoch, the training time is :8.91
+In the 27 epoch, the training time is :9.14
+In the 30 epoch, the training time is :8.56
+loss is not going down-- break
+After 33 epochs, the loss function value is 2.5513e+03
+All done, the total running time is 339.03 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :2.85
+In the 3 epoch, the sparse coding time is :2.40
+In the 6 epoch, the sparse coding time is :2.43
+In the 9 epoch, the sparse coding time is :2.58
+In the 12 epoch, the sparse coding time is :2.68
+In the 15 epoch, the sparse coding time is :2.59
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.682 0.5950520833333334 0.5896774193548387
+with parameters as :  21 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :11.71
+In the 3 epoch, the training time is :13.21
+In the 6 epoch, the training time is :11.65
+In the 9 epoch, the training time is :11.30
+In the 12 epoch, the training time is :11.13
+In the 15 epoch, the training time is :9.89
+In the 18 epoch, the training time is :9.97
+In the 21 epoch, the training time is :9.57
+In the 24 epoch, the training time is :9.00
+In the 27 epoch, the training time is :8.91
+In the 30 epoch, the training time is :8.80
+In the 33 epoch, the training time is :8.35
+In the 36 epoch, the training time is :8.23
+In the 39 epoch, the training time is :8.58
+In the 42 epoch, the training time is :8.32
+loss is not going down-- break
+After 45 epochs, the loss function value is 1.7318e+03
+All done, the total running time is 461.63 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :2.92
+In the 3 epoch, the sparse coding time is :2.72
+In the 6 epoch, the sparse coding time is :2.69
+In the 9 epoch, the sparse coding time is :2.50
+In the 12 epoch, the sparse coding time is :2.46
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6425 0.5546875 0.5437141033822591
+with parameters as :  21 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :12.24
+In the 3 epoch, the training time is :12.63
+In the 6 epoch, the training time is :12.65
+In the 9 epoch, the training time is :11.47
+In the 12 epoch, the training time is :10.67
+In the 15 epoch, the training time is :9.68
+In the 18 epoch, the training time is :9.30
+In the 21 epoch, the training time is :9.55
+In the 24 epoch, the training time is :9.55
+In the 27 epoch, the training time is :9.35
+In the 30 epoch, the training time is :8.70
+In the 33 epoch, the training time is :8.99
+In the 36 epoch, the training time is :9.01
+In the 39 epoch, the training time is :8.83
+loss is not going down-- break
+After 40 epochs, the loss function value is 2.2984e+03
+All done, the total running time is 423.86 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :3.01
+In the 3 epoch, the sparse coding time is :2.75
+In the 6 epoch, the sparse coding time is :2.53
+In the 9 epoch, the sparse coding time is :2.58
+In the 12 epoch, the sparse coding time is :2.43
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6295 0.5091145833333334 0.5134602757715037
+with parameters as :  21 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :15.29
+In the 3 epoch, the training time is :14.03
+In the 6 epoch, the training time is :12.25
+In the 9 epoch, the training time is :11.10
+In the 12 epoch, the training time is :10.52
+In the 15 epoch, the training time is :9.98
+In the 18 epoch, the training time is :9.82
+In the 21 epoch, the training time is :9.53
+In the 24 epoch, the training time is :9.71
+In the 27 epoch, the training time is :10.09
+In the 30 epoch, the training time is :9.55
+In the 33 epoch, the training time is :9.63
+In the 36 epoch, the training time is :9.87
+In the 39 epoch, the training time is :9.47
+In the 42 epoch, the training time is :9.84
+In the 45 epoch, the training time is :9.42
+In the 48 epoch, the training time is :9.38
+In the 51 epoch, the training time is :9.21
+In the 54 epoch, the training time is :9.35
+In the 57 epoch, the training time is :9.57
+In the 60 epoch, the training time is :9.61
+In the 63 epoch, the training time is :9.39
+In the 66 epoch, the training time is :9.60
+In the 69 epoch, the training time is :9.50
+In the 72 epoch, the training time is :9.56
+In the 75 epoch, the training time is :9.35
+In the 78 epoch, the training time is :9.35
+In the 81 epoch, the training time is :9.79
+In the 84 epoch, the training time is :9.26
+In the 87 epoch, the training time is :9.45
+In the 90 epoch, the training time is :9.48
+In the 93 epoch, the training time is :9.60
+In the 96 epoch, the training time is :9.46
+In the 99 epoch, the training time is :9.42
+In the 102 epoch, the training time is :9.21
+In the 105 epoch, the training time is :9.32
+In the 108 epoch, the training time is :9.11
+In the 111 epoch, the training time is :9.22
+In the 114 epoch, the training time is :9.25
+In the 117 epoch, the training time is :9.09
+In the 120 epoch, the training time is :9.49
+In the 123 epoch, the training time is :9.13
+In the 126 epoch, the training time is :8.94
+In the 129 epoch, the training time is :9.39
+In the 132 epoch, the training time is :9.28
+In the 135 epoch, the training time is :9.49
+In the 138 epoch, the training time is :9.23
+In the 141 epoch, the training time is :9.38
+In the 144 epoch, the training time is :9.14
+In the 147 epoch, the training time is :9.08
+In the 150 epoch, the training time is :8.92
+In the 153 epoch, the training time is :9.58
+In the 156 epoch, the training time is :9.01
+In the 159 epoch, the training time is :9.31
+In the 162 epoch, the training time is :9.21
+In the 165 epoch, the training time is :9.30
+In the 168 epoch, the training time is :8.91
+In the 171 epoch, the training time is :8.88
+In the 174 epoch, the training time is :8.81
+In the 177 epoch, the training time is :8.93
+In the 180 epoch, the training time is :8.82
+loss is not going down-- break
+After 181 epochs, the loss function value is 1.0146e+03
+All done, the total running time is 1783.33 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :4.62
+In the 3 epoch, the sparse coding time is :3.50
+In the 6 epoch, the sparse coding time is :3.43
+In the 9 epoch, the sparse coding time is :2.91
+In the 12 epoch, the sparse coding time is :2.65
+In the 15 epoch, the sparse coding time is :2.95
+In the 18 epoch, the sparse coding time is :2.88
+In the 21 epoch, the sparse coding time is :2.97
+In the 24 epoch, the sparse coding time is :2.69
+In the 27 epoch, the sparse coding time is :2.76
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6265 0.5703125 0.5397412199630314
+with parameters as :  21 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :17.30
+In the 3 epoch, the training time is :13.02
+In the 6 epoch, the training time is :12.47
+In the 9 epoch, the training time is :10.97
+In the 12 epoch, the training time is :10.19
+In the 15 epoch, the training time is :10.06
+In the 18 epoch, the training time is :9.66
+In the 21 epoch, the training time is :9.98
+In the 24 epoch, the training time is :10.01
+In the 27 epoch, the training time is :9.82
+In the 30 epoch, the training time is :9.68
+In the 33 epoch, the training time is :9.66
+In the 36 epoch, the training time is :9.81
+In the 39 epoch, the training time is :9.88
+In the 42 epoch, the training time is :9.26
+In the 45 epoch, the training time is :9.22
+In the 48 epoch, the training time is :9.32
+In the 51 epoch, the training time is :9.75
+In the 54 epoch, the training time is :9.38
+In the 57 epoch, the training time is :9.42
+In the 60 epoch, the training time is :8.91
+In the 63 epoch, the training time is :9.45
+In the 66 epoch, the training time is :9.18
+In the 69 epoch, the training time is :9.29
+In the 72 epoch, the training time is :8.91
+In the 75 epoch, the training time is :9.35
+In the 78 epoch, the training time is :8.86
+In the 81 epoch, the training time is :9.27
+In the 84 epoch, the training time is :9.31
+In the 87 epoch, the training time is :9.03
+In the 90 epoch, the training time is :9.09
+In the 93 epoch, the training time is :8.74
+In the 96 epoch, the training time is :9.14
+In the 99 epoch, the training time is :9.30
+In the 102 epoch, the training time is :9.34
+In the 105 epoch, the training time is :9.02
+In the 108 epoch, the training time is :9.05
+loss is not going down-- break
+After 110 epochs, the loss function value is 1.5971e+03
+All done, the total running time is 1100.88 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :4.42
+In the 3 epoch, the sparse coding time is :3.38
+In the 6 epoch, the sparse coding time is :3.02
+In the 9 epoch, the sparse coding time is :2.97
+In the 12 epoch, the sparse coding time is :2.91
+In the 15 epoch, the sparse coding time is :2.84
+In the 18 epoch, the sparse coding time is :2.72
+In the 21 epoch, the sparse coding time is :2.61
+In the 24 epoch, the sparse coding time is :2.84
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.641 0.59765625 0.561124694376528
+with parameters as :  21 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :14.40
+In the 3 epoch, the training time is :12.89
+In the 6 epoch, the training time is :11.65
+In the 9 epoch, the training time is :10.49
+In the 12 epoch, the training time is :10.80
+In the 15 epoch, the training time is :10.59
+In the 18 epoch, the training time is :10.16
+In the 21 epoch, the training time is :10.34
+In the 24 epoch, the training time is :9.90
+In the 27 epoch, the training time is :9.74
+In the 30 epoch, the training time is :9.52
+In the 33 epoch, the training time is :9.45
+In the 36 epoch, the training time is :9.43
+In the 39 epoch, the training time is :9.75
+In the 42 epoch, the training time is :9.71
+In the 45 epoch, the training time is :9.77
+In the 48 epoch, the training time is :9.21
+In the 51 epoch, the training time is :9.44
+In the 54 epoch, the training time is :9.26
+In the 57 epoch, the training time is :9.40
+In the 60 epoch, the training time is :9.31
+In the 63 epoch, the training time is :9.16
+In the 66 epoch, the training time is :9.05
+In the 69 epoch, the training time is :9.22
+In the 72 epoch, the training time is :9.34
+In the 75 epoch, the training time is :9.11
+In the 78 epoch, the training time is :8.98
+In the 81 epoch, the training time is :9.33
+In the 84 epoch, the training time is :10.18
+In the 87 epoch, the training time is :9.21
+In the 90 epoch, the training time is :8.95
+In the 93 epoch, the training time is :9.09
+In the 96 epoch, the training time is :8.88
+In the 99 epoch, the training time is :8.87
+In the 102 epoch, the training time is :8.46
+In the 105 epoch, the training time is :8.54
+In the 108 epoch, the training time is :8.90
+In the 111 epoch, the training time is :8.82
+In the 114 epoch, the training time is :8.72
+In the 117 epoch, the training time is :8.52
+In the 120 epoch, the training time is :8.51
+In the 123 epoch, the training time is :8.55
+In the 126 epoch, the training time is :8.69
+In the 129 epoch, the training time is :8.89
+In the 132 epoch, the training time is :8.59
+In the 135 epoch, the training time is :8.76
+In the 138 epoch, the training time is :9.06
+In the 141 epoch, the training time is :9.06
+In the 144 epoch, the training time is :8.93
+In the 147 epoch, the training time is :8.89
+In the 150 epoch, the training time is :8.69
+In the 153 epoch, the training time is :9.01
+In the 156 epoch, the training time is :8.88
+In the 159 epoch, the training time is :8.80
+In the 162 epoch, the training time is :8.74
+In the 165 epoch, the training time is :8.90
+In the 168 epoch, the training time is :8.70
+In the 171 epoch, the training time is :8.91
+In the 174 epoch, the training time is :8.82
+loss is not going down-- break
+After 177 epochs, the loss function value is 9.8719e+02
+All done, the total running time is 1695.87 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :4.26
+In the 3 epoch, the sparse coding time is :3.59
+In the 6 epoch, the sparse coding time is :3.42
+In the 9 epoch, the sparse coding time is :3.30
+In the 12 epoch, the sparse coding time is :3.30
+In the 15 epoch, the sparse coding time is :3.13
+In the 18 epoch, the sparse coding time is :2.76
+In the 21 epoch, the sparse coding time is :2.86
+In the 24 epoch, the sparse coding time is :2.89
+In the 27 epoch, the sparse coding time is :2.77
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6245 0.5989583333333334 0.5505685218432077
+with parameters as :  21 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :17.19
+In the 3 epoch, the training time is :14.07
+In the 6 epoch, the training time is :12.52
+In the 9 epoch, the training time is :10.89
+In the 12 epoch, the training time is :10.75
+In the 15 epoch, the training time is :10.45
+In the 18 epoch, the training time is :10.42
+In the 21 epoch, the training time is :10.16
+In the 24 epoch, the training time is :10.26
+In the 27 epoch, the training time is :9.88
+In the 30 epoch, the training time is :10.29
+In the 33 epoch, the training time is :9.72
+In the 36 epoch, the training time is :10.23
+In the 39 epoch, the training time is :9.62
+In the 42 epoch, the training time is :9.80
+In the 45 epoch, the training time is :9.89
+In the 48 epoch, the training time is :9.32
+In the 51 epoch, the training time is :9.55
+In the 54 epoch, the training time is :9.54
+In the 57 epoch, the training time is :9.26
+In the 60 epoch, the training time is :9.66
+In the 63 epoch, the training time is :9.36
+In the 66 epoch, the training time is :9.34
+In the 69 epoch, the training time is :8.84
+In the 72 epoch, the training time is :9.66
+In the 75 epoch, the training time is :9.25
+In the 78 epoch, the training time is :9.43
+In the 81 epoch, the training time is :9.55
+In the 84 epoch, the training time is :9.49
+In the 87 epoch, the training time is :9.17
+In the 90 epoch, the training time is :9.24
+In the 93 epoch, the training time is :9.40
+In the 96 epoch, the training time is :8.93
+In the 99 epoch, the training time is :8.86
+In the 102 epoch, the training time is :9.02
+In the 105 epoch, the training time is :8.53
+loss is not going down-- break
+After 106 epochs, the loss function value is 1.5441e+03
+All done, the total running time is 1079.71 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :4.71
+In the 3 epoch, the sparse coding time is :3.46
+In the 6 epoch, the sparse coding time is :3.31
+In the 9 epoch, the sparse coding time is :3.22
+In the 12 epoch, the sparse coding time is :2.84
+In the 15 epoch, the sparse coding time is :2.77
+In the 18 epoch, the sparse coding time is :2.78
+In the 21 epoch, the sparse coding time is :2.82
+In the 24 epoch, the sparse coding time is :2.48
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.613 0.6015625 0.5441696113074205
+with parameters as :  21 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :12.51
+In the 3 epoch, the training time is :12.62
+In the 6 epoch, the training time is :11.28
+In the 9 epoch, the training time is :10.45
+In the 12 epoch, the training time is :9.77
+In the 15 epoch, the training time is :9.05
+In the 18 epoch, the training time is :8.71
+In the 21 epoch, the training time is :9.09
+In the 24 epoch, the training time is :8.90
+In the 27 epoch, the training time is :8.72
+In the 30 epoch, the training time is :8.59
+In the 33 epoch, the training time is :8.77
+In the 36 epoch, the training time is :8.71
+loss is not going down-- break
+After 39 epochs, the loss function value is 2.0421e+03
+All done, the total running time is 396.04 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :2.79
+In the 3 epoch, the sparse coding time is :2.50
+In the 6 epoch, the sparse coding time is :2.64
+In the 9 epoch, the sparse coding time is :2.35
+In the 12 epoch, the sparse coding time is :2.53
+In the 15 epoch, the sparse coding time is :2.53
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6855 0.6510416666666666 0.6138735420503376
+with parameters as :  29 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :13.50
+In the 3 epoch, the training time is :13.32
+In the 6 epoch, the training time is :10.75
+In the 9 epoch, the training time is :10.31
+In the 12 epoch, the training time is :9.81
+In the 15 epoch, the training time is :9.86
+In the 18 epoch, the training time is :9.14
+In the 21 epoch, the training time is :8.92
+In the 24 epoch, the training time is :8.94
+In the 27 epoch, the training time is :8.53
+loss is not going down-- break
+After 29 epochs, the loss function value is 2.6122e+03
+All done, the total running time is 311.33 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :3.09
+In the 3 epoch, the sparse coding time is :2.90
+In the 6 epoch, the sparse coding time is :2.70
+In the 9 epoch, the sparse coding time is :2.52
+In the 12 epoch, the sparse coding time is :2.51
+In the 15 epoch, the sparse coding time is :2.41
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.622 0.5442708333333334 0.5251256281407035
+with parameters as :  29 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :11.97
+In the 3 epoch, the training time is :13.98
+In the 6 epoch, the training time is :11.86
+In the 9 epoch, the training time is :10.77
+In the 12 epoch, the training time is :10.93
+In the 15 epoch, the training time is :9.64
+In the 18 epoch, the training time is :9.29
+In the 21 epoch, the training time is :9.55
+In the 24 epoch, the training time is :9.40
+In the 27 epoch, the training time is :9.36
+In the 30 epoch, the training time is :9.01
+In the 33 epoch, the training time is :8.87
+In the 36 epoch, the training time is :8.99
+In the 39 epoch, the training time is :9.12
+In the 42 epoch, the training time is :8.86
+In the 45 epoch, the training time is :8.98
+In the 48 epoch, the training time is :8.77
+loss is not going down-- break
+After 51 epochs, the loss function value is 1.7538e+03
+All done, the total running time is 520.81 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :2.90
+In the 3 epoch, the sparse coding time is :2.60
+In the 6 epoch, the sparse coding time is :2.51
+In the 9 epoch, the sparse coding time is :2.33
+In the 12 epoch, the sparse coding time is :2.49
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6535 0.5260416666666666 0.5383077948034644
+with parameters as :  29 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :12.72
+In the 3 epoch, the training time is :13.17
+In the 6 epoch, the training time is :11.63
+In the 9 epoch, the training time is :11.89
+In the 12 epoch, the training time is :11.04
+In the 15 epoch, the training time is :10.15
+In the 18 epoch, the training time is :9.84
+In the 21 epoch, the training time is :9.49
+In the 24 epoch, the training time is :9.85
+In the 27 epoch, the training time is :9.61
+In the 30 epoch, the training time is :9.28
+In the 33 epoch, the training time is :9.63
+In the 36 epoch, the training time is :9.18
+In the 39 epoch, the training time is :9.61
+In the 42 epoch, the training time is :9.37
+In the 45 epoch, the training time is :9.06
+In the 48 epoch, the training time is :8.98
+In the 51 epoch, the training time is :9.00
+In the 54 epoch, the training time is :8.91
+loss is not going down-- break
+After 55 epochs, the loss function value is 2.2625e+03
+All done, the total running time is 575.90 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :3.36
+In the 3 epoch, the sparse coding time is :3.14
+In the 6 epoch, the sparse coding time is :2.84
+In the 9 epoch, the sparse coding time is :2.82
+In the 12 epoch, the sparse coding time is :2.75
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.63 0.55078125 0.5334174022698613
+with parameters as :  29 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :15.28
+In the 3 epoch, the training time is :13.71
+In the 6 epoch, the training time is :12.51
+In the 9 epoch, the training time is :10.55
+In the 12 epoch, the training time is :10.78
+In the 15 epoch, the training time is :10.17
+In the 18 epoch, the training time is :10.11
+In the 21 epoch, the training time is :9.55
+In the 24 epoch, the training time is :9.46
+In the 27 epoch, the training time is :9.60
+In the 30 epoch, the training time is :9.70
+In the 33 epoch, the training time is :9.39
+In the 36 epoch, the training time is :9.47
+In the 39 epoch, the training time is :9.42
+In the 42 epoch, the training time is :9.43
+In the 45 epoch, the training time is :9.32
+In the 48 epoch, the training time is :9.15
+In the 51 epoch, the training time is :8.87
+In the 54 epoch, the training time is :9.34
+In the 57 epoch, the training time is :9.04
+In the 60 epoch, the training time is :9.10
+In the 63 epoch, the training time is :9.14
+In the 66 epoch, the training time is :8.86
+In the 69 epoch, the training time is :8.82
+In the 72 epoch, the training time is :9.13
+In the 75 epoch, the training time is :8.85
+In the 78 epoch, the training time is :8.83
+In the 81 epoch, the training time is :8.83
+In the 84 epoch, the training time is :8.99
+In the 87 epoch, the training time is :9.26
+In the 90 epoch, the training time is :8.82
+In the 93 epoch, the training time is :9.07
+In the 96 epoch, the training time is :8.79
+In the 99 epoch, the training time is :8.88
+In the 102 epoch, the training time is :9.18
+In the 105 epoch, the training time is :8.82
+In the 108 epoch, the training time is :8.92
+In the 111 epoch, the training time is :8.85
+In the 114 epoch, the training time is :9.15
+In the 117 epoch, the training time is :9.05
+In the 120 epoch, the training time is :8.90
+In the 123 epoch, the training time is :8.84
+In the 126 epoch, the training time is :8.72
+In the 129 epoch, the training time is :8.76
+In the 132 epoch, the training time is :8.54
+In the 135 epoch, the training time is :8.83
+In the 138 epoch, the training time is :8.73
+In the 141 epoch, the training time is :8.95
+In the 144 epoch, the training time is :8.68
+In the 147 epoch, the training time is :8.84
+In the 150 epoch, the training time is :8.60
+In the 153 epoch, the training time is :8.77
+In the 156 epoch, the training time is :8.53
+In the 159 epoch, the training time is :8.38
+In the 162 epoch, the training time is :8.72
+In the 165 epoch, the training time is :8.60
+In the 168 epoch, the training time is :8.65
+In the 171 epoch, the training time is :8.82
+In the 174 epoch, the training time is :8.64
+In the 177 epoch, the training time is :8.44
+In the 180 epoch, the training time is :9.42
+In the 183 epoch, the training time is :8.55
+In the 186 epoch, the training time is :8.54
+In the 189 epoch, the training time is :8.91
+In the 192 epoch, the training time is :9.40
+In the 195 epoch, the training time is :9.72
+In the 198 epoch, the training time is :9.24
+After 199 epochs, the loss function value is 1.0122e+03
+All done, the total running time is 1888.73 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :6.93
+In the 3 epoch, the sparse coding time is :6.18
+In the 6 epoch, the sparse coding time is :5.01
+In the 9 epoch, the sparse coding time is :4.76
+In the 12 epoch, the sparse coding time is :5.17
+In the 15 epoch, the sparse coding time is :5.09
+In the 18 epoch, the sparse coding time is :4.92
+In the 21 epoch, the sparse coding time is :6.13
+In the 24 epoch, the sparse coding time is :4.32
+In the 27 epoch, the sparse coding time is :4.38
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.621 0.5924479166666666 0.5455635491606715
+with parameters as :  29 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :20.33
+In the 3 epoch, the training time is :16.73
+In the 6 epoch, the training time is :14.60
+In the 9 epoch, the training time is :13.54
+In the 12 epoch, the training time is :12.93
+In the 15 epoch, the training time is :12.57
+In the 18 epoch, the training time is :12.34
+In the 21 epoch, the training time is :11.95
+In the 24 epoch, the training time is :12.04
+In the 27 epoch, the training time is :11.69
+In the 30 epoch, the training time is :11.80
+In the 33 epoch, the training time is :12.09
+In the 36 epoch, the training time is :11.67
+In the 39 epoch, the training time is :11.98
+In the 42 epoch, the training time is :11.46
+In the 45 epoch, the training time is :11.56
+In the 48 epoch, the training time is :11.55
+In the 51 epoch, the training time is :11.86
+In the 54 epoch, the training time is :11.31
+In the 57 epoch, the training time is :11.47
+In the 60 epoch, the training time is :11.42
+In the 63 epoch, the training time is :11.18
+In the 66 epoch, the training time is :11.18
+In the 69 epoch, the training time is :11.47
+In the 72 epoch, the training time is :11.13
+In the 75 epoch, the training time is :11.37
+In the 78 epoch, the training time is :11.05
+In the 81 epoch, the training time is :11.10
+In the 84 epoch, the training time is :11.18
+In the 87 epoch, the training time is :11.12
+In the 90 epoch, the training time is :11.05
+In the 93 epoch, the training time is :10.90
+In the 96 epoch, the training time is :10.85
+In the 99 epoch, the training time is :11.04
+In the 102 epoch, the training time is :10.76
+In the 105 epoch, the training time is :11.31
+In the 108 epoch, the training time is :10.93
+In the 111 epoch, the training time is :10.94
+In the 114 epoch, the training time is :10.90
+In the 117 epoch, the training time is :10.78
+In the 120 epoch, the training time is :10.87
+In the 123 epoch, the training time is :10.83
+In the 126 epoch, the training time is :10.69
+In the 129 epoch, the training time is :10.96
+In the 132 epoch, the training time is :10.66
+loss is not going down-- break
+After 135 epochs, the loss function value is 1.6052e+03
+All done, the total running time is 1622.26 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :7.06
+In the 3 epoch, the sparse coding time is :5.90
+In the 6 epoch, the sparse coding time is :4.85
+In the 9 epoch, the sparse coding time is :4.80
+In the 12 epoch, the sparse coding time is :4.65
+In the 15 epoch, the sparse coding time is :4.53
+In the 18 epoch, the sparse coding time is :4.39
+In the 21 epoch, the sparse coding time is :4.30
+In the 24 epoch, the sparse coding time is :4.33
+In the 27 epoch, the sparse coding time is :4.36
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6225 0.5651041666666666 0.5348120764017252
+with parameters as :  29 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6662e+03
+In the 0 epoch, the training time is :20.12
+In the 3 epoch, the training time is :17.12
+In the 6 epoch, the training time is :14.64
+In the 9 epoch, the training time is :13.88
+In the 12 epoch, the training time is :13.48
+In the 15 epoch, the training time is :12.36
+In the 18 epoch, the training time is :13.14
+In the 21 epoch, the training time is :12.31
+In the 24 epoch, the training time is :12.57
+In the 27 epoch, the training time is :11.85
+In the 30 epoch, the training time is :12.19
+In the 33 epoch, the training time is :11.63
+In the 36 epoch, the training time is :11.49
+In the 39 epoch, the training time is :11.60
+In the 42 epoch, the training time is :12.31
+In the 45 epoch, the training time is :11.35
+In the 48 epoch, the training time is :11.46
+In the 51 epoch, the training time is :11.16
+In the 54 epoch, the training time is :11.43
+In the 57 epoch, the training time is :11.50
+In the 60 epoch, the training time is :11.50
+In the 63 epoch, the training time is :11.50
+In the 66 epoch, the training time is :11.18
+In the 69 epoch, the training time is :11.26
+In the 72 epoch, the training time is :11.40
+In the 75 epoch, the training time is :10.52
+In the 78 epoch, the training time is :11.06
+In the 81 epoch, the training time is :10.68
+In the 84 epoch, the training time is :11.07
+In the 87 epoch, the training time is :10.57
+In the 90 epoch, the training time is :10.67
+In the 93 epoch, the training time is :10.64
+In the 96 epoch, the training time is :10.63
+In the 99 epoch, the training time is :10.45
+In the 102 epoch, the training time is :10.74
+In the 105 epoch, the training time is :10.65
+In the 108 epoch, the training time is :10.74
+In the 111 epoch, the training time is :10.60
+In the 114 epoch, the training time is :11.04
+In the 117 epoch, the training time is :10.44
+In the 120 epoch, the training time is :10.72
+In the 123 epoch, the training time is :10.44
+In the 126 epoch, the training time is :10.55
+In the 129 epoch, the training time is :10.46
+In the 132 epoch, the training time is :10.61
+In the 135 epoch, the training time is :10.52
+loss is not going down-- break
+After 136 epochs, the loss function value is 1.0162e+03
+All done, the total running time is 1620.35 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :6.02
+In the 3 epoch, the sparse coding time is :5.10
+In the 6 epoch, the sparse coding time is :4.62
+In the 9 epoch, the sparse coding time is :4.51
+In the 12 epoch, the sparse coding time is :4.41
+In the 15 epoch, the sparse coding time is :4.37
+In the 18 epoch, the sparse coding time is :4.35
+In the 21 epoch, the sparse coding time is :4.33
+In the 24 epoch, the sparse coding time is :4.25
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.623 0.578125 0.5408038976857491
+with parameters as :  29 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2062e+03
+In the 0 epoch, the training time is :22.72
+In the 3 epoch, the training time is :16.63
+In the 6 epoch, the training time is :14.79
+In the 9 epoch, the training time is :13.35
+In the 12 epoch, the training time is :13.32
+In the 15 epoch, the training time is :13.10
+In the 18 epoch, the training time is :12.88
+In the 21 epoch, the training time is :12.08
+In the 24 epoch, the training time is :12.24
+In the 27 epoch, the training time is :11.56
+In the 30 epoch, the training time is :12.02
+In the 33 epoch, the training time is :12.20
+In the 36 epoch, the training time is :11.40
+In the 39 epoch, the training time is :11.89
+In the 42 epoch, the training time is :11.55
+In the 45 epoch, the training time is :11.55
+In the 48 epoch, the training time is :11.49
+In the 51 epoch, the training time is :11.61
+In the 54 epoch, the training time is :11.26
+In the 57 epoch, the training time is :11.67
+In the 60 epoch, the training time is :11.07
+In the 63 epoch, the training time is :11.19
+In the 66 epoch, the training time is :11.20
+In the 69 epoch, the training time is :11.23
+In the 72 epoch, the training time is :10.92
+In the 75 epoch, the training time is :11.20
+In the 78 epoch, the training time is :11.06
+In the 81 epoch, the training time is :11.01
+In the 84 epoch, the training time is :11.00
+In the 87 epoch, the training time is :11.09
+In the 90 epoch, the training time is :11.22
+In the 93 epoch, the training time is :11.17
+In the 96 epoch, the training time is :11.22
+In the 99 epoch, the training time is :11.27
+In the 102 epoch, the training time is :11.11
+In the 105 epoch, the training time is :10.65
+In the 108 epoch, the training time is :10.85
+loss is not going down-- break
+After 111 epochs, the loss function value is 1.5849e+03
+All done, the total running time is 1361.89 
+
+Sparse coding initial loss function value is 9.3200e+02:
+In the 0 epoch, the sparse coding time is :6.61
+In the 3 epoch, the sparse coding time is :6.01
+In the 6 epoch, the sparse coding time is :5.45
+In the 9 epoch, the sparse coding time is :5.09
+In the 12 epoch, the sparse coding time is :4.87
+In the 15 epoch, the sparse coding time is :5.13
+In the 18 epoch, the sparse coding time is :4.85
+In the 21 epoch, the sparse coding time is :4.83
+In the 24 epoch, the sparse coding time is :4.66
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6335 0.6119791666666666 0.5618649133293484
+with parameters as :  29 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :15.16
+In the 3 epoch, the training time is :14.91
+In the 6 epoch, the training time is :13.00
+In the 9 epoch, the training time is :12.10
+In the 12 epoch, the training time is :11.57
+In the 15 epoch, the training time is :10.95
+In the 18 epoch, the training time is :10.27
+In the 21 epoch, the training time is :10.55
+In the 24 epoch, the training time is :10.70
+In the 27 epoch, the training time is :10.54
+In the 30 epoch, the training time is :10.66
+In the 33 epoch, the training time is :10.02
+In the 36 epoch, the training time is :9.62
+In the 39 epoch, the training time is :9.85
+In the 42 epoch, the training time is :9.68
+loss is not going down-- break
+After 44 epochs, the loss function value is 2.0281e+03
+All done, the total running time is 512.13 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.22
+In the 3 epoch, the sparse coding time is :4.12
+In the 6 epoch, the sparse coding time is :4.05
+In the 9 epoch, the sparse coding time is :4.07
+In the 12 epoch, the sparse coding time is :4.11
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6475 0.6119791666666666 0.5714285714285715
+with parameters as :  21 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :14.74
+In the 3 epoch, the training time is :15.09
+In the 6 epoch, the training time is :12.54
+In the 9 epoch, the training time is :11.89
+In the 12 epoch, the training time is :11.39
+In the 15 epoch, the training time is :10.70
+In the 18 epoch, the training time is :10.12
+In the 21 epoch, the training time is :10.26
+In the 24 epoch, the training time is :9.80
+In the 27 epoch, the training time is :10.05
+In the 30 epoch, the training time is :10.21
+In the 33 epoch, the training time is :9.66
+In the 36 epoch, the training time is :10.17
+loss is not going down-- break
+After 39 epochs, the loss function value is 2.6038e+03
+All done, the total running time is 454.31 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.21
+In the 3 epoch, the sparse coding time is :4.11
+In the 6 epoch, the sparse coding time is :4.13
+In the 9 epoch, the sparse coding time is :4.07
+In the 12 epoch, the sparse coding time is :4.05
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6625 0.6276041666666666 0.588163514338011
+with parameters as :  21 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :15.07
+In the 3 epoch, the training time is :15.45
+In the 6 epoch, the training time is :14.12
+In the 9 epoch, the training time is :12.90
+In the 12 epoch, the training time is :11.93
+In the 15 epoch, the training time is :10.93
+In the 18 epoch, the training time is :11.29
+In the 21 epoch, the training time is :11.47
+In the 24 epoch, the training time is :11.30
+In the 27 epoch, the training time is :11.41
+In the 30 epoch, the training time is :11.48
+In the 33 epoch, the training time is :11.34
+In the 36 epoch, the training time is :11.17
+In the 39 epoch, the training time is :11.63
+In the 42 epoch, the training time is :11.42
+In the 45 epoch, the training time is :11.64
+In the 48 epoch, the training time is :11.37
+In the 51 epoch, the training time is :10.69
+In the 54 epoch, the training time is :11.59
+In the 57 epoch, the training time is :11.38
+In the 60 epoch, the training time is :11.06
+In the 63 epoch, the training time is :10.54
+In the 66 epoch, the training time is :10.45
+In the 69 epoch, the training time is :10.63
+loss is not going down-- break
+After 70 epochs, the loss function value is 1.7349e+03
+All done, the total running time is 834.63 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.67
+In the 3 epoch, the sparse coding time is :4.17
+In the 6 epoch, the sparse coding time is :4.13
+In the 9 epoch, the sparse coding time is :4.07
+In the 12 epoch, the sparse coding time is :4.08
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.662 0.609375 0.5806451612903225
+with parameters as :  21 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :15.68
+In the 3 epoch, the training time is :15.38
+In the 6 epoch, the training time is :14.44
+In the 9 epoch, the training time is :12.49
+In the 12 epoch, the training time is :11.45
+In the 15 epoch, the training time is :11.64
+In the 18 epoch, the training time is :11.90
+In the 21 epoch, the training time is :11.83
+In the 24 epoch, the training time is :11.57
+In the 27 epoch, the training time is :11.45
+In the 30 epoch, the training time is :11.50
+In the 33 epoch, the training time is :11.45
+In the 36 epoch, the training time is :10.91
+In the 39 epoch, the training time is :10.44
+In the 42 epoch, the training time is :10.42
+In the 45 epoch, the training time is :10.37
+loss is not going down-- break
+After 47 epochs, the loss function value is 2.2756e+03
+All done, the total running time is 580.40 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.44
+In the 3 epoch, the sparse coding time is :4.31
+In the 6 epoch, the sparse coding time is :4.14
+In the 9 epoch, the sparse coding time is :3.99
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.667 0.5833333333333334 0.5736235595390525
+with parameters as :  21 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :18.18
+In the 3 epoch, the training time is :15.54
+In the 6 epoch, the training time is :13.51
+In the 9 epoch, the training time is :12.80
+In the 12 epoch, the training time is :12.69
+In the 15 epoch, the training time is :12.69
+In the 18 epoch, the training time is :12.79
+In the 21 epoch, the training time is :12.06
+In the 24 epoch, the training time is :11.94
+In the 27 epoch, the training time is :11.78
+In the 30 epoch, the training time is :11.38
+In the 33 epoch, the training time is :11.66
+In the 36 epoch, the training time is :11.15
+In the 39 epoch, the training time is :11.19
+In the 42 epoch, the training time is :11.63
+In the 45 epoch, the training time is :11.12
+In the 48 epoch, the training time is :11.36
+In the 51 epoch, the training time is :11.10
+In the 54 epoch, the training time is :10.83
+In the 57 epoch, the training time is :10.83
+In the 60 epoch, the training time is :11.08
+In the 63 epoch, the training time is :11.17
+In the 66 epoch, the training time is :10.81
+In the 69 epoch, the training time is :10.84
+In the 72 epoch, the training time is :10.83
+In the 75 epoch, the training time is :11.08
+In the 78 epoch, the training time is :10.78
+In the 81 epoch, the training time is :10.81
+In the 84 epoch, the training time is :10.98
+In the 87 epoch, the training time is :10.70
+In the 90 epoch, the training time is :10.78
+In the 93 epoch, the training time is :10.87
+In the 96 epoch, the training time is :10.63
+In the 99 epoch, the training time is :10.55
+In the 102 epoch, the training time is :10.66
+In the 105 epoch, the training time is :10.71
+In the 108 epoch, the training time is :10.53
+In the 111 epoch, the training time is :10.57
+In the 114 epoch, the training time is :10.58
+In the 117 epoch, the training time is :10.41
+In the 120 epoch, the training time is :10.40
+In the 123 epoch, the training time is :10.47
+In the 126 epoch, the training time is :10.54
+In the 129 epoch, the training time is :10.86
+In the 132 epoch, the training time is :10.53
+In the 135 epoch, the training time is :10.67
+In the 138 epoch, the training time is :10.50
+In the 141 epoch, the training time is :10.34
+In the 144 epoch, the training time is :10.45
+In the 147 epoch, the training time is :10.41
+In the 150 epoch, the training time is :10.24
+In the 153 epoch, the training time is :10.69
+In the 156 epoch, the training time is :10.53
+In the 159 epoch, the training time is :10.46
+In the 162 epoch, the training time is :10.66
+In the 165 epoch, the training time is :10.95
+In the 168 epoch, the training time is :10.94
+In the 171 epoch, the training time is :10.38
+In the 174 epoch, the training time is :10.35
+In the 177 epoch, the training time is :10.41
+In the 180 epoch, the training time is :10.47
+In the 183 epoch, the training time is :10.22
+loss is not going down-- break
+After 185 epochs, the loss function value is 1.0275e+03
+All done, the total running time is 2106.50 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :5.25
+In the 3 epoch, the sparse coding time is :4.59
+In the 6 epoch, the sparse coding time is :4.58
+In the 9 epoch, the sparse coding time is :4.33
+In the 12 epoch, the sparse coding time is :4.35
+In the 15 epoch, the sparse coding time is :4.20
+In the 18 epoch, the sparse coding time is :4.18
+In the 21 epoch, the sparse coding time is :4.17
+In the 24 epoch, the sparse coding time is :4.17
+In the 27 epoch, the sparse coding time is :4.25
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6385 0.6575520833333334 0.582804385458742
+with parameters as :  21 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :19.45
+In the 3 epoch, the training time is :15.57
+In the 6 epoch, the training time is :14.80
+In the 9 epoch, the training time is :13.17
+In the 12 epoch, the training time is :12.37
+In the 15 epoch, the training time is :11.71
+In the 18 epoch, the training time is :11.76
+In the 21 epoch, the training time is :11.63
+In the 24 epoch, the training time is :11.67
+In the 27 epoch, the training time is :11.62
+In the 30 epoch, the training time is :11.80
+In the 33 epoch, the training time is :11.94
+In the 36 epoch, the training time is :11.74
+In the 39 epoch, the training time is :11.60
+In the 42 epoch, the training time is :11.44
+In the 45 epoch, the training time is :11.38
+In the 48 epoch, the training time is :11.06
+In the 51 epoch, the training time is :11.44
+In the 54 epoch, the training time is :11.47
+In the 57 epoch, the training time is :11.25
+In the 60 epoch, the training time is :11.40
+In the 63 epoch, the training time is :10.90
+In the 66 epoch, the training time is :10.99
+In the 69 epoch, the training time is :11.43
+In the 72 epoch, the training time is :11.22
+In the 75 epoch, the training time is :10.87
+In the 78 epoch, the training time is :11.11
+In the 81 epoch, the training time is :10.76
+In the 84 epoch, the training time is :10.82
+In the 87 epoch, the training time is :10.85
+In the 90 epoch, the training time is :10.80
+In the 93 epoch, the training time is :11.03
+In the 96 epoch, the training time is :10.76
+In the 99 epoch, the training time is :10.57
+In the 102 epoch, the training time is :10.49
+In the 105 epoch, the training time is :10.69
+In the 108 epoch, the training time is :10.56
+In the 111 epoch, the training time is :10.58
+In the 114 epoch, the training time is :10.64
+In the 117 epoch, the training time is :10.86
+In the 120 epoch, the training time is :10.60
+loss is not going down-- break
+After 123 epochs, the loss function value is 1.5853e+03
+All done, the total running time is 1450.42 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :6.24
+In the 3 epoch, the sparse coding time is :5.28
+In the 6 epoch, the sparse coding time is :4.80
+In the 9 epoch, the sparse coding time is :4.60
+In the 12 epoch, the sparse coding time is :4.42
+In the 15 epoch, the sparse coding time is :4.57
+In the 18 epoch, the sparse coding time is :4.47
+In the 21 epoch, the sparse coding time is :4.44
+In the 24 epoch, the sparse coding time is :4.42
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6475 0.6236979166666666 0.5760673481659652
+with parameters as :  21 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :19.58
+In the 3 epoch, the training time is :15.97
+In the 6 epoch, the training time is :13.82
+In the 9 epoch, the training time is :13.09
+In the 12 epoch, the training time is :13.25
+In the 15 epoch, the training time is :12.83
+In the 18 epoch, the training time is :12.75
+In the 21 epoch, the training time is :12.08
+In the 24 epoch, the training time is :12.25
+In the 27 epoch, the training time is :12.14
+In the 30 epoch, the training time is :12.25
+In the 33 epoch, the training time is :11.42
+In the 36 epoch, the training time is :12.05
+In the 39 epoch, the training time is :11.40
+In the 42 epoch, the training time is :11.47
+In the 45 epoch, the training time is :10.87
+In the 48 epoch, the training time is :10.98
+In the 51 epoch, the training time is :11.21
+In the 54 epoch, the training time is :11.33
+In the 57 epoch, the training time is :11.09
+In the 60 epoch, the training time is :11.23
+In the 63 epoch, the training time is :11.05
+In the 66 epoch, the training time is :11.09
+In the 69 epoch, the training time is :10.97
+In the 72 epoch, the training time is :10.91
+In the 75 epoch, the training time is :11.08
+In the 78 epoch, the training time is :10.87
+In the 81 epoch, the training time is :10.82
+In the 84 epoch, the training time is :10.85
+In the 87 epoch, the training time is :10.95
+In the 90 epoch, the training time is :10.79
+In the 93 epoch, the training time is :10.76
+In the 96 epoch, the training time is :10.85
+In the 99 epoch, the training time is :10.47
+In the 102 epoch, the training time is :10.62
+In the 105 epoch, the training time is :10.56
+In the 108 epoch, the training time is :10.96
+In the 111 epoch, the training time is :10.64
+In the 114 epoch, the training time is :10.82
+In the 117 epoch, the training time is :10.59
+In the 120 epoch, the training time is :10.75
+In the 123 epoch, the training time is :10.55
+In the 126 epoch, the training time is :10.52
+In the 129 epoch, the training time is :10.56
+In the 132 epoch, the training time is :10.72
+In the 135 epoch, the training time is :10.44
+In the 138 epoch, the training time is :10.62
+In the 141 epoch, the training time is :10.44
+In the 144 epoch, the training time is :10.56
+In the 147 epoch, the training time is :10.65
+In the 150 epoch, the training time is :10.57
+In the 153 epoch, the training time is :10.92
+In the 156 epoch, the training time is :10.80
+In the 159 epoch, the training time is :10.62
+In the 162 epoch, the training time is :10.89
+In the 165 epoch, the training time is :10.67
+In the 168 epoch, the training time is :10.88
+In the 171 epoch, the training time is :10.67
+In the 174 epoch, the training time is :10.71
+In the 177 epoch, the training time is :10.38
+loss is not going down-- break
+After 178 epochs, the loss function value is 9.7262e+02
+All done, the total running time is 2057.94 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :6.23
+In the 3 epoch, the sparse coding time is :5.56
+In the 6 epoch, the sparse coding time is :5.28
+In the 9 epoch, the sparse coding time is :5.05
+In the 12 epoch, the sparse coding time is :4.86
+In the 15 epoch, the sparse coding time is :4.65
+In the 18 epoch, the sparse coding time is :4.58
+In the 21 epoch, the sparse coding time is :4.69
+In the 24 epoch, the sparse coding time is :4.61
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.639 0.6705729166666666 0.5878995433789954
+with parameters as :  21 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :20.78
+In the 3 epoch, the training time is :15.90
+In the 6 epoch, the training time is :14.21
+In the 9 epoch, the training time is :13.31
+In the 12 epoch, the training time is :13.31
+In the 15 epoch, the training time is :13.11
+In the 18 epoch, the training time is :12.56
+In the 21 epoch, the training time is :12.37
+In the 24 epoch, the training time is :11.99
+In the 27 epoch, the training time is :12.12
+In the 30 epoch, the training time is :11.82
+In the 33 epoch, the training time is :12.11
+In the 36 epoch, the training time is :11.35
+In the 39 epoch, the training time is :11.65
+In the 42 epoch, the training time is :11.66
+In the 45 epoch, the training time is :11.40
+In the 48 epoch, the training time is :11.50
+In the 51 epoch, the training time is :11.25
+In the 54 epoch, the training time is :10.94
+In the 57 epoch, the training time is :10.81
+In the 60 epoch, the training time is :11.02
+In the 63 epoch, the training time is :10.89
+In the 66 epoch, the training time is :11.03
+In the 69 epoch, the training time is :10.86
+In the 72 epoch, the training time is :10.68
+In the 75 epoch, the training time is :10.77
+In the 78 epoch, the training time is :10.75
+In the 81 epoch, the training time is :10.81
+In the 84 epoch, the training time is :10.74
+In the 87 epoch, the training time is :10.70
+In the 90 epoch, the training time is :10.52
+In the 93 epoch, the training time is :10.78
+In the 96 epoch, the training time is :10.57
+In the 99 epoch, the training time is :10.46
+In the 102 epoch, the training time is :10.73
+In the 105 epoch, the training time is :10.82
+loss is not going down-- break
+After 106 epochs, the loss function value is 1.5741e+03
+All done, the total running time is 1275.74 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :6.44
+In the 3 epoch, the sparse coding time is :5.33
+In the 6 epoch, the sparse coding time is :4.79
+In the 9 epoch, the sparse coding time is :4.73
+In the 12 epoch, the sparse coding time is :4.91
+In the 15 epoch, the sparse coding time is :4.58
+In the 18 epoch, the sparse coding time is :4.54
+In the 21 epoch, the sparse coding time is :4.66
+In the 24 epoch, the sparse coding time is :4.54
+In the 27 epoch, the sparse coding time is :4.46
+In the 30 epoch, the sparse coding time is :4.55
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.64 0.6575520833333334 0.5838150289017341
+with parameters as :  21 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :15.36
+In the 3 epoch, the training time is :15.41
+In the 6 epoch, the training time is :13.62
+In the 9 epoch, the training time is :12.47
+In the 12 epoch, the training time is :12.62
+In the 15 epoch, the training time is :11.24
+In the 18 epoch, the training time is :10.58
+In the 21 epoch, the training time is :10.09
+In the 24 epoch, the training time is :10.30
+In the 27 epoch, the training time is :10.11
+loss is not going down-- break
+After 30 epochs, the loss function value is 2.0360e+03
+All done, the total running time is 374.95 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.29
+In the 3 epoch, the sparse coding time is :4.07
+In the 6 epoch, the sparse coding time is :4.10
+In the 9 epoch, the sparse coding time is :4.21
+In the 12 epoch, the sparse coding time is :4.20
+In the 15 epoch, the sparse coding time is :4.09
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6595 0.6471354166666666 0.5934328358208955
+with parameters as :  29 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :15.18
+In the 3 epoch, the training time is :15.42
+In the 6 epoch, the training time is :14.34
+In the 9 epoch, the training time is :11.80
+In the 12 epoch, the training time is :11.30
+In the 15 epoch, the training time is :10.85
+In the 18 epoch, the training time is :10.56
+In the 21 epoch, the training time is :10.45
+In the 24 epoch, the training time is :10.44
+In the 27 epoch, the training time is :10.40
+In the 30 epoch, the training time is :10.10
+In the 33 epoch, the training time is :10.14
+In the 36 epoch, the training time is :10.11
+In the 39 epoch, the training time is :10.14
+In the 42 epoch, the training time is :9.81
+In the 45 epoch, the training time is :10.05
+loss is not going down-- break
+After 46 epochs, the loss function value is 2.6009e+03
+All done, the total running time is 538.78 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.54
+In the 3 epoch, the sparse coding time is :4.33
+In the 6 epoch, the sparse coding time is :4.34
+In the 9 epoch, the sparse coding time is :4.27
+In the 12 epoch, the sparse coding time is :4.19
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.652 0.6015625 0.5703703703703704
+with parameters as :  29 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :15.84
+In the 3 epoch, the training time is :16.18
+In the 6 epoch, the training time is :14.33
+In the 9 epoch, the training time is :12.86
+In the 12 epoch, the training time is :11.90
+In the 15 epoch, the training time is :12.36
+In the 18 epoch, the training time is :11.53
+In the 21 epoch, the training time is :11.66
+In the 24 epoch, the training time is :11.49
+In the 27 epoch, the training time is :10.95
+In the 30 epoch, the training time is :10.98
+In the 33 epoch, the training time is :11.32
+In the 36 epoch, the training time is :10.93
+In the 39 epoch, the training time is :11.09
+In the 42 epoch, the training time is :11.04
+In the 45 epoch, the training time is :10.82
+In the 48 epoch, the training time is :10.68
+In the 51 epoch, the training time is :11.01
+In the 54 epoch, the training time is :10.74
+In the 57 epoch, the training time is :10.74
+In the 60 epoch, the training time is :10.60
+In the 63 epoch, the training time is :10.37
+In the 66 epoch, the training time is :10.34
+In the 69 epoch, the training time is :10.07
+loss is not going down-- break
+After 70 epochs, the loss function value is 1.7234e+03
+All done, the total running time is 840.93 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.53
+In the 3 epoch, the sparse coding time is :4.30
+In the 6 epoch, the sparse coding time is :4.17
+In the 9 epoch, the sparse coding time is :4.03
+In the 12 epoch, the sparse coding time is :4.10
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.663 0.5872395833333334 0.5723350253807107
+with parameters as :  29 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :16.07
+In the 3 epoch, the training time is :15.38
+In the 6 epoch, the training time is :14.43
+In the 9 epoch, the training time is :13.95
+In the 12 epoch, the training time is :12.79
+In the 15 epoch, the training time is :11.91
+In the 18 epoch, the training time is :11.66
+In the 21 epoch, the training time is :11.44
+In the 24 epoch, the training time is :11.27
+In the 27 epoch, the training time is :10.50
+In the 30 epoch, the training time is :10.86
+In the 33 epoch, the training time is :10.08
+In the 36 epoch, the training time is :10.42
+loss is not going down-- break
+After 38 epochs, the loss function value is 2.2771e+03
+All done, the total running time is 485.72 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.68
+In the 3 epoch, the sparse coding time is :4.24
+In the 6 epoch, the sparse coding time is :4.08
+In the 9 epoch, the sparse coding time is :4.12
+In the 12 epoch, the sparse coding time is :4.17
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.638 0.57421875 0.5491905354919053
+with parameters as :  29 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :18.89
+In the 3 epoch, the training time is :16.10
+In the 6 epoch, the training time is :14.57
+In the 9 epoch, the training time is :13.17
+In the 12 epoch, the training time is :12.98
+In the 15 epoch, the training time is :12.66
+In the 18 epoch, the training time is :11.74
+In the 21 epoch, the training time is :12.04
+In the 24 epoch, the training time is :11.67
+In the 27 epoch, the training time is :12.13
+In the 30 epoch, the training time is :11.64
+In the 33 epoch, the training time is :12.18
+In the 36 epoch, the training time is :11.91
+In the 39 epoch, the training time is :12.07
+In the 42 epoch, the training time is :11.99
+In the 45 epoch, the training time is :11.61
+In the 48 epoch, the training time is :11.57
+In the 51 epoch, the training time is :11.47
+In the 54 epoch, the training time is :11.55
+In the 57 epoch, the training time is :11.03
+In the 60 epoch, the training time is :11.48
+In the 63 epoch, the training time is :11.24
+In the 66 epoch, the training time is :11.35
+In the 69 epoch, the training time is :11.34
+In the 72 epoch, the training time is :10.92
+In the 75 epoch, the training time is :11.11
+In the 78 epoch, the training time is :11.03
+In the 81 epoch, the training time is :11.26
+In the 84 epoch, the training time is :10.98
+In the 87 epoch, the training time is :10.97
+In the 90 epoch, the training time is :11.01
+In the 93 epoch, the training time is :10.85
+In the 96 epoch, the training time is :10.68
+In the 99 epoch, the training time is :11.14
+In the 102 epoch, the training time is :10.88
+In the 105 epoch, the training time is :11.19
+In the 108 epoch, the training time is :10.77
+In the 111 epoch, the training time is :10.77
+In the 114 epoch, the training time is :10.80
+In the 117 epoch, the training time is :10.92
+In the 120 epoch, the training time is :10.90
+In the 123 epoch, the training time is :10.64
+In the 126 epoch, the training time is :10.54
+In the 129 epoch, the training time is :10.88
+In the 132 epoch, the training time is :10.82
+In the 135 epoch, the training time is :10.99
+In the 138 epoch, the training time is :10.88
+In the 141 epoch, the training time is :10.58
+In the 144 epoch, the training time is :10.94
+In the 147 epoch, the training time is :10.77
+In the 150 epoch, the training time is :10.67
+In the 153 epoch, the training time is :10.79
+In the 156 epoch, the training time is :10.75
+In the 159 epoch, the training time is :10.51
+In the 162 epoch, the training time is :10.43
+In the 165 epoch, the training time is :10.70
+In the 168 epoch, the training time is :10.67
+In the 171 epoch, the training time is :10.75
+In the 174 epoch, the training time is :10.92
+In the 177 epoch, the training time is :10.90
+In the 180 epoch, the training time is :10.77
+In the 183 epoch, the training time is :10.86
+In the 186 epoch, the training time is :10.74
+In the 189 epoch, the training time is :10.81
+In the 192 epoch, the training time is :10.97
+In the 195 epoch, the training time is :10.70
+In the 198 epoch, the training time is :10.70
+After 199 epochs, the loss function value is 1.0198e+03
+All done, the total running time is 2308.79 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :7.12
+In the 3 epoch, the sparse coding time is :5.50
+In the 6 epoch, the sparse coding time is :4.82
+In the 9 epoch, the sparse coding time is :4.60
+In the 12 epoch, the sparse coding time is :4.50
+In the 15 epoch, the sparse coding time is :4.42
+In the 18 epoch, the sparse coding time is :4.39
+In the 21 epoch, the sparse coding time is :4.33
+In the 24 epoch, the sparse coding time is :4.23
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6195 0.6028645833333334 0.5489033787788974
+with parameters as :  29 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :19.04
+In the 3 epoch, the training time is :15.87
+In the 6 epoch, the training time is :14.29
+In the 9 epoch, the training time is :12.94
+In the 12 epoch, the training time is :12.60
+In the 15 epoch, the training time is :11.59
+In the 18 epoch, the training time is :12.25
+In the 21 epoch, the training time is :11.77
+In the 24 epoch, the training time is :11.99
+In the 27 epoch, the training time is :11.61
+In the 30 epoch, the training time is :11.36
+In the 33 epoch, the training time is :11.83
+In the 36 epoch, the training time is :11.34
+In the 39 epoch, the training time is :11.54
+In the 42 epoch, the training time is :11.15
+In the 45 epoch, the training time is :11.38
+In the 48 epoch, the training time is :11.79
+In the 51 epoch, the training time is :10.79
+In the 54 epoch, the training time is :11.39
+In the 57 epoch, the training time is :10.98
+In the 60 epoch, the training time is :11.10
+In the 63 epoch, the training time is :10.87
+In the 66 epoch, the training time is :10.58
+In the 69 epoch, the training time is :10.87
+In the 72 epoch, the training time is :10.87
+In the 75 epoch, the training time is :11.29
+In the 78 epoch, the training time is :11.02
+In the 81 epoch, the training time is :10.64
+In the 84 epoch, the training time is :10.55
+In the 87 epoch, the training time is :10.86
+In the 90 epoch, the training time is :10.59
+In the 93 epoch, the training time is :10.81
+In the 96 epoch, the training time is :10.40
+In the 99 epoch, the training time is :10.49
+In the 102 epoch, the training time is :11.21
+In the 105 epoch, the training time is :10.84
+In the 108 epoch, the training time is :10.74
+In the 111 epoch, the training time is :10.55
+In the 114 epoch, the training time is :10.72
+In the 117 epoch, the training time is :10.77
+In the 120 epoch, the training time is :10.50
+In the 123 epoch, the training time is :10.70
+In the 126 epoch, the training time is :10.73
+In the 129 epoch, the training time is :10.47
+In the 132 epoch, the training time is :10.60
+loss is not going down-- break
+After 135 epochs, the loss function value is 1.5951e+03
+All done, the total running time is 1566.92 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :6.33
+In the 3 epoch, the sparse coding time is :5.20
+In the 6 epoch, the sparse coding time is :4.78
+In the 9 epoch, the sparse coding time is :4.55
+In the 12 epoch, the sparse coding time is :4.54
+In the 15 epoch, the sparse coding time is :4.38
+In the 18 epoch, the sparse coding time is :4.27
+In the 21 epoch, the sparse coding time is :4.02
+In the 24 epoch, the sparse coding time is :4.10
+In the 27 epoch, the sparse coding time is :3.96
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.619 0.6106770833333334 0.5517647058823529
+with parameters as :  29 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6682e+03
+In the 0 epoch, the training time is :17.63
+In the 3 epoch, the training time is :15.08
+In the 6 epoch, the training time is :13.68
+In the 9 epoch, the training time is :12.71
+In the 12 epoch, the training time is :12.99
+In the 15 epoch, the training time is :12.73
+In the 18 epoch, the training time is :11.74
+In the 21 epoch, the training time is :11.59
+In the 24 epoch, the training time is :11.09
+In the 27 epoch, the training time is :11.05
+In the 30 epoch, the training time is :11.30
+In the 33 epoch, the training time is :11.29
+In the 36 epoch, the training time is :10.87
+In the 39 epoch, the training time is :10.72
+In the 42 epoch, the training time is :10.78
+In the 45 epoch, the training time is :10.30
+In the 48 epoch, the training time is :9.54
+In the 51 epoch, the training time is :9.18
+In the 54 epoch, the training time is :9.59
+In the 57 epoch, the training time is :9.40
+In the 60 epoch, the training time is :9.63
+In the 63 epoch, the training time is :9.74
+In the 66 epoch, the training time is :9.69
+In the 69 epoch, the training time is :9.24
+In the 72 epoch, the training time is :9.73
+In the 75 epoch, the training time is :9.36
+In the 78 epoch, the training time is :9.55
+In the 81 epoch, the training time is :9.36
+In the 84 epoch, the training time is :9.21
+In the 87 epoch, the training time is :9.51
+In the 90 epoch, the training time is :9.62
+In the 93 epoch, the training time is :8.99
+In the 96 epoch, the training time is :8.87
+In the 99 epoch, the training time is :8.65
+In the 102 epoch, the training time is :8.89
+In the 105 epoch, the training time is :9.41
+In the 108 epoch, the training time is :9.27
+In the 111 epoch, the training time is :9.19
+In the 114 epoch, the training time is :8.79
+In the 117 epoch, the training time is :9.03
+In the 120 epoch, the training time is :9.08
+In the 123 epoch, the training time is :9.25
+In the 126 epoch, the training time is :8.90
+loss is not going down-- break
+After 128 epochs, the loss function value is 1.0072e+03
+All done, the total running time is 1356.94 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :5.42
+In the 3 epoch, the sparse coding time is :3.92
+In the 6 epoch, the sparse coding time is :4.06
+In the 9 epoch, the sparse coding time is :3.34
+In the 12 epoch, the sparse coding time is :2.97
+In the 15 epoch, the sparse coding time is :3.13
+In the 18 epoch, the sparse coding time is :3.12
+In the 21 epoch, the sparse coding time is :3.04
+In the 24 epoch, the sparse coding time is :2.94
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.62 0.56640625 0.5337423312883437
+with parameters as :  29 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2082e+03
+In the 0 epoch, the training time is :17.20
+In the 3 epoch, the training time is :13.22
+In the 6 epoch, the training time is :11.68
+In the 9 epoch, the training time is :11.15
+In the 12 epoch, the training time is :10.43
+In the 15 epoch, the training time is :10.87
+In the 18 epoch, the training time is :9.93
+In the 21 epoch, the training time is :9.75
+In the 24 epoch, the training time is :9.87
+In the 27 epoch, the training time is :10.02
+In the 30 epoch, the training time is :10.32
+In the 33 epoch, the training time is :9.78
+In the 36 epoch, the training time is :9.50
+In the 39 epoch, the training time is :10.03
+In the 42 epoch, the training time is :9.90
+In the 45 epoch, the training time is :9.68
+In the 48 epoch, the training time is :9.74
+In the 51 epoch, the training time is :9.92
+In the 54 epoch, the training time is :9.45
+In the 57 epoch, the training time is :9.14
+In the 60 epoch, the training time is :9.46
+In the 63 epoch, the training time is :9.39
+In the 66 epoch, the training time is :9.56
+In the 69 epoch, the training time is :9.18
+In the 72 epoch, the training time is :9.24
+In the 75 epoch, the training time is :9.17
+In the 78 epoch, the training time is :8.97
+In the 81 epoch, the training time is :9.18
+In the 84 epoch, the training time is :9.10
+In the 87 epoch, the training time is :8.91
+In the 90 epoch, the training time is :9.02
+In the 93 epoch, the training time is :9.04
+In the 96 epoch, the training time is :8.78
+In the 99 epoch, the training time is :9.44
+loss is not going down-- break
+After 101 epochs, the loss function value is 1.5737e+03
+All done, the total running time is 1031.61 
+
+Sparse coding initial loss function value is 9.4700e+02:
+In the 0 epoch, the sparse coding time is :4.20
+In the 3 epoch, the sparse coding time is :3.41
+In the 6 epoch, the sparse coding time is :3.27
+In the 9 epoch, the sparse coding time is :2.98
+In the 12 epoch, the sparse coding time is :2.94
+In the 15 epoch, the sparse coding time is :2.93
+In the 18 epoch, the sparse coding time is :2.86
+In the 21 epoch, the sparse coding time is :2.89
+In the 24 epoch, the sparse coding time is :2.56
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6255 0.6588541666666666 0.5746734809767177
+with parameters as :  29 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :11.90
+In the 3 epoch, the training time is :11.97
+In the 6 epoch, the training time is :10.56
+In the 9 epoch, the training time is :10.34
+In the 12 epoch, the training time is :9.67
+In the 15 epoch, the training time is :8.72
+In the 18 epoch, the training time is :8.55
+In the 21 epoch, the training time is :8.79
+In the 24 epoch, the training time is :8.38
+In the 27 epoch, the training time is :8.91
+In the 30 epoch, the training time is :8.94
+In the 33 epoch, the training time is :9.01
+In the 36 epoch, the training time is :8.42
+loss is not going down-- break
+After 38 epochs, the loss function value is 2.0662e+03
+All done, the total running time is 378.93 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.44
+In the 3 epoch, the sparse coding time is :3.05
+In the 6 epoch, the sparse coding time is :3.10
+In the 9 epoch, the sparse coding time is :3.20
+In the 12 epoch, the sparse coding time is :3.10
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6645 0.6671001300390117 0.6045963464938127
+with parameters as :  21 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :12.30
+In the 3 epoch, the training time is :12.48
+In the 6 epoch, the training time is :11.38
+In the 9 epoch, the training time is :10.22
+In the 12 epoch, the training time is :9.01
+In the 15 epoch, the training time is :8.79
+In the 18 epoch, the training time is :8.84
+In the 21 epoch, the training time is :8.72
+In the 24 epoch, the training time is :9.05
+In the 27 epoch, the training time is :8.56
+In the 30 epoch, the training time is :8.61
+In the 33 epoch, the training time is :8.81
+In the 36 epoch, the training time is :8.42
+In the 39 epoch, the training time is :8.17
+In the 42 epoch, the training time is :8.39
+loss is not going down-- break
+After 45 epochs, the loss function value is 2.5450e+03
+All done, the total running time is 439.46 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.05
+In the 3 epoch, the sparse coding time is :2.88
+In the 6 epoch, the sparse coding time is :2.96
+In the 9 epoch, the sparse coding time is :2.94
+In the 12 epoch, the sparse coding time is :2.94
+In the 15 epoch, the sparse coding time is :2.99
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.7005 0.611183355006502 0.6107862248213125
+with parameters as :  21 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :12.63
+In the 3 epoch, the training time is :13.60
+In the 6 epoch, the training time is :11.34
+In the 9 epoch, the training time is :10.67
+In the 12 epoch, the training time is :11.10
+In the 15 epoch, the training time is :10.52
+In the 18 epoch, the training time is :9.70
+In the 21 epoch, the training time is :9.82
+In the 24 epoch, the training time is :9.59
+In the 27 epoch, the training time is :9.16
+In the 30 epoch, the training time is :8.99
+In the 33 epoch, the training time is :9.08
+In the 36 epoch, the training time is :9.44
+In the 39 epoch, the training time is :9.03
+In the 42 epoch, the training time is :9.03
+In the 45 epoch, the training time is :8.98
+In the 48 epoch, the training time is :8.84
+loss is not going down-- break
+After 51 epochs, the loss function value is 1.7220e+03
+All done, the total running time is 530.82 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.10
+In the 3 epoch, the sparse coding time is :2.69
+In the 6 epoch, the sparse coding time is :2.48
+In the 9 epoch, the sparse coding time is :2.78
+In the 12 epoch, the sparse coding time is :2.90
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.648 0.5318595578673602 0.5374507227332457
+with parameters as :  21 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :13.29
+In the 3 epoch, the training time is :12.74
+In the 6 epoch, the training time is :10.88
+In the 9 epoch, the training time is :9.85
+In the 12 epoch, the training time is :9.85
+In the 15 epoch, the training time is :9.88
+In the 18 epoch, the training time is :10.28
+In the 21 epoch, the training time is :10.02
+In the 24 epoch, the training time is :9.14
+In the 27 epoch, the training time is :9.25
+In the 30 epoch, the training time is :8.75
+loss is not going down-- break
+After 33 epochs, the loss function value is 2.2904e+03
+All done, the total running time is 356.41 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.18
+In the 3 epoch, the sparse coding time is :3.14
+In the 6 epoch, the sparse coding time is :2.87
+In the 9 epoch, the sparse coding time is :2.91
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.5985 0.48634590377113135 0.4822695035460993
+with parameters as :  21 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :14.30
+In the 3 epoch, the training time is :13.45
+In the 6 epoch, the training time is :12.41
+In the 9 epoch, the training time is :12.35
+In the 12 epoch, the training time is :10.53
+In the 15 epoch, the training time is :10.38
+In the 18 epoch, the training time is :11.22
+In the 21 epoch, the training time is :10.17
+In the 24 epoch, the training time is :10.04
+In the 27 epoch, the training time is :9.97
+In the 30 epoch, the training time is :10.23
+In the 33 epoch, the training time is :10.02
+In the 36 epoch, the training time is :9.66
+In the 39 epoch, the training time is :9.92
+In the 42 epoch, the training time is :9.64
+In the 45 epoch, the training time is :9.78
+In the 48 epoch, the training time is :9.50
+In the 51 epoch, the training time is :9.39
+In the 54 epoch, the training time is :9.83
+In the 57 epoch, the training time is :9.33
+In the 60 epoch, the training time is :9.14
+In the 63 epoch, the training time is :9.31
+In the 66 epoch, the training time is :8.72
+In the 69 epoch, the training time is :9.26
+In the 72 epoch, the training time is :9.08
+In the 75 epoch, the training time is :9.58
+In the 78 epoch, the training time is :9.72
+In the 81 epoch, the training time is :9.24
+In the 84 epoch, the training time is :9.08
+In the 87 epoch, the training time is :8.56
+In the 90 epoch, the training time is :9.00
+In the 93 epoch, the training time is :8.88
+In the 96 epoch, the training time is :9.15
+In the 99 epoch, the training time is :9.43
+In the 102 epoch, the training time is :9.24
+In the 105 epoch, the training time is :9.36
+In the 108 epoch, the training time is :9.33
+In the 111 epoch, the training time is :8.89
+In the 114 epoch, the training time is :8.96
+In the 117 epoch, the training time is :9.15
+In the 120 epoch, the training time is :9.28
+In the 123 epoch, the training time is :9.12
+In the 126 epoch, the training time is :9.00
+In the 129 epoch, the training time is :9.03
+In the 132 epoch, the training time is :9.35
+In the 135 epoch, the training time is :9.03
+In the 138 epoch, the training time is :8.83
+In the 141 epoch, the training time is :8.85
+In the 144 epoch, the training time is :8.62
+In the 147 epoch, the training time is :9.21
+In the 150 epoch, the training time is :8.76
+In the 153 epoch, the training time is :8.80
+In the 156 epoch, the training time is :9.27
+In the 159 epoch, the training time is :8.82
+In the 162 epoch, the training time is :9.01
+In the 165 epoch, the training time is :9.13
+In the 168 epoch, the training time is :9.09
+In the 171 epoch, the training time is :8.88
+In the 174 epoch, the training time is :8.90
+In the 177 epoch, the training time is :8.69
+In the 180 epoch, the training time is :8.88
+In the 183 epoch, the training time is :8.91
+In the 186 epoch, the training time is :8.83
+In the 189 epoch, the training time is :8.35
+In the 192 epoch, the training time is :9.00
+In the 195 epoch, the training time is :8.49
+In the 198 epoch, the training time is :9.04
+After 199 epochs, the loss function value is 1.0336e+03
+All done, the total running time is 1933.94 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :4.64
+In the 3 epoch, the sparse coding time is :3.58
+In the 6 epoch, the sparse coding time is :3.27
+In the 9 epoch, the sparse coding time is :3.35
+In the 12 epoch, the sparse coding time is :3.25
+In the 15 epoch, the sparse coding time is :2.92
+In the 18 epoch, the sparse coding time is :2.81
+In the 21 epoch, the sparse coding time is :2.84
+In the 24 epoch, the sparse coding time is :2.92
+In the 27 epoch, the sparse coding time is :2.80
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.62 0.6163849154746424 0.5550351288056206
+with parameters as :  21 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :15.71
+In the 3 epoch, the training time is :13.00
+In the 6 epoch, the training time is :11.23
+In the 9 epoch, the training time is :10.72
+In the 12 epoch, the training time is :10.53
+In the 15 epoch, the training time is :10.52
+In the 18 epoch, the training time is :10.47
+In the 21 epoch, the training time is :10.33
+In the 24 epoch, the training time is :10.26
+In the 27 epoch, the training time is :9.30
+In the 30 epoch, the training time is :9.97
+In the 33 epoch, the training time is :9.94
+In the 36 epoch, the training time is :9.66
+In the 39 epoch, the training time is :9.29
+In the 42 epoch, the training time is :9.18
+In the 45 epoch, the training time is :9.18
+In the 48 epoch, the training time is :9.41
+In the 51 epoch, the training time is :9.40
+In the 54 epoch, the training time is :9.67
+In the 57 epoch, the training time is :9.72
+In the 60 epoch, the training time is :9.69
+In the 63 epoch, the training time is :9.42
+In the 66 epoch, the training time is :9.30
+In the 69 epoch, the training time is :9.56
+In the 72 epoch, the training time is :9.53
+In the 75 epoch, the training time is :9.62
+In the 78 epoch, the training time is :9.55
+In the 81 epoch, the training time is :9.12
+In the 84 epoch, the training time is :9.25
+In the 87 epoch, the training time is :9.24
+In the 90 epoch, the training time is :9.28
+In the 93 epoch, the training time is :9.16
+In the 96 epoch, the training time is :9.18
+In the 99 epoch, the training time is :9.38
+In the 102 epoch, the training time is :9.15
+In the 105 epoch, the training time is :9.17
+In the 108 epoch, the training time is :9.40
+In the 111 epoch, the training time is :9.31
+loss is not going down-- break
+After 112 epochs, the loss function value is 1.6225e+03
+All done, the total running time is 1131.95 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.66
+In the 3 epoch, the sparse coding time is :3.41
+In the 6 epoch, the sparse coding time is :3.10
+In the 9 epoch, the sparse coding time is :2.79
+In the 12 epoch, the sparse coding time is :2.91
+In the 15 epoch, the sparse coding time is :2.90
+In the 18 epoch, the sparse coding time is :2.93
+In the 21 epoch, the sparse coding time is :2.86
+In the 24 epoch, the sparse coding time is :2.81
+In the 27 epoch, the sparse coding time is :2.71
+In the 30 epoch, the sparse coding time is :2.50
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6315 0.6514954486345904 0.5761932144910868
+with parameters as :  21 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :17.05
+In the 3 epoch, the training time is :12.94
+In the 6 epoch, the training time is :11.72
+In the 9 epoch, the training time is :10.93
+In the 12 epoch, the training time is :11.48
+In the 15 epoch, the training time is :10.18
+In the 18 epoch, the training time is :10.72
+In the 21 epoch, the training time is :10.76
+In the 24 epoch, the training time is :9.89
+In the 27 epoch, the training time is :9.92
+In the 30 epoch, the training time is :9.95
+In the 33 epoch, the training time is :9.83
+In the 36 epoch, the training time is :9.84
+In the 39 epoch, the training time is :9.32
+In the 42 epoch, the training time is :9.53
+In the 45 epoch, the training time is :9.73
+In the 48 epoch, the training time is :9.65
+In the 51 epoch, the training time is :9.39
+In the 54 epoch, the training time is :9.54
+In the 57 epoch, the training time is :9.72
+In the 60 epoch, the training time is :9.67
+In the 63 epoch, the training time is :9.47
+In the 66 epoch, the training time is :9.29
+In the 69 epoch, the training time is :9.05
+In the 72 epoch, the training time is :9.34
+In the 75 epoch, the training time is :9.28
+In the 78 epoch, the training time is :9.52
+In the 81 epoch, the training time is :9.29
+In the 84 epoch, the training time is :9.36
+In the 87 epoch, the training time is :9.33
+In the 90 epoch, the training time is :9.39
+In the 93 epoch, the training time is :9.31
+In the 96 epoch, the training time is :9.49
+In the 99 epoch, the training time is :9.57
+In the 102 epoch, the training time is :9.19
+In the 105 epoch, the training time is :9.27
+In the 108 epoch, the training time is :9.26
+In the 111 epoch, the training time is :9.10
+In the 114 epoch, the training time is :9.11
+In the 117 epoch, the training time is :9.27
+In the 120 epoch, the training time is :9.07
+In the 123 epoch, the training time is :8.87
+In the 126 epoch, the training time is :9.13
+In the 129 epoch, the training time is :9.44
+In the 132 epoch, the training time is :9.14
+In the 135 epoch, the training time is :9.11
+In the 138 epoch, the training time is :9.29
+In the 141 epoch, the training time is :9.43
+In the 144 epoch, the training time is :9.37
+In the 147 epoch, the training time is :8.95
+loss is not going down-- break
+After 149 epochs, the loss function value is 9.9611e+02
+All done, the total running time is 1489.12 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :4.01
+In the 3 epoch, the sparse coding time is :3.57
+In the 6 epoch, the sparse coding time is :3.39
+In the 9 epoch, the sparse coding time is :3.32
+In the 12 epoch, the sparse coding time is :3.28
+In the 15 epoch, the sparse coding time is :3.02
+In the 18 epoch, the sparse coding time is :3.07
+In the 21 epoch, the sparse coding time is :2.90
+In the 24 epoch, the sparse coding time is :2.86
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6375 0.6124837451235371 0.5650869826034792
+with parameters as :  21 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :16.34
+In the 3 epoch, the training time is :14.52
+In the 6 epoch, the training time is :11.04
+In the 9 epoch, the training time is :11.27
+In the 12 epoch, the training time is :11.25
+In the 15 epoch, the training time is :10.93
+In the 18 epoch, the training time is :10.40
+In the 21 epoch, the training time is :10.16
+In the 24 epoch, the training time is :9.60
+In the 27 epoch, the training time is :9.95
+In the 30 epoch, the training time is :9.99
+In the 33 epoch, the training time is :9.86
+In the 36 epoch, the training time is :10.37
+In the 39 epoch, the training time is :9.37
+In the 42 epoch, the training time is :9.94
+In the 45 epoch, the training time is :9.34
+In the 48 epoch, the training time is :9.47
+In the 51 epoch, the training time is :9.32
+In the 54 epoch, the training time is :8.99
+In the 57 epoch, the training time is :9.04
+In the 60 epoch, the training time is :9.37
+In the 63 epoch, the training time is :8.73
+In the 66 epoch, the training time is :9.62
+In the 69 epoch, the training time is :9.05
+In the 72 epoch, the training time is :8.60
+In the 75 epoch, the training time is :9.09
+In the 78 epoch, the training time is :9.24
+In the 81 epoch, the training time is :9.05
+In the 84 epoch, the training time is :9.43
+In the 87 epoch, the training time is :9.18
+In the 90 epoch, the training time is :9.10
+In the 93 epoch, the training time is :9.17
+In the 96 epoch, the training time is :9.12
+In the 99 epoch, the training time is :9.01
+In the 102 epoch, the training time is :9.24
+loss is not going down-- break
+After 103 epochs, the loss function value is 1.5849e+03
+All done, the total running time is 1047.04 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.79
+In the 3 epoch, the sparse coding time is :3.17
+In the 6 epoch, the sparse coding time is :2.93
+In the 9 epoch, the sparse coding time is :2.88
+In the 12 epoch, the sparse coding time is :2.86
+In the 15 epoch, the sparse coding time is :2.69
+In the 18 epoch, the sparse coding time is :2.83
+In the 21 epoch, the sparse coding time is :2.74
+In the 24 epoch, the sparse coding time is :2.90
+In the 27 epoch, the sparse coding time is :2.64
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.644 0.6189856957087126 0.5721153846153846
+with parameters as :  21 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :12.32
+In the 3 epoch, the training time is :12.45
+In the 6 epoch, the training time is :11.40
+In the 9 epoch, the training time is :9.88
+In the 12 epoch, the training time is :9.66
+In the 15 epoch, the training time is :9.31
+In the 18 epoch, the training time is :8.82
+In the 21 epoch, the training time is :8.83
+In the 24 epoch, the training time is :8.54
+In the 27 epoch, the training time is :8.76
+In the 30 epoch, the training time is :8.80
+In the 33 epoch, the training time is :8.13
+In the 36 epoch, the training time is :8.25
+In the 39 epoch, the training time is :8.33
+loss is not going down-- break
+After 40 epochs, the loss function value is 2.0362e+03
+All done, the total running time is 397.42 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.02
+In the 3 epoch, the sparse coding time is :2.76
+In the 6 epoch, the sparse coding time is :2.78
+In the 9 epoch, the sparse coding time is :2.82
+In the 12 epoch, the sparse coding time is :2.64
+In the 15 epoch, the sparse coding time is :2.65
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.673 0.6423927178153446 0.6017052375152253
+with parameters as :  29 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :12.62
+In the 3 epoch, the training time is :12.68
+In the 6 epoch, the training time is :11.53
+In the 9 epoch, the training time is :10.25
+In the 12 epoch, the training time is :9.57
+In the 15 epoch, the training time is :9.01
+In the 18 epoch, the training time is :9.42
+In the 21 epoch, the training time is :9.14
+In the 24 epoch, the training time is :8.82
+In the 27 epoch, the training time is :8.51
+In the 30 epoch, the training time is :8.53
+In the 33 epoch, the training time is :8.37
+In the 36 epoch, the training time is :8.45
+In the 39 epoch, the training time is :8.36
+In the 42 epoch, the training time is :8.37
+In the 45 epoch, the training time is :8.70
+In the 48 epoch, the training time is :8.69
+In the 51 epoch, the training time is :8.78
+loss is not going down-- break
+After 54 epochs, the loss function value is 2.5922e+03
+All done, the total running time is 525.69 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :2.77
+In the 3 epoch, the sparse coding time is :2.65
+In the 6 epoch, the sparse coding time is :2.44
+In the 9 epoch, the sparse coding time is :2.57
+In the 12 epoch, the sparse coding time is :2.57
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6685 0.6150845253576073 0.5879428216283406
+with parameters as :  29 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :12.20
+In the 3 epoch, the training time is :12.82
+In the 6 epoch, the training time is :11.60
+In the 9 epoch, the training time is :11.00
+In the 12 epoch, the training time is :10.14
+In the 15 epoch, the training time is :10.23
+In the 18 epoch, the training time is :9.89
+In the 21 epoch, the training time is :9.40
+In the 24 epoch, the training time is :9.55
+In the 27 epoch, the training time is :9.38
+In the 30 epoch, the training time is :9.18
+In the 33 epoch, the training time is :9.85
+In the 36 epoch, the training time is :9.54
+In the 39 epoch, the training time is :9.50
+In the 42 epoch, the training time is :9.18
+In the 45 epoch, the training time is :8.71
+In the 48 epoch, the training time is :8.76
+In the 51 epoch, the training time is :8.71
+In the 54 epoch, the training time is :8.74
+In the 57 epoch, the training time is :8.41
+In the 60 epoch, the training time is :8.33
+In the 63 epoch, the training time is :8.36
+loss is not going down-- break
+After 66 epochs, the loss function value is 1.7112e+03
+All done, the total running time is 656.15 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :2.83
+In the 3 epoch, the sparse coding time is :2.48
+In the 6 epoch, the sparse coding time is :2.66
+In the 9 epoch, the sparse coding time is :2.49
+In the 12 epoch, the sparse coding time is :2.41
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6685 0.5500650195058517 0.5606361829025845
+with parameters as :  29 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :12.64
+In the 3 epoch, the training time is :13.06
+In the 6 epoch, the training time is :11.59
+In the 9 epoch, the training time is :11.06
+In the 12 epoch, the training time is :10.08
+In the 15 epoch, the training time is :10.38
+In the 18 epoch, the training time is :9.81
+In the 21 epoch, the training time is :9.88
+In the 24 epoch, the training time is :9.34
+In the 27 epoch, the training time is :9.39
+In the 30 epoch, the training time is :9.20
+In the 33 epoch, the training time is :9.30
+In the 36 epoch, the training time is :9.18
+In the 39 epoch, the training time is :9.21
+In the 42 epoch, the training time is :8.80
+loss is not going down-- break
+After 44 epochs, the loss function value is 2.2748e+03
+All done, the total running time is 464.62 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :2.86
+In the 3 epoch, the sparse coding time is :2.79
+In the 6 epoch, the sparse coding time is :2.58
+In the 9 epoch, the sparse coding time is :2.61
+In the 12 epoch, the sparse coding time is :2.45
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.645 0.576072821846554 0.5551378446115289
+with parameters as :  29 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :14.68
+In the 3 epoch, the training time is :13.12
+In the 6 epoch, the training time is :12.68
+In the 9 epoch, the training time is :11.09
+In the 12 epoch, the training time is :11.48
+In the 15 epoch, the training time is :11.06
+In the 18 epoch, the training time is :10.86
+In the 21 epoch, the training time is :10.21
+In the 24 epoch, the training time is :10.10
+In the 27 epoch, the training time is :10.16
+In the 30 epoch, the training time is :9.48
+In the 33 epoch, the training time is :9.82
+In the 36 epoch, the training time is :9.99
+In the 39 epoch, the training time is :10.33
+In the 42 epoch, the training time is :10.22
+In the 45 epoch, the training time is :10.03
+In the 48 epoch, the training time is :10.21
+In the 51 epoch, the training time is :9.57
+In the 54 epoch, the training time is :9.81
+In the 57 epoch, the training time is :9.13
+In the 60 epoch, the training time is :9.72
+In the 63 epoch, the training time is :9.51
+In the 66 epoch, the training time is :9.45
+In the 69 epoch, the training time is :9.86
+In the 72 epoch, the training time is :9.65
+In the 75 epoch, the training time is :9.42
+In the 78 epoch, the training time is :9.31
+In the 81 epoch, the training time is :9.46
+In the 84 epoch, the training time is :9.14
+In the 87 epoch, the training time is :9.36
+In the 90 epoch, the training time is :9.59
+In the 93 epoch, the training time is :9.54
+In the 96 epoch, the training time is :9.34
+In the 99 epoch, the training time is :9.45
+In the 102 epoch, the training time is :9.29
+In the 105 epoch, the training time is :9.25
+In the 108 epoch, the training time is :9.65
+In the 111 epoch, the training time is :9.36
+In the 114 epoch, the training time is :9.21
+In the 117 epoch, the training time is :9.28
+In the 120 epoch, the training time is :9.56
+In the 123 epoch, the training time is :9.26
+In the 126 epoch, the training time is :9.01
+In the 129 epoch, the training time is :9.39
+In the 132 epoch, the training time is :9.43
+In the 135 epoch, the training time is :8.87
+In the 138 epoch, the training time is :9.56
+In the 141 epoch, the training time is :9.33
+In the 144 epoch, the training time is :9.19
+In the 147 epoch, the training time is :9.21
+In the 150 epoch, the training time is :9.47
+In the 153 epoch, the training time is :8.96
+In the 156 epoch, the training time is :8.87
+In the 159 epoch, the training time is :8.94
+In the 162 epoch, the training time is :9.16
+In the 165 epoch, the training time is :9.25
+In the 168 epoch, the training time is :9.13
+In the 171 epoch, the training time is :9.14
+In the 174 epoch, the training time is :8.98
+In the 177 epoch, the training time is :9.01
+In the 180 epoch, the training time is :9.04
+In the 183 epoch, the training time is :9.05
+loss is not going down-- break
+After 185 epochs, the loss function value is 1.0456e+03
+All done, the total running time is 1844.99 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :4.56
+In the 3 epoch, the sparse coding time is :3.49
+In the 6 epoch, the sparse coding time is :3.04
+In the 9 epoch, the sparse coding time is :2.96
+In the 12 epoch, the sparse coding time is :2.76
+In the 15 epoch, the sparse coding time is :2.78
+In the 18 epoch, the sparse coding time is :2.83
+In the 21 epoch, the sparse coding time is :2.76
+In the 24 epoch, the sparse coding time is :2.78
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6415 0.6241872561768531 0.5724508050089445
+with parameters as :  29 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :15.90
+In the 3 epoch, the training time is :13.27
+In the 6 epoch, the training time is :12.02
+In the 9 epoch, the training time is :11.59
+In the 12 epoch, the training time is :11.54
+In the 15 epoch, the training time is :11.16
+In the 18 epoch, the training time is :10.52
+In the 21 epoch, the training time is :11.02
+In the 24 epoch, the training time is :10.59
+In the 27 epoch, the training time is :10.31
+In the 30 epoch, the training time is :10.54
+In the 33 epoch, the training time is :10.15
+In the 36 epoch, the training time is :9.77
+In the 39 epoch, the training time is :10.10
+In the 42 epoch, the training time is :9.76
+In the 45 epoch, the training time is :9.58
+In the 48 epoch, the training time is :9.66
+In the 51 epoch, the training time is :9.75
+In the 54 epoch, the training time is :9.80
+In the 57 epoch, the training time is :9.92
+In the 60 epoch, the training time is :9.66
+In the 63 epoch, the training time is :9.76
+In the 66 epoch, the training time is :9.71
+In the 69 epoch, the training time is :9.94
+In the 72 epoch, the training time is :9.26
+In the 75 epoch, the training time is :9.75
+In the 78 epoch, the training time is :9.64
+In the 81 epoch, the training time is :9.59
+In the 84 epoch, the training time is :9.36
+In the 87 epoch, the training time is :9.49
+In the 90 epoch, the training time is :9.56
+In the 93 epoch, the training time is :9.73
+In the 96 epoch, the training time is :9.74
+In the 99 epoch, the training time is :9.88
+In the 102 epoch, the training time is :9.48
+In the 105 epoch, the training time is :9.54
+In the 108 epoch, the training time is :9.37
+In the 111 epoch, the training time is :9.59
+In the 114 epoch, the training time is :8.96
+loss is not going down-- break
+After 117 epochs, the loss function value is 1.6292e+03
+All done, the total running time is 1214.08 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :4.22
+In the 3 epoch, the sparse coding time is :3.18
+In the 6 epoch, the sparse coding time is :3.07
+In the 9 epoch, the sparse coding time is :3.04
+In the 12 epoch, the sparse coding time is :2.85
+In the 15 epoch, the sparse coding time is :2.72
+In the 18 epoch, the sparse coding time is :2.76
+In the 21 epoch, the sparse coding time is :2.74
+In the 24 epoch, the sparse coding time is :2.69
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.636 0.6176853055916776 0.566150178784267
+with parameters as :  29 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6982e+03
+In the 0 epoch, the training time is :15.42
+In the 3 epoch, the training time is :13.68
+In the 6 epoch, the training time is :12.85
+In the 9 epoch, the training time is :11.49
+In the 12 epoch, the training time is :10.59
+In the 15 epoch, the training time is :11.22
+In the 18 epoch, the training time is :10.97
+In the 21 epoch, the training time is :10.70
+In the 24 epoch, the training time is :10.58
+In the 27 epoch, the training time is :11.30
+In the 30 epoch, the training time is :10.81
+In the 33 epoch, the training time is :10.24
+In the 36 epoch, the training time is :9.93
+In the 39 epoch, the training time is :9.95
+In the 42 epoch, the training time is :10.28
+In the 45 epoch, the training time is :10.15
+In the 48 epoch, the training time is :9.93
+In the 51 epoch, the training time is :9.08
+In the 54 epoch, the training time is :9.71
+In the 57 epoch, the training time is :9.65
+In the 60 epoch, the training time is :10.01
+In the 63 epoch, the training time is :9.92
+In the 66 epoch, the training time is :9.76
+In the 69 epoch, the training time is :9.90
+In the 72 epoch, the training time is :9.87
+In the 75 epoch, the training time is :9.55
+In the 78 epoch, the training time is :9.84
+In the 81 epoch, the training time is :9.92
+In the 84 epoch, the training time is :9.53
+In the 87 epoch, the training time is :9.32
+In the 90 epoch, the training time is :9.38
+In the 93 epoch, the training time is :9.63
+In the 96 epoch, the training time is :9.60
+In the 99 epoch, the training time is :9.74
+In the 102 epoch, the training time is :9.32
+In the 105 epoch, the training time is :9.43
+In the 108 epoch, the training time is :9.11
+In the 111 epoch, the training time is :9.39
+In the 114 epoch, the training time is :9.22
+In the 117 epoch, the training time is :9.21
+In the 120 epoch, the training time is :9.62
+In the 123 epoch, the training time is :9.65
+In the 126 epoch, the training time is :9.08
+In the 129 epoch, the training time is :9.05
+In the 132 epoch, the training time is :9.03
+In the 135 epoch, the training time is :8.96
+In the 138 epoch, the training time is :9.01
+In the 141 epoch, the training time is :9.23
+In the 144 epoch, the training time is :9.36
+In the 147 epoch, the training time is :9.23
+In the 150 epoch, the training time is :8.97
+In the 153 epoch, the training time is :9.36
+In the 156 epoch, the training time is :9.37
+loss is not going down-- break
+After 157 epochs, the loss function value is 1.0105e+03
+All done, the total running time is 1608.03 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :4.32
+In the 3 epoch, the sparse coding time is :3.76
+In the 6 epoch, the sparse coding time is :3.23
+In the 9 epoch, the sparse coding time is :3.32
+In the 12 epoch, the sparse coding time is :3.03
+In the 15 epoch, the sparse coding time is :2.97
+In the 18 epoch, the sparse coding time is :2.93
+In the 21 epoch, the sparse coding time is :2.72
+In the 24 epoch, the sparse coding time is :2.64
+In the 27 epoch, the sparse coding time is :2.62
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6155 0.6020806241872562 0.5463126843657817
+with parameters as :  29 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2382e+03
+In the 0 epoch, the training time is :17.16
+In the 3 epoch, the training time is :13.49
+In the 6 epoch, the training time is :12.51
+In the 9 epoch, the training time is :11.93
+In the 12 epoch, the training time is :11.20
+In the 15 epoch, the training time is :10.67
+In the 18 epoch, the training time is :10.10
+In the 21 epoch, the training time is :10.37
+In the 24 epoch, the training time is :10.49
+In the 27 epoch, the training time is :10.21
+In the 30 epoch, the training time is :10.30
+In the 33 epoch, the training time is :9.89
+In the 36 epoch, the training time is :10.11
+In the 39 epoch, the training time is :9.71
+In the 42 epoch, the training time is :9.88
+In the 45 epoch, the training time is :10.19
+In the 48 epoch, the training time is :9.93
+In the 51 epoch, the training time is :9.91
+In the 54 epoch, the training time is :10.08
+In the 57 epoch, the training time is :9.66
+In the 60 epoch, the training time is :9.73
+In the 63 epoch, the training time is :9.99
+In the 66 epoch, the training time is :9.98
+In the 69 epoch, the training time is :9.69
+In the 72 epoch, the training time is :9.68
+In the 75 epoch, the training time is :9.83
+In the 78 epoch, the training time is :10.01
+In the 81 epoch, the training time is :9.60
+In the 84 epoch, the training time is :9.75
+In the 87 epoch, the training time is :9.34
+In the 90 epoch, the training time is :9.74
+In the 93 epoch, the training time is :9.64
+In the 96 epoch, the training time is :9.87
+In the 99 epoch, the training time is :9.63
+In the 102 epoch, the training time is :9.94
+In the 105 epoch, the training time is :9.51
+In the 108 epoch, the training time is :9.79
+In the 111 epoch, the training time is :9.66
+In the 114 epoch, the training time is :9.55
+In the 117 epoch, the training time is :9.42
+In the 120 epoch, the training time is :9.51
+In the 123 epoch, the training time is :9.65
+In the 126 epoch, the training time is :9.19
+In the 129 epoch, the training time is :9.36
+In the 132 epoch, the training time is :9.32
+loss is not going down-- break
+After 135 epochs, the loss function value is 1.5456e+03
+All done, the total running time is 1400.58 
+
+Sparse coding initial loss function value is 9.3300e+02:
+In the 0 epoch, the sparse coding time is :3.82
+In the 3 epoch, the sparse coding time is :3.52
+In the 6 epoch, the sparse coding time is :3.17
+In the 9 epoch, the sparse coding time is :3.14
+In the 12 epoch, the sparse coding time is :2.95
+In the 15 epoch, the sparse coding time is :2.80
+In the 18 epoch, the sparse coding time is :2.88
+In the 21 epoch, the sparse coding time is :2.72
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.621 0.6137841352405722 0.554641598119859
+with parameters as :  29 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :11.91
+In the 3 epoch, the training time is :12.60
+In the 6 epoch, the training time is :11.03
+In the 9 epoch, the training time is :10.24
+In the 12 epoch, the training time is :9.03
+In the 15 epoch, the training time is :9.08
+In the 18 epoch, the training time is :8.76
+In the 21 epoch, the training time is :8.38
+In the 24 epoch, the training time is :8.61
+In the 27 epoch, the training time is :8.84
+In the 30 epoch, the training time is :8.66
+In the 33 epoch, the training time is :8.27
+loss is not going down-- break
+After 36 epochs, the loss function value is 2.0772e+03
+All done, the total running time is 361.22 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :2.87
+In the 3 epoch, the sparse coding time is :2.89
+In the 6 epoch, the sparse coding time is :2.58
+In the 9 epoch, the sparse coding time is :2.74
+In the 12 epoch, the sparse coding time is :2.49
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6305 0.574025974025974 0.5446703635243376
+with parameters as :  21 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :12.17
+In the 3 epoch, the training time is :11.81
+In the 6 epoch, the training time is :11.38
+In the 9 epoch, the training time is :10.26
+In the 12 epoch, the training time is :9.17
+In the 15 epoch, the training time is :8.59
+In the 18 epoch, the training time is :8.52
+In the 21 epoch, the training time is :8.72
+In the 24 epoch, the training time is :8.36
+In the 27 epoch, the training time is :8.36
+In the 30 epoch, the training time is :8.23
+In the 33 epoch, the training time is :7.97
+loss is not going down-- break
+After 34 epochs, the loss function value is 2.6327e+03
+All done, the total running time is 336.82 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :2.73
+In the 3 epoch, the sparse coding time is :2.70
+In the 6 epoch, the sparse coding time is :2.72
+In the 9 epoch, the sparse coding time is :2.60
+In the 12 epoch, the sparse coding time is :2.57
+In the 15 epoch, the sparse coding time is :2.70
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6385 0.538961038961039 0.5344494526722472
+with parameters as :  21 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :12.04
+In the 3 epoch, the training time is :12.59
+In the 6 epoch, the training time is :11.38
+In the 9 epoch, the training time is :10.52
+In the 12 epoch, the training time is :10.31
+In the 15 epoch, the training time is :9.47
+In the 18 epoch, the training time is :9.54
+In the 21 epoch, the training time is :9.62
+In the 24 epoch, the training time is :9.13
+In the 27 epoch, the training time is :9.01
+In the 30 epoch, the training time is :9.16
+In the 33 epoch, the training time is :9.10
+In the 36 epoch, the training time is :8.84
+In the 39 epoch, the training time is :8.91
+In the 42 epoch, the training time is :9.05
+In the 45 epoch, the training time is :8.81
+In the 48 epoch, the training time is :9.00
+In the 51 epoch, the training time is :8.93
+In the 54 epoch, the training time is :8.94
+In the 57 epoch, the training time is :8.87
+In the 60 epoch, the training time is :8.31
+loss is not going down-- break
+After 62 epochs, the loss function value is 1.7246e+03
+All done, the total running time is 615.07 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :2.86
+In the 3 epoch, the sparse coding time is :2.91
+In the 6 epoch, the sparse coding time is :2.63
+In the 9 epoch, the sparse coding time is :2.62
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6515 0.5402597402597402 0.5441465009810335
+with parameters as :  21 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :12.50
+In the 3 epoch, the training time is :13.45
+In the 6 epoch, the training time is :11.35
+In the 9 epoch, the training time is :10.38
+In the 12 epoch, the training time is :9.70
+In the 15 epoch, the training time is :9.64
+In the 18 epoch, the training time is :9.64
+In the 21 epoch, the training time is :9.35
+In the 24 epoch, the training time is :9.48
+In the 27 epoch, the training time is :9.20
+In the 30 epoch, the training time is :9.48
+In the 33 epoch, the training time is :8.73
+In the 36 epoch, the training time is :8.54
+In the 39 epoch, the training time is :8.55
+In the 42 epoch, the training time is :8.41
+In the 45 epoch, the training time is :8.29
+loss is not going down-- break
+After 48 epochs, the loss function value is 2.2438e+03
+All done, the total running time is 486.54 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :3.05
+In the 3 epoch, the sparse coding time is :2.73
+In the 6 epoch, the sparse coding time is :2.65
+In the 9 epoch, the sparse coding time is :2.57
+In the 12 epoch, the sparse coding time is :2.52
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6465 0.5844155844155844 0.5600497822028625
+with parameters as :  21 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :14.50
+In the 3 epoch, the training time is :13.40
+In the 6 epoch, the training time is :12.15
+In the 9 epoch, the training time is :10.45
+In the 12 epoch, the training time is :9.56
+In the 15 epoch, the training time is :10.54
+In the 18 epoch, the training time is :10.31
+In the 21 epoch, the training time is :10.28
+In the 24 epoch, the training time is :9.14
+In the 27 epoch, the training time is :9.20
+In the 30 epoch, the training time is :9.87
+In the 33 epoch, the training time is :9.57
+In the 36 epoch, the training time is :9.38
+In the 39 epoch, the training time is :9.68
+In the 42 epoch, the training time is :9.56
+In the 45 epoch, the training time is :9.68
+In the 48 epoch, the training time is :9.03
+In the 51 epoch, the training time is :9.00
+In the 54 epoch, the training time is :8.88
+In the 57 epoch, the training time is :8.83
+In the 60 epoch, the training time is :9.43
+In the 63 epoch, the training time is :9.31
+In the 66 epoch, the training time is :9.25
+In the 69 epoch, the training time is :9.40
+In the 72 epoch, the training time is :9.10
+In the 75 epoch, the training time is :9.13
+In the 78 epoch, the training time is :8.91
+In the 81 epoch, the training time is :8.89
+In the 84 epoch, the training time is :9.16
+In the 87 epoch, the training time is :8.90
+In the 90 epoch, the training time is :9.09
+In the 93 epoch, the training time is :9.01
+In the 96 epoch, the training time is :8.89
+In the 99 epoch, the training time is :9.14
+In the 102 epoch, the training time is :9.02
+In the 105 epoch, the training time is :9.16
+In the 108 epoch, the training time is :9.37
+In the 111 epoch, the training time is :8.88
+In the 114 epoch, the training time is :9.26
+In the 117 epoch, the training time is :8.80
+In the 120 epoch, the training time is :9.12
+In the 123 epoch, the training time is :8.93
+In the 126 epoch, the training time is :9.15
+In the 129 epoch, the training time is :9.11
+In the 132 epoch, the training time is :9.02
+In the 135 epoch, the training time is :9.14
+In the 138 epoch, the training time is :8.90
+In the 141 epoch, the training time is :8.89
+In the 144 epoch, the training time is :8.62
+In the 147 epoch, the training time is :9.13
+In the 150 epoch, the training time is :8.97
+In the 153 epoch, the training time is :9.26
+In the 156 epoch, the training time is :8.71
+In the 159 epoch, the training time is :9.01
+In the 162 epoch, the training time is :8.96
+In the 165 epoch, the training time is :9.03
+In the 168 epoch, the training time is :8.72
+In the 171 epoch, the training time is :8.95
+In the 174 epoch, the training time is :8.63
+In the 177 epoch, the training time is :8.88
+In the 180 epoch, the training time is :8.60
+In the 183 epoch, the training time is :8.83
+In the 186 epoch, the training time is :8.48
+In the 189 epoch, the training time is :8.82
+In the 192 epoch, the training time is :8.61
+In the 195 epoch, the training time is :9.02
+In the 198 epoch, the training time is :8.83
+After 199 epochs, the loss function value is 1.0243e+03
+All done, the total running time is 1893.67 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :4.64
+In the 3 epoch, the sparse coding time is :3.90
+In the 6 epoch, the sparse coding time is :3.44
+In the 9 epoch, the sparse coding time is :3.11
+In the 12 epoch, the sparse coding time is :3.00
+In the 15 epoch, the sparse coding time is :2.80
+In the 18 epoch, the sparse coding time is :2.98
+In the 21 epoch, the sparse coding time is :2.71
+In the 24 epoch, the sparse coding time is :2.60
+In the 27 epoch, the sparse coding time is :2.53
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.625 0.5662337662337662 0.5376078914919851
+with parameters as :  21 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :15.00
+In the 3 epoch, the training time is :12.43
+In the 6 epoch, the training time is :11.45
+In the 9 epoch, the training time is :10.70
+In the 12 epoch, the training time is :10.47
+In the 15 epoch, the training time is :10.39
+In the 18 epoch, the training time is :10.16
+In the 21 epoch, the training time is :9.80
+In the 24 epoch, the training time is :9.42
+In the 27 epoch, the training time is :9.55
+In the 30 epoch, the training time is :9.37
+In the 33 epoch, the training time is :9.57
+In the 36 epoch, the training time is :9.04
+In the 39 epoch, the training time is :9.34
+In the 42 epoch, the training time is :9.17
+In the 45 epoch, the training time is :9.70
+In the 48 epoch, the training time is :9.25
+In the 51 epoch, the training time is :9.45
+In the 54 epoch, the training time is :9.74
+In the 57 epoch, the training time is :9.48
+In the 60 epoch, the training time is :9.30
+In the 63 epoch, the training time is :9.68
+In the 66 epoch, the training time is :9.64
+In the 69 epoch, the training time is :9.25
+In the 72 epoch, the training time is :9.46
+In the 75 epoch, the training time is :9.58
+In the 78 epoch, the training time is :9.23
+In the 81 epoch, the training time is :9.06
+In the 84 epoch, the training time is :9.13
+In the 87 epoch, the training time is :9.25
+In the 90 epoch, the training time is :9.40
+In the 93 epoch, the training time is :9.14
+In the 96 epoch, the training time is :8.73
+In the 99 epoch, the training time is :9.08
+In the 102 epoch, the training time is :9.10
+In the 105 epoch, the training time is :9.18
+In the 108 epoch, the training time is :9.43
+In the 111 epoch, the training time is :9.28
+In the 114 epoch, the training time is :9.12
+In the 117 epoch, the training time is :9.22
+In the 120 epoch, the training time is :9.20
+In the 123 epoch, the training time is :9.08
+In the 126 epoch, the training time is :9.22
+In the 129 epoch, the training time is :8.95
+In the 132 epoch, the training time is :9.32
+In the 135 epoch, the training time is :9.18
+In the 138 epoch, the training time is :9.11
+In the 141 epoch, the training time is :9.23
+In the 144 epoch, the training time is :9.40
+loss is not going down-- break
+After 147 epochs, the loss function value is 1.5637e+03
+All done, the total running time is 1445.83 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :5.42
+In the 3 epoch, the sparse coding time is :3.43
+In the 6 epoch, the sparse coding time is :3.07
+In the 9 epoch, the sparse coding time is :3.04
+In the 12 epoch, the sparse coding time is :2.80
+In the 15 epoch, the sparse coding time is :2.95
+In the 18 epoch, the sparse coding time is :3.01
+In the 21 epoch, the sparse coding time is :2.63
+In the 24 epoch, the sparse coding time is :2.94
+In the 27 epoch, the sparse coding time is :2.72
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.622 0.5454545454545454 0.5263157894736842
+with parameters as :  21 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :16.39
+In the 3 epoch, the training time is :13.69
+In the 6 epoch, the training time is :12.24
+In the 9 epoch, the training time is :11.76
+In the 12 epoch, the training time is :10.64
+In the 15 epoch, the training time is :10.92
+In the 18 epoch, the training time is :11.39
+In the 21 epoch, the training time is :10.80
+In the 24 epoch, the training time is :10.50
+In the 27 epoch, the training time is :10.29
+In the 30 epoch, the training time is :10.32
+In the 33 epoch, the training time is :10.10
+In the 36 epoch, the training time is :10.35
+In the 39 epoch, the training time is :10.10
+In the 42 epoch, the training time is :10.17
+In the 45 epoch, the training time is :9.69
+In the 48 epoch, the training time is :9.74
+In the 51 epoch, the training time is :9.73
+In the 54 epoch, the training time is :10.02
+In the 57 epoch, the training time is :9.53
+In the 60 epoch, the training time is :9.75
+In the 63 epoch, the training time is :9.49
+In the 66 epoch, the training time is :9.22
+In the 69 epoch, the training time is :9.25
+In the 72 epoch, the training time is :9.75
+In the 75 epoch, the training time is :9.25
+In the 78 epoch, the training time is :9.39
+In the 81 epoch, the training time is :9.16
+In the 84 epoch, the training time is :9.36
+In the 87 epoch, the training time is :9.40
+In the 90 epoch, the training time is :9.05
+In the 93 epoch, the training time is :9.28
+In the 96 epoch, the training time is :9.05
+In the 99 epoch, the training time is :9.31
+In the 102 epoch, the training time is :9.19
+In the 105 epoch, the training time is :9.16
+In the 108 epoch, the training time is :9.11
+In the 111 epoch, the training time is :8.90
+In the 114 epoch, the training time is :9.19
+In the 117 epoch, the training time is :9.07
+In the 120 epoch, the training time is :9.04
+In the 123 epoch, the training time is :9.22
+In the 126 epoch, the training time is :9.19
+In the 129 epoch, the training time is :9.09
+In the 132 epoch, the training time is :9.02
+In the 135 epoch, the training time is :8.82
+In the 138 epoch, the training time is :9.16
+In the 141 epoch, the training time is :8.96
+In the 144 epoch, the training time is :9.11
+In the 147 epoch, the training time is :9.23
+In the 150 epoch, the training time is :8.88
+In the 153 epoch, the training time is :9.05
+In the 156 epoch, the training time is :8.87
+In the 159 epoch, the training time is :8.98
+In the 162 epoch, the training time is :8.95
+In the 165 epoch, the training time is :8.70
+In the 168 epoch, the training time is :8.77
+In the 171 epoch, the training time is :8.75
+In the 174 epoch, the training time is :8.89
+In the 177 epoch, the training time is :9.05
+In the 180 epoch, the training time is :9.14
+In the 183 epoch, the training time is :8.90
+In the 186 epoch, the training time is :8.76
+In the 189 epoch, the training time is :8.79
+In the 192 epoch, the training time is :9.00
+In the 195 epoch, the training time is :9.12
+In the 198 epoch, the training time is :8.98
+After 199 epochs, the loss function value is 9.7599e+02
+All done, the total running time is 1948.95 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :4.36
+In the 3 epoch, the sparse coding time is :3.69
+In the 6 epoch, the sparse coding time is :3.31
+In the 9 epoch, the sparse coding time is :3.26
+In the 12 epoch, the sparse coding time is :3.19
+In the 15 epoch, the sparse coding time is :3.11
+In the 18 epoch, the sparse coding time is :3.09
+In the 21 epoch, the sparse coding time is :3.11
+In the 24 epoch, the sparse coding time is :2.88
+In the 27 epoch, the sparse coding time is :2.82
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6105 0.5753246753246753 0.5321321321321322
+with parameters as :  21 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :15.72
+In the 3 epoch, the training time is :14.30
+In the 6 epoch, the training time is :12.92
+In the 9 epoch, the training time is :11.95
+In the 12 epoch, the training time is :11.52
+In the 15 epoch, the training time is :11.19
+In the 18 epoch, the training time is :10.92
+In the 21 epoch, the training time is :10.98
+In the 24 epoch, the training time is :10.17
+In the 27 epoch, the training time is :9.85
+In the 30 epoch, the training time is :9.65
+In the 33 epoch, the training time is :9.99
+In the 36 epoch, the training time is :9.78
+In the 39 epoch, the training time is :9.97
+In the 42 epoch, the training time is :10.11
+In the 45 epoch, the training time is :9.50
+In the 48 epoch, the training time is :9.37
+In the 51 epoch, the training time is :9.76
+In the 54 epoch, the training time is :9.47
+In the 57 epoch, the training time is :9.50
+In the 60 epoch, the training time is :9.46
+In the 63 epoch, the training time is :9.54
+In the 66 epoch, the training time is :9.68
+In the 69 epoch, the training time is :9.50
+In the 72 epoch, the training time is :9.40
+In the 75 epoch, the training time is :9.24
+In the 78 epoch, the training time is :9.38
+In the 81 epoch, the training time is :9.36
+In the 84 epoch, the training time is :9.14
+In the 87 epoch, the training time is :9.04
+In the 90 epoch, the training time is :9.37
+In the 93 epoch, the training time is :9.32
+In the 96 epoch, the training time is :9.29
+loss is not going down-- break
+After 98 epochs, the loss function value is 1.5678e+03
+All done, the total running time is 1023.83 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :4.70
+In the 3 epoch, the sparse coding time is :3.51
+In the 6 epoch, the sparse coding time is :3.54
+In the 9 epoch, the sparse coding time is :3.22
+In the 12 epoch, the sparse coding time is :3.27
+In the 15 epoch, the sparse coding time is :2.80
+In the 18 epoch, the sparse coding time is :3.10
+In the 21 epoch, the sparse coding time is :3.05
+In the 24 epoch, the sparse coding time is :2.95
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.604 0.5545454545454546 0.5188335358444714
+with parameters as :  21 0.01 0.001 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :12.93
+In the 3 epoch, the training time is :13.28
+In the 6 epoch, the training time is :11.74
+In the 9 epoch, the training time is :10.61
+In the 12 epoch, the training time is :9.81
+In the 15 epoch, the training time is :9.09
+In the 18 epoch, the training time is :8.96
+In the 21 epoch, the training time is :8.77
+In the 24 epoch, the training time is :8.72
+In the 27 epoch, the training time is :8.37
+In the 30 epoch, the training time is :8.10
+In the 33 epoch, the training time is :8.18
+loss is not going down-- break
+After 35 epochs, the loss function value is 2.0761e+03
+All done, the total running time is 356.52 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :2.91
+In the 3 epoch, the sparse coding time is :2.76
+In the 6 epoch, the sparse coding time is :2.84
+In the 9 epoch, the sparse coding time is :2.72
+In the 12 epoch, the sparse coding time is :2.60
+In the 15 epoch, the sparse coding time is :2.68
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6265 0.5753246753246753 0.5425597060624617
+with parameters as :  29 0.1 0.1 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :12.27
+In the 3 epoch, the training time is :12.83
+In the 6 epoch, the training time is :11.17
+In the 9 epoch, the training time is :10.43
+In the 12 epoch, the training time is :9.85
+In the 15 epoch, the training time is :9.39
+In the 18 epoch, the training time is :9.14
+In the 21 epoch, the training time is :8.88
+In the 24 epoch, the training time is :8.98
+In the 27 epoch, the training time is :8.65
+In the 30 epoch, the training time is :8.59
+In the 33 epoch, the training time is :8.53
+loss is not going down-- break
+After 35 epochs, the loss function value is 2.5640e+03
+All done, the total running time is 361.76 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :2.71
+In the 3 epoch, the sparse coding time is :2.75
+In the 6 epoch, the sparse coding time is :2.60
+In the 9 epoch, the sparse coding time is :2.51
+In the 12 epoch, the sparse coding time is :2.65
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.654 0.5701298701298702 0.5592356687898089
+with parameters as :  29 0.1 0.1 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :12.26
+In the 3 epoch, the training time is :13.60
+In the 6 epoch, the training time is :11.41
+In the 9 epoch, the training time is :10.99
+In the 12 epoch, the training time is :10.10
+In the 15 epoch, the training time is :10.11
+In the 18 epoch, the training time is :9.54
+In the 21 epoch, the training time is :9.39
+In the 24 epoch, the training time is :9.47
+In the 27 epoch, the training time is :9.41
+In the 30 epoch, the training time is :9.61
+In the 33 epoch, the training time is :9.61
+In the 36 epoch, the training time is :9.17
+In the 39 epoch, the training time is :8.74
+In the 42 epoch, the training time is :8.94
+In the 45 epoch, the training time is :8.62
+loss is not going down-- break
+After 46 epochs, the loss function value is 1.7313e+03
+All done, the total running time is 484.25 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :3.12
+In the 3 epoch, the sparse coding time is :3.11
+In the 6 epoch, the sparse coding time is :2.59
+In the 9 epoch, the sparse coding time is :2.51
+In the 12 epoch, the sparse coding time is :2.90
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.628 0.5142857142857142 0.5156249999999999
+with parameters as :  29 0.1 0.010000000000000002 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :12.45
+In the 3 epoch, the training time is :14.25
+In the 6 epoch, the training time is :12.63
+In the 9 epoch, the training time is :11.23
+In the 12 epoch, the training time is :10.63
+In the 15 epoch, the training time is :9.81
+In the 18 epoch, the training time is :9.80
+In the 21 epoch, the training time is :9.28
+In the 24 epoch, the training time is :9.51
+In the 27 epoch, the training time is :9.44
+In the 30 epoch, the training time is :9.22
+In the 33 epoch, the training time is :9.20
+In the 36 epoch, the training time is :8.87
+In the 39 epoch, the training time is :8.59
+In the 42 epoch, the training time is :9.06
+In the 45 epoch, the training time is :8.50
+In the 48 epoch, the training time is :8.44
+loss is not going down-- break
+After 51 epochs, the loss function value is 2.2451e+03
+All done, the total running time is 526.88 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :2.77
+In the 3 epoch, the sparse coding time is :2.82
+In the 6 epoch, the sparse coding time is :2.67
+In the 9 epoch, the sparse coding time is :2.57
+In the 12 epoch, the sparse coding time is :2.45
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6415 0.548051948051948 0.5406790518898142
+with parameters as :  29 0.1 0.010000000000000002 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :16.10
+In the 3 epoch, the training time is :14.01
+In the 6 epoch, the training time is :13.32
+In the 9 epoch, the training time is :11.42
+In the 12 epoch, the training time is :11.22
+In the 15 epoch, the training time is :11.45
+In the 18 epoch, the training time is :10.27
+In the 21 epoch, the training time is :10.28
+In the 24 epoch, the training time is :10.32
+In the 27 epoch, the training time is :10.25
+In the 30 epoch, the training time is :10.56
+In the 33 epoch, the training time is :9.92
+In the 36 epoch, the training time is :10.02
+In the 39 epoch, the training time is :9.94
+In the 42 epoch, the training time is :10.31
+In the 45 epoch, the training time is :9.92
+In the 48 epoch, the training time is :9.97
+In the 51 epoch, the training time is :9.29
+In the 54 epoch, the training time is :9.80
+In the 57 epoch, the training time is :9.56
+In the 60 epoch, the training time is :10.21
+In the 63 epoch, the training time is :10.03
+In the 66 epoch, the training time is :9.66
+In the 69 epoch, the training time is :10.20
+In the 72 epoch, the training time is :10.05
+In the 75 epoch, the training time is :9.86
+In the 78 epoch, the training time is :9.65
+In the 81 epoch, the training time is :9.90
+In the 84 epoch, the training time is :9.67
+In the 87 epoch, the training time is :9.85
+In the 90 epoch, the training time is :9.74
+In the 93 epoch, the training time is :9.51
+In the 96 epoch, the training time is :9.85
+In the 99 epoch, the training time is :9.52
+In the 102 epoch, the training time is :9.78
+In the 105 epoch, the training time is :9.53
+In the 108 epoch, the training time is :9.44
+In the 111 epoch, the training time is :9.67
+In the 114 epoch, the training time is :9.32
+In the 117 epoch, the training time is :9.20
+In the 120 epoch, the training time is :9.37
+In the 123 epoch, the training time is :9.05
+In the 126 epoch, the training time is :9.15
+In the 129 epoch, the training time is :9.47
+In the 132 epoch, the training time is :9.07
+In the 135 epoch, the training time is :9.26
+In the 138 epoch, the training time is :9.00
+In the 141 epoch, the training time is :9.22
+In the 144 epoch, the training time is :9.29
+In the 147 epoch, the training time is :9.18
+In the 150 epoch, the training time is :9.20
+In the 153 epoch, the training time is :9.19
+In the 156 epoch, the training time is :9.04
+In the 159 epoch, the training time is :9.18
+In the 162 epoch, the training time is :9.35
+In the 165 epoch, the training time is :9.42
+In the 168 epoch, the training time is :9.42
+In the 171 epoch, the training time is :9.24
+In the 174 epoch, the training time is :9.26
+In the 177 epoch, the training time is :8.99
+In the 180 epoch, the training time is :9.39
+In the 183 epoch, the training time is :8.91
+In the 186 epoch, the training time is :9.12
+In the 189 epoch, the training time is :9.12
+In the 192 epoch, the training time is :9.02
+In the 195 epoch, the training time is :9.00
+In the 198 epoch, the training time is :9.21
+After 199 epochs, the loss function value is 1.0144e+03
+All done, the total running time is 2003.23 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :5.14
+In the 3 epoch, the sparse coding time is :4.16
+In the 6 epoch, the sparse coding time is :3.48
+In the 9 epoch, the sparse coding time is :3.36
+In the 12 epoch, the sparse coding time is :3.57
+In the 15 epoch, the sparse coding time is :2.89
+In the 18 epoch, the sparse coding time is :3.07
+In the 21 epoch, the sparse coding time is :3.02
+In the 24 epoch, the sparse coding time is :2.94
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6055 0.5896103896103896 0.5350618738951091
+with parameters as :  29 0.01 0.01 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :16.35
+In the 3 epoch, the training time is :14.66
+In the 6 epoch, the training time is :13.40
+In the 9 epoch, the training time is :11.93
+In the 12 epoch, the training time is :11.74
+In the 15 epoch, the training time is :11.95
+In the 18 epoch, the training time is :11.11
+In the 21 epoch, the training time is :11.50
+In the 24 epoch, the training time is :10.74
+In the 27 epoch, the training time is :10.16
+In the 30 epoch, the training time is :10.16
+In the 33 epoch, the training time is :10.52
+In the 36 epoch, the training time is :10.81
+In the 39 epoch, the training time is :10.20
+In the 42 epoch, the training time is :10.02
+In the 45 epoch, the training time is :10.24
+In the 48 epoch, the training time is :9.97
+In the 51 epoch, the training time is :10.05
+In the 54 epoch, the training time is :9.98
+In the 57 epoch, the training time is :9.90
+In the 60 epoch, the training time is :9.86
+In the 63 epoch, the training time is :9.89
+In the 66 epoch, the training time is :9.75
+In the 69 epoch, the training time is :9.79
+In the 72 epoch, the training time is :9.82
+In the 75 epoch, the training time is :9.41
+In the 78 epoch, the training time is :9.88
+In the 81 epoch, the training time is :9.42
+In the 84 epoch, the training time is :9.72
+In the 87 epoch, the training time is :9.89
+In the 90 epoch, the training time is :9.66
+In the 93 epoch, the training time is :9.60
+In the 96 epoch, the training time is :9.64
+In the 99 epoch, the training time is :9.71
+In the 102 epoch, the training time is :9.41
+In the 105 epoch, the training time is :9.68
+In the 108 epoch, the training time is :9.75
+In the 111 epoch, the training time is :9.53
+In the 114 epoch, the training time is :9.46
+In the 117 epoch, the training time is :9.34
+loss is not going down-- break
+After 120 epochs, the loss function value is 1.6288e+03
+All done, the total running time is 1283.56 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :4.00
+In the 3 epoch, the sparse coding time is :3.28
+In the 6 epoch, the sparse coding time is :3.08
+In the 9 epoch, the sparse coding time is :3.21
+In the 12 epoch, the sparse coding time is :2.98
+In the 15 epoch, the sparse coding time is :2.74
+In the 18 epoch, the sparse coding time is :2.87
+In the 21 epoch, the sparse coding time is :2.78
+In the 24 epoch, the sparse coding time is :2.62
+In the 27 epoch, the sparse coding time is :2.60
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.632 0.6363636363636364 0.5710955710955711
+with parameters as :  29 0.01 0.01 0.001 1
+
+
+The initial loss function value is :5.6962e+03
+In the 0 epoch, the training time is :17.36
+In the 3 epoch, the training time is :14.30
+In the 6 epoch, the training time is :13.06
+In the 9 epoch, the training time is :11.69
+In the 12 epoch, the training time is :11.49
+In the 15 epoch, the training time is :11.30
+In the 18 epoch, the training time is :11.36
+In the 21 epoch, the training time is :10.72
+In the 24 epoch, the training time is :10.88
+In the 27 epoch, the training time is :10.23
+In the 30 epoch, the training time is :10.58
+In the 33 epoch, the training time is :10.12
+In the 36 epoch, the training time is :10.52
+In the 39 epoch, the training time is :10.09
+In the 42 epoch, the training time is :10.27
+In the 45 epoch, the training time is :9.78
+In the 48 epoch, the training time is :9.95
+In the 51 epoch, the training time is :9.81
+In the 54 epoch, the training time is :10.15
+In the 57 epoch, the training time is :10.22
+In the 60 epoch, the training time is :9.89
+In the 63 epoch, the training time is :9.73
+In the 66 epoch, the training time is :9.84
+In the 69 epoch, the training time is :9.74
+In the 72 epoch, the training time is :9.52
+In the 75 epoch, the training time is :9.76
+In the 78 epoch, the training time is :9.54
+In the 81 epoch, the training time is :9.88
+In the 84 epoch, the training time is :9.58
+In the 87 epoch, the training time is :9.63
+In the 90 epoch, the training time is :9.46
+In the 93 epoch, the training time is :9.85
+In the 96 epoch, the training time is :9.88
+In the 99 epoch, the training time is :9.67
+In the 102 epoch, the training time is :9.16
+In the 105 epoch, the training time is :9.44
+In the 108 epoch, the training time is :9.10
+In the 111 epoch, the training time is :9.77
+In the 114 epoch, the training time is :9.43
+In the 117 epoch, the training time is :9.50
+In the 120 epoch, the training time is :9.41
+In the 123 epoch, the training time is :9.27
+In the 126 epoch, the training time is :9.12
+In the 129 epoch, the training time is :9.29
+In the 132 epoch, the training time is :9.21
+In the 135 epoch, the training time is :9.47
+In the 138 epoch, the training time is :9.34
+In the 141 epoch, the training time is :9.52
+In the 144 epoch, the training time is :9.30
+In the 147 epoch, the training time is :9.22
+In the 150 epoch, the training time is :9.36
+In the 153 epoch, the training time is :9.25
+loss is not going down-- break
+After 156 epochs, the loss function value is 1.0000e+03
+All done, the total running time is 1610.43 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :5.00
+In the 3 epoch, the sparse coding time is :4.21
+In the 6 epoch, the sparse coding time is :3.81
+In the 9 epoch, the sparse coding time is :3.55
+In the 12 epoch, the sparse coding time is :3.22
+In the 15 epoch, the sparse coding time is :3.15
+In the 18 epoch, the sparse coding time is :3.08
+In the 21 epoch, the sparse coding time is :3.07
+In the 24 epoch, the sparse coding time is :3.14
+In the 27 epoch, the sparse coding time is :2.85
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6175 0.577922077922078 0.5377643504531723
+with parameters as :  29 0.01 0.001 0.001 0.1
+
+
+The initial loss function value is :6.2362e+03
+In the 0 epoch, the training time is :18.52
+In the 3 epoch, the training time is :14.95
+In the 6 epoch, the training time is :13.03
+In the 9 epoch, the training time is :11.32
+In the 12 epoch, the training time is :10.11
+In the 15 epoch, the training time is :10.74
+In the 18 epoch, the training time is :10.91
+In the 21 epoch, the training time is :10.66
+In the 24 epoch, the training time is :10.55
+In the 27 epoch, the training time is :10.62
+In the 30 epoch, the training time is :10.35
+In the 33 epoch, the training time is :10.13
+In the 36 epoch, the training time is :9.79
+In the 39 epoch, the training time is :9.58
+In the 42 epoch, the training time is :9.77
+In the 45 epoch, the training time is :10.40
+In the 48 epoch, the training time is :10.09
+In the 51 epoch, the training time is :10.27
+In the 54 epoch, the training time is :9.50
+In the 57 epoch, the training time is :9.56
+In the 60 epoch, the training time is :9.46
+In the 63 epoch, the training time is :9.66
+In the 66 epoch, the training time is :9.40
+In the 69 epoch, the training time is :9.64
+In the 72 epoch, the training time is :9.25
+In the 75 epoch, the training time is :9.56
+In the 78 epoch, the training time is :9.82
+In the 81 epoch, the training time is :9.44
+In the 84 epoch, the training time is :9.56
+In the 87 epoch, the training time is :9.88
+In the 90 epoch, the training time is :9.92
+In the 93 epoch, the training time is :9.69
+In the 96 epoch, the training time is :9.71
+In the 99 epoch, the training time is :9.96
+In the 102 epoch, the training time is :9.60
+In the 105 epoch, the training time is :9.46
+In the 108 epoch, the training time is :9.66
+In the 111 epoch, the training time is :9.87
+In the 114 epoch, the training time is :9.43
+In the 117 epoch, the training time is :9.39
+In the 120 epoch, the training time is :9.60
+loss is not going down-- break
+After 122 epochs, the loss function value is 1.5621e+03
+All done, the total running time is 1284.40 
+
+Sparse coding initial loss function value is 9.3400e+02:
+In the 0 epoch, the sparse coding time is :4.07
+In the 3 epoch, the sparse coding time is :3.47
+In the 6 epoch, the sparse coding time is :3.21
+In the 9 epoch, the sparse coding time is :2.94
+In the 12 epoch, the sparse coding time is :2.93
+In the 15 epoch, the sparse coding time is :3.00
+In the 18 epoch, the sparse coding time is :2.82
+In the 21 epoch, the sparse coding time is :2.69
+In the 24 epoch, the sparse coding time is :2.67
+break condition loss value diff satisfied
+The validation accuracy, recall and precision are :  0.6365 0.5636363636363636 0.5442006269592476
+with parameters as :  29 0.01 0.001 0.001 1
+
+
+Traceback (most recent call last):
+  File "tunning.py", line 97, in <module>
+    D, D0, S, S0, W, opts, loss = torch.load(
+  File "/home/chenhao1/miniconda3/lib/python3.8/site-packages/torch/serialization.py", line 579, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/home/chenhao1/miniconda3/lib/python3.8/site-packages/torch/serialization.py", line 230, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/chenhao1/miniconda3/lib/python3.8/site-packages/torch/serialization.py", line 211, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '../saved_dicts/[3, 1, 5, 0.1, 0.01, 1, 0.1]DD0SS0Woptsloss.pt'
