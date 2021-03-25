@@ -37,7 +37,7 @@ snr=10000;
 opt.method='batch';%'online';
 opt.priorType='conv';%'times';
 opt.estepType1='chain';%'tree' for e-step;
-opt.addone=1;%add bias term;
+opt.addone=0;%add bias term;
 opt.conv=1;%or'fft' for convolution method;
 opt.display=0;%display the words and probablities; 
 opt.dsiter= 10; % display for every 1000 iteration;
@@ -48,7 +48,7 @@ X = permute(X, [2,3,1]);
 %%%%%loading data%%%%%%%
 [F,T,No_spect]=size(X);
 C=size(Y,2);
-K=1;
+K=2;
 gamma=0;
 runs=1;
 perc=0.75;  % perc * n_samples for training, default as 0.75
@@ -116,7 +116,10 @@ acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
     end % end of lamb
 end % end of runs
 
-
+% # best lamb, winzize, N, K=1
+% # 10, 30, 200
+% # 10, 100, 10
+% # 10, 50, 50
 %% test
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_te.mat')
 X_test = permute(X, [2,3,1]);

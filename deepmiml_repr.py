@@ -89,31 +89,30 @@ metrics.f1_score(yt.flatten(), y_pred.flatten())
 
 
 #%%
+import torch
 route = '/home/chenhao1/Matlab/WSCDL/'
-with open(route+'you_raich.txt') as f:
-    d = f.readlines()
-
-acc = []
+with open(route+'you_raich_0.txt') as f:
+    data =f.readlines()
 rec = []
 prec = []
+count = 0
+for i, d in enumerate(data):
+    if d == 'rec =\n':
+        rec.append(float(data[i+2][4:10]))
+        count += 1
 
-for i, v in enumerate(d):
-    if v == 'acc =\n':
-        vv = d[i+2]
-        acc.append(float(vv[4:9]))
+    if d == 'prec =\n':
+        prec.append(float(data[i+2][4:10]))
+        if count == 10:
+            print(rec[-1])
+            print(prec[-1])
 
-    if v == 'prec =\n':
-        vv = d[i+2]
-        prec.append(float(vv[4:9]))
+rec, prec = torch.tensor(rec), torch.tensor(prec)
+f1 = 2/(1/rec+1/prec)
+v, i = f1.sort()
+# best lamb, winzize, N
+# 10, 30, 200
+# 10, 100, 10
+# 10, 50, 50
 
-    if v == 'rec =\n':
-        vv = d[i+2]
-        rec.append(float(vv[4:9]))
-
-r = torch.rand(144, 3)
-r[:,0] = torch.tensor(acc)
-r[:,1] = torch.tensor(rec)
-r[:,2] = torch.tensor(prec)
-res = torch.rand(144, 4)
-res[:,:3] = r
-res[:,3] = 2/(1/r[:,1] + 1/r[:,2])
+# %%
