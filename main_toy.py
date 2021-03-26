@@ -14,7 +14,7 @@ opts.show_details = False  # default as true
 
 #%% training section
 X, Y, opts.ft = load_toy(opts)  # opts.ft saved all the true features
-X, Y = X[4*opts.n:], Y[4*opts.n:]
+# X, Y = X[4*opts.n:], Y[4*opts.n:]
 D, D0, S, S0, W = init(X, opts)
 D, D0, S, S0, W, loss = train(D, D0, S, S0, W, X, Y, opts)
 plot_result(X, Y, D, D0, S, S0, W, opts.ft, loss, opts)
