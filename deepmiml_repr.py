@@ -115,4 +115,28 @@ v, i = f1.sort()
 # 10, 100, 10
 # 10, 50, 50
 
+with open(route+'you_raich_k2.txt') as f:
+    data =f.readlines()
+f1 = []
+for i, d in enumerate(data):
+    if d == 'f1 =\n':
+        f1.append(float(data[i+2][4:10]))
+
+f1 = torch.tensor(f1)
+v, i = f1.sort()
+# best 
+# 39,  57,  23
+# 0.5555, 0.5559, 0.5579
+count = 0
+for i, d in enumerate(data):
+    if d == 'f1 =\n':
+        if count== 38 or count == 56 or count == 22:
+            print('lamb', data[i+7])
+            print('winsize', data[i+12])
+            print('N', data[i+17])
+        count += 1
+# best lamb, winzize, N, k=2
+# 1, 150, 200
+# 0.01, 50, 50
+# 0.1, 100, 50
 # %%

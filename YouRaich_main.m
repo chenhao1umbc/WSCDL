@@ -110,6 +110,7 @@ wini=1e-3*randn(no_para,C,K);
 y_hat = get_signal_label(w, valX, opt);  % opt.px will be changed
 acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
 [rec, prec] = prec_rec(valY, y_hat)
+f1 = 2/(1/(rec+1e-30) + 1/(prec+1e-30))
 
             end % end of N loop
         end % end of winsize loop
