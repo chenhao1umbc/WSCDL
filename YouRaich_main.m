@@ -180,8 +180,9 @@ opt.K = K;
     mean_f1 = mean(f1)
 end % end of i
 
-
-
+% i = 6 is the best
+% lamb, winzize, N, K
+% 0.1, 100, 50, 2
 %% test
 load('/home/chenhao1/Matlab/data_matlab/ESC10/esc10_te.mat')
 X_test = permute(X, [2,3,1]);
