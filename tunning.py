@@ -97,7 +97,7 @@ opts.lamb, opts.lamb0, opts.eta, opts.mu = 1, 0.1, 1, 0.1 #sparsity, label, low 
 res = []
 for runs in range(5):
     X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
-    X_te, Y_te, yy_te = load_data(opts, data='test')
+    xte, yte, yy_te = load_data(opts, data='val')
 
     opts.Dw, opts.lamb, opts.lamb0, opts.eta, opts.mu = \
                         29, 0.1, 0.01, 1e-3, 0.1 
@@ -105,8 +105,8 @@ for runs in range(5):
     save_results(D, D0, S, S0, W, opts, loss)
 
     # res = torch.load('tunning.pt')
-    _, _, St, S0t, _ = init(X_te, opts)
-    acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, X_te, Y_te, opts)
+    _, _, St, S0t, _ = init(xte, opts)
+    acc, y_hat, St, S0t, loss_t = test(D, D0, St, S0t, W, xte, yte, opts)
     print('The validation accuracy, recall and precision are : ',\
             acc.acc, acc.recall, acc.f1)
     print('\n')
