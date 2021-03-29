@@ -67,68 +67,68 @@ opt.myfunc = myfunc; % added the myfunc to option
 
 
 %% rough tunning
-lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
-winsize_pool=[30, 50, 100, 150];
-N_pool=[0.1, 5, 10, 20, 50, 100, 200];%sparsity constraints;
+% lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
+% winsize_pool=[30, 50, 100, 150];
+% N_pool=[5, 10, 20, 50, 100, 200];%sparsity constraints;
+% 
+% acc = zeros(runs, 1); 
+% rec = zeros(runs, 1); 
+% prec = zeros(runs, 1); 
+% 
+% for i=1:runs
+%     permidx=randperm(No_spect);
+%     trainY = Y(permidx(1:no_train),:);
+%     trainX = X(:,:,permidx(1:no_train));
+%     
+%     valX = X(:,:,permidx(no_train+1:end));
+%     valY = Y(permidx(no_train+1:end),:);
+% 
+%     x = permute(trainX, [3, 1, 2]);
+%     px = py.torch.tensor(py.numpy.array(x));
+%     px = px.cuda().float();
+%     opt.px = px; % added the myfunc to option
+%     
+%     for lamb = lamb_pool
+%         for winsize = winsize_pool
+%             for N = N_pool
+%                 
+% opt.px = px; % opt.px will be changed in validation, do not delete               
+% lamb
+% winsize
+% N
+% opt.winsize = winsize;
+% trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
+% if opt.addone
+%     no_para=F*winsize+1;
+% else
+%     no_para=F*winsize;
+% end
+% wini=1e-3*randn(no_para,C,K);
+% [ w,~,loss,garr] = EMPosteriorRegularized_batch(...
+%     wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,opt,lamb);
+% 
+% % this part is newly added to see the signal level accuracy result
+% [y_hat, p] = get_signal_label(w, valX, opt);  % opt.px will be changed
+% acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
+% [rec, prec] = prec_rec(valY, y_hat)
+% f1 = 2/(1/(rec+1e-30) + 1/(prec+1e-30))
+% 
+%             end % end of N loop
+%         end % end of winsize loop
+%     end % end of lamb
+% end % end of runs
+% 
+% % # best lamb, winzize, N, K=1
+% % # 10, 30, 200
+% % # 10, 100, 10
+% % # 10, 50, 50
+% 
+% % # best lamb, winzize, N, k=2
+% % # 1, 150, 200
+% % # 0.01, 50, 50
+% % # 0.1, 100, 50
 
-acc = zeros(runs, 1); 
-rec = zeros(runs, 1); 
-prec = zeros(runs, 1); 
-
-for i=1:runs
-    permidx=randperm(No_spect);
-    trainY = Y(permidx(1:no_train),:);
-    trainX = X(:,:,permidx(1:no_train));
-    
-    valX = X(:,:,permidx(no_train+1:end));
-    valY = Y(permidx(no_train+1:end),:);
-
-    x = permute(trainX, [3, 1, 2]);
-    px = py.torch.tensor(py.numpy.array(x));
-    px = px.cuda().float();
-    opt.px = px; % added the myfunc to option
-    
-    for lamb = lamb_pool
-        for winsize = winsize_pool
-            for N = N_pool
-                
-opt.px = px; % opt.px will be changed in validation, do not delete               
-lamb
-winsize
-N
-opt.winsize = winsize;
-trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
-if opt.addone
-    no_para=F*winsize+1;
-else
-    no_para=F*winsize;
-end
-wini=1e-3*randn(no_para,C,K);
-[ w,~,loss,garr] = EMPosteriorRegularized_batch(...
-    wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,opt,lamb);
-
-% this part is newly added to see the signal level accuracy result
-[y_hat, p] = get_signal_label(w, valX, opt);  % opt.px will be changed
-acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
-[rec, prec] = prec_rec(valY, y_hat)
-f1 = 2/(1/(rec+1e-30) + 1/(prec+1e-30))
-
-            end % end of N loop
-        end % end of winsize loop
-    end % end of lamb
-end % end of runs
-
-% # best lamb, winzize, N, K=1
-% # 10, 30, 200
-% # 10, 100, 10
-% # 10, 50, 50
-
-% # best lamb, winzize, N, k=2
-% # 1, 150, 200
-% # 0.01, 50, 50
-% # 0.1, 100, 50
-
-%% finer tunning
+%% Finer tunning
 % 
 % runs = 5;
 % for i = 1:6
@@ -231,6 +231,50 @@ end % end of runs
 %     save('you_raich_yhat.mat', 'p')
 % end % end of runs
 % mean_f1 = mean(f1)
+
+%% Step by step tunning
+% lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
+% winsize_pool=[30, 50, 100, 150];
+% N_pool=[5, 10, 20, 50, 100, 200];%sparsity constraints;
+
+winsize_pool=[30, 50, 100, 150];
+lamb = 0.1;
+N = 50;
+
+for winsize = winsize_pool
+    f1 = zeros(5,1);
+    for i=1:runs
+        permidx=randperm(No_spect);
+        trainY = Y(permidx(1:no_train),:);
+        trainX = X(:,:,permidx(1:no_train));
+
+        valX = X(:,:,permidx(no_train+1:end));
+        valY = Y(permidx(no_train+1:end),:);
+
+        x = permute(trainX, [3, 1, 2]);
+        px = py.torch.tensor(py.numpy.array(x));
+        px = px.cuda().float();
+        opt.px = px; % added the myfunc to option
+
+        opt.winsize = winsize;
+        trainNvec = N*ones(1,no_train);%N_vec(permidx(i,1:no_train));
+        if opt.addone
+            no_para=F*winsize+1;
+        else
+            no_para=F*winsize;
+        end
+        wini=1e-3*randn(no_para,C,K);
+        [ w,~,loss,garr] = EMPosteriorRegularized_batch(...
+            wini,trainX,trainY,trainNvec,EMiterations,Miterations,0,gamma,opt,lamb);
+
+        % this part is newly added to see the signal level accuracy result
+        [y_hat, p] = get_signal_label(w, valX, opt);  % opt.px will be changed
+        acc = sum((y_hat - valY) == 0, 'all')/numel(y_hat)
+        [rec, prec] = prec_rec(valY, y_hat);
+        f1(i) = 2/(1/(rec+1e-30) + 1/(prec+1e-30))
+    end % end of runs
+    mean_f1= mean(f1)
+end % end of outer loop
 
 
 
