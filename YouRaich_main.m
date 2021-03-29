@@ -52,7 +52,7 @@ K=2;
 gamma=0;
 runs=1;
 perc=0.75;  % perc * n_samples for training, default as 0.75
-EMiterations = 1; 
+EMiterations = 200; %%%%%%%%%%%%%%%%%%%%%
 Miterations=1;
 no_train=ceil(perc*No_spect);
 no_test=No_spect-no_train;
@@ -69,7 +69,7 @@ opt.myfunc = myfunc; % added the myfunc to option
 %% rough tunning
 lamb_pool=[10, 1, 0.1, 0.01, 1e-3, 1e-4];
 winsize_pool=[30, 50, 100, 150];
-N_pool=[5, 10, 20, 50, 100, 200];%sparsity constraints;
+N_pool=[0.1, 5, 10, 20, 50, 100, 200];%sparsity constraints;
 
 acc = zeros(runs, 1); 
 rec = zeros(runs, 1); 
