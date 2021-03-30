@@ -194,7 +194,7 @@ X = permute(X, [2,3,1]);
 
 runs = 5;
 [lamb, winzize, N, K] = deal(0.1, 100, 50, 2); 
-acc = zeros(runs, 1); 
+auc = zeros(runs, 1); 
 f1 = zeros(runs, 1); 
 opt.C = C;
 opt.F = F;
@@ -228,8 +228,8 @@ for r=1:runs
     acc = sum((y_hat - Y_test) == 0, 'all')/numel(y_hat)
     [rec, prec] = prec_rec(Y_test, y_hat)
     f1(r) = 2/(1/(rec+1e-30) + 1/(prec+1e-30))
-    [fpr, tpr,~, auc(i)] = perfcurve(logical(valY(:)),p(:),'true');
-    save('you_raich_yhat.mat', 'p')
+    [fpr, tpr,~, auc(r)] = perfcurve(logical(Y_test(:)),p(:),'true');
+%     save('you_raich_yhat.mat', 'p')
 end % end of runs
 mean_f1 = mean(f1)
 

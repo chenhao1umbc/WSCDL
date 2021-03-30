@@ -13,12 +13,13 @@ for i = 1:N
     px = px.cuda().float().unsqueeze(py.int(0));
     option.px = px; % added the myfunc to option
     
-    [pp,~]=PriorOneBag(W,X(:,:, i),option);  % pp contains null as the last row shape [C+1, n_instance]     [p, ~] = max(pp'); % p is per class probability
-    P(i, :) = p(1:10);
+    [pp,~]=PriorOneBag(W,X(:,:, i),option);  % pp contains null as the last row shape [C+1, n_instance]
     [~, ind] = max(pp);
     pool_label = 1:size(pp, 1)-1;
     label = intersect(pool_label, ind);
     y_hat(i, label) = 1;
+    [p, ~] = max(pp'); % p is per class probability
+    P(i, :) = p(1:10);
 
 end
 
