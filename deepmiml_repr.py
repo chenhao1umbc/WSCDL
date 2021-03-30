@@ -43,7 +43,7 @@ deepmiml = DeepMIML(L=L, K=K, base_model=model)
 deepmiml.model.summary()
 
 "load training data"
-mat = sio.loadmat('../data/ESC10/esc10_tr.mat')
+mat = sio.loadmat('/home/chenhao1/Hpython/data/ESC10/esc10_tr.mat')
 x, y, yy = mat['X'], mat['Y'], mat['yy']
 
 #%%
@@ -77,15 +77,20 @@ plt.show()
 
 #%% test part
 model = deepmiml.model
-mat = sio.loadmat('../data/ESC10/esc10_tr.mat')
+mat = sio.loadmat('/home/chenhao1/Hpython/data/ESC10/esc10_te.mat')
 xt, yt, yyt = mat['X'], mat['Y'], mat['yy']
 
 print("Start Predicting...")
 y_pred = model.predict(xt[...,None])
-thr = 0.23
-y_pred[y_pred>=thr] = 1
-y_pred[y_pred<thr] = 0
-metrics.f1_score(yt.flatten(), y_pred.flatten())
+r = metrics.roc_curve(yt.flatten(), y_pred.flatten())
+plt.plot(r[0], r[1])
+print('auc' , metrics.auc(r[0], r[1]))
+
+thr = 0.1001
+y_pred[y_pred>thr] = 1
+y_pred[y_pred<=thr] = 0 
+print('recall', metrics.recall_score(yt.flatten(), y_pred.flatten()))
+print('f1', metrics.f1_score(yt.flatten(), y_pred.flatten()))
 
 
 # %%
