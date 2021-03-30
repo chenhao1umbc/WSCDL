@@ -143,6 +143,7 @@ def init(X, opts, init='rand'):
         N, T, F = X.shape
     else:
         N, F, T = X.shape
+    torch.manual_seed(opts.seed)
     D = torch.rand(opts.C, opts.K, opts.Dh,opts.Dw, device=opts.dev)
     D0 = torch.rand(opts.K0, opts.Dh, opts.Dw, device=opts.dev)
     if init == 'good' :
