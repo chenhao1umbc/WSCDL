@@ -96,6 +96,7 @@ opts.lamb, opts.lamb0, opts.eta, opts.mu = 1, 0.1, 1, 0.1 #sparsity, label, low 
 # %% test
 res = []
 for runs in range(5):
+    opts.seed = runs
     X, Y, yy = load_data(opts, data='train') # shape of [n_sample, f, t]
     xte, yte, yy_te = load_data(opts, data='val')
 

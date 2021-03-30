@@ -77,6 +77,7 @@ def load_data(opts, data='test', route=''):
 
     n, f, t = x.shape  # shape of [n_sample, f, t]
     if opts.shuffle:
+        torch.manual_seed(opts.seed)
         nn = torch.randperm(x.shape[0])
         x, y, yy = x[nn], y[nn], yy[nn]
 
@@ -143,7 +144,7 @@ def init(X, opts, init='rand'):
         N, T, F = X.shape
     else:
         N, F, T = X.shape
-    torch.manual_seed(opts.seed)
+    torch.manual_seed(0)
     D = torch.rand(opts.C, opts.K, opts.Dh,opts.Dw, device=opts.dev)
     D0 = torch.rand(opts.K0, opts.Dh, opts.Dw, device=opts.dev)
     if init == 'good' :
