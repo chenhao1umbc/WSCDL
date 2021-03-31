@@ -89,7 +89,7 @@ r = metrics.roc_curve(yt.flatten(), y_pred.flatten())
 plt.plot(r[0], r[1])
 print('auc' , metrics.auc(r[0], r[1]))
 
-thr = 0.20041028 #r[2].min()
+thr = r[2].mean()
 y_pred[y_pred>thr] = 1
 y_pred[y_pred<=thr] = 0 
 print('accuracy_score', metrics.accuracy_score(yt.flatten(), y_pred.flatten()))

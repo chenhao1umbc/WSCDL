@@ -30,3 +30,14 @@ smooth = 0;
 % test
 [HammingLoss,RankingLoss,OneError,Coverage,Average_Precision,Outputs,Pre_Labels]= ...
     MLKNN_test(tr_data,tr_label,te_data,te_label,k,Prior,PriorN,Cond,CondN);
+
+o = Outputs;
+t = te_label;
+t(t==-1) = 0;
+Average_Precision
+thr = mean(o);
+o(o<thr) = 0;
+o(o>=thr) = 1;
+[rec, prec] = prec_rec(t, o) % it need you_raich
+f1 = 2/(1/(rec+1e-30) + 1/(prec+1e-30))
+[fpr, tpr,~, auc] = perfcurve(logical(t(:)),o(:),'true');
