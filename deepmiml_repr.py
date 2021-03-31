@@ -62,14 +62,17 @@ plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
+plt.savefig('DeepMIML_acc.png')
 plt.show()
 # summarize history for loss
+fig = plt.figure()
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.title('model loss')
 plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
+plt.savefig('DeepMIML_loss.png')
 plt.show()
 
 # save_keras_model(deepmiml.model, "outputs/{}/{}".format(dataset.name, model_name))
@@ -86,11 +89,14 @@ r = metrics.roc_curve(yt.flatten(), y_pred.flatten())
 plt.plot(r[0], r[1])
 print('auc' , metrics.auc(r[0], r[1]))
 
-thr = 0.1001
+thr = 0.20041028 #r[2].min()
 y_pred[y_pred>thr] = 1
 y_pred[y_pred<=thr] = 0 
+print('accuracy_score', metrics.accuracy_score(yt.flatten(), y_pred.flatten()))
+print('precision', metrics.precision_score(yt.flatten(), y_pred.flatten()))
 print('recall', metrics.recall_score(yt.flatten(), y_pred.flatten()))
 print('f1', metrics.f1_score(yt.flatten(), y_pred.flatten()))
+
 
 
 # %%
