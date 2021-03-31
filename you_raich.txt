@@ -1,0 +1,4514 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2021 The MathWorks, Inc.
+                  R2021a (9.10.0.1602886) 64-bit (glnxa64)
+                             February 17, 2021
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+>> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> 
+lamb =
+
+     1
+
+
+winsize =
+
+    30
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    30
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    30
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    30
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    30
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    30
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    50
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    50
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    50
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    50
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    50
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+    50
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   100
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   100
+
+
+N =
+
+    10
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    10
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   100
+
+
+N =
+
+    20
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    10
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   100
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   100
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   100
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    10
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   150
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   150
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   150
+
+
+N =
+
+    20
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    10
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   150
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   150
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+     1
+
+
+winsize =
+
+   150
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    10
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    30
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     6
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    30
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     6
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    30
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     6
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    30
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    30
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    30
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    11
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    50
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    50
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     6
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    50
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     6
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    50
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    50
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+    50
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    11
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   100
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   100
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   100
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   100
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   100
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   100
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    11
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   150
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   150
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   150
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   150
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   150
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.1000
+
+
+winsize =
+
+   150
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    11
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    30
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    30
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    30
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    30
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    30
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    30
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    50
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    50
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     6
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    50
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     6
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    50
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    50
+
+
+N =
+
+   100
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    10
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+    50
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   100
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     9
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   100
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   100
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   100
+
+
+N =
+
+    50
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    11
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   100
+
+
+N =
+
+   100
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    10
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   100
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    13
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   150
+
+
+N =
+
+     5
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    11
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   150
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   150
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   150
+
+
+N =
+
+    50
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    11
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   150
+
+
+N =
+
+   100
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    12
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+    0.0100
+
+
+winsize =
+
+   150
+
+
+N =
+
+   200
+
+Start trainig model
+
+curr_iter =
+
+    10
+
+loss change is too small and stop tranining
+
+curr_iter =
+
+    13
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    30
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    30
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    30
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    30
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    30
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    30
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    50
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    50
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    50
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    50
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    50
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+    50
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   100
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   100
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   100
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   100
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   100
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   100
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   150
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   150
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   150
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   150
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   150
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-03
+
+
+winsize =
+
+   150
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    30
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    30
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    30
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    30
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    30
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    30
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    50
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    50
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    50
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    50
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    50
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+    50
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   100
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   100
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   100
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   100
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   100
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   100
+
+
+N =
+
+   200
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     8
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   150
+
+
+N =
+
+     5
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     4
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   150
+
+
+N =
+
+    10
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   150
+
+
+N =
+
+    20
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   150
+
+
+N =
+
+    50
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     5
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   150
+
+
+N =
+
+   100
+
+Start trainig model
+loss change is too small and stop tranining
+
+curr_iter =
+
+     7
+
+
+acc =
+
+    0.6190
+
+
+rec =
+
+     0
+
+
+prec =
+
+     0
+
+
+lamb =
+
+   1.0000e-04
+
+
+winsize =
+
+   150
+
+
+N =
+
+   200
+
+Start trainig model
