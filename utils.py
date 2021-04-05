@@ -1358,12 +1358,14 @@ def load_toy(opts, test='train'):
     current_label = torch.tensor([1, 1, 1, 1]).float()
     Y[(i+1) * n: (i + 2) * n] = current_label
 
+    xx = X[:, :T]
     X = awgn(X[:, :T], opts.snr, opts.seed, test)  #truncation step & adding noise
     # # z-norm, the standardization, 0-mean, var-1
     X = znorm(X)
     # unit norm, norm(x) = 1
     # X = X/(X**2).sum(-1).sqrt().unsqueeze(-1)
-    return X.to(opts.dev), Y.to(opts.dev), [featurec, feature1, feature2, feature3, feature4]
+    return X.to(opts.dev), Y.to(opts.dev), \
+        [featurec, feature1, feature2, feature3, feature4], xx
 
 
 def loss_fun(X, Y, D, D0, S, S0, W, opts):
