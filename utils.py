@@ -19,6 +19,8 @@ from sklearn import metrics
 # import spams
 import scipy.sparse as sparse
 
+import seaborn as sns
+
 tt = datetime.datetime.now
 # torch.set_default_dtype(torch.double)
 np.set_printoptions(linewidth=160)
@@ -1520,142 +1522,149 @@ def loss_fun_test_spec(X, D, D0, S, S0, opts):
 
 
 def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
+    sns.set(style="darkgrid")
+    plt.rcParams.update({
+        'font.size': 22,
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 22,
+        'ytick.labelsize': 22,
+        'legend.fontsize': 22,
+        'pdf.fonttype': 42  # for LaTeX compatibility
+    })
+
     N, C = Y.shape
     S_tik = torch.cat((S.mean(3), torch.ones(N, C, 1, device=S.device)), dim=-1)
-    exp_PtSnW = (S_tik * W).sum(2).exp()  # shape of [N, C]
+    exp_PtSnW = (S_tik * W).sum(2).exp()
     exp_PtSnW[torch.isinf(exp_PtSnW)] = 1e38
     Y_hat = 1 / (1 + exp_PtSnW)
 
-    # reconstruction of input signal
-    DconvS = S[:, :, 0, :].clone()  # to avoid zeros for cuda decision, shape of [N, C, T]
-    Dcopy = D.clone().flip(2).unsqueeze(2)  # D shape is [C,K,1, M]
-    K , M = D.shape[1:]
-    T, M_2 =  S.shape[-1], int((M-1)/2)
-    for c in range(Y.shape[1]):
-        # the following line is doing, convolution, sum up C, and truncation for m/2: m/2+T
-        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
-    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=D0.shape[0], padding=M - 1).sum(1)[:, M_2:M_2 + T]  # r is shape of [N, T)
+    def save_fig(name): 
+        if opts.savefig:
+            plt.tight_layout()
+            plt.savefig(f'figures/{name}.pdf', format='pdf', bbox_inches='tight')
+        plt.close()
 
-    plt.figure()
-    plt.subplot(211)
+    # 1. Sparse coefficients
     ss = S.clone().reshape(S.shape[0], -1)
-    plt.imshow(ss.abs().cpu().numpy(), aspect='auto')
-    plt.title('Absolute value of sparse coefficients')
-    plt.xlabel('Time index')
-    plt.ylabel('Example index')
-    ss[ss!=0] = 1
-    plt.subplot(212)
-    plt.imshow(ss.cpu().numpy(), aspect='auto')
-    plt.title('None zeros of sparse coefficients')
-    plt.xlabel('Time index')
-    plt.ylabel('Example index')
-    plt.tight_layout()
-    if opts.savefig : plt.savefig('figures/sparse_coefficients.eps', format='eps')
-
     plt.figure()
-    plt.subplot(211)
+    plt.imshow(ss.abs().cpu().numpy(), aspect='auto', cmap='viridis')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+    save_fig('sparse_coefficients_abs')
+
+    ss[ss != 0] = 1
+    plt.figure()
+    plt.imshow(ss.cpu().numpy(), aspect='auto', cmap='Greys')
+    plt.xlabel('Time index')
+    plt.ylabel('Example index')
+    save_fig('sparse_coefficients_binary')
+
+    # 2. Common part
     s0 = S0.clone().reshape(S0.shape[0], -1)
-    plt.imshow(s0.abs().cpu().numpy(), aspect='auto')
-    plt.title('Absolute value of sparse coefficients - common part')
+    plt.figure()
+    plt.imshow(s0.abs().cpu().numpy(), aspect='auto', cmap='viridis')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
-    s0[s0!=0] = 1
-    plt.subplot(212)
-    plt.imshow(s0.cpu().numpy(), aspect='auto')
-    plt.title('None zeros of sparse coefficients - common part')
+    save_fig('common_coefficients_abs')
+
+    s0[s0 != 0] = 1
+    plt.figure()
+    plt.imshow(s0.cpu().numpy(), aspect='auto', cmap='Greys')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
-    plt.tight_layout()
-    if opts.savefig : plt.savefig('figures/common_coefficients.eps', format='eps')
+    save_fig('common_coefficients_binary')
+
+    # 3. Reconstructed vs Original
+    DconvS = S[:, :, 0, :].clone()
+    Dcopy = D.clone().flip(2).unsqueeze(2)
+    K, M = D.shape[1:]
+    T, M_2 = S.shape[-1], int((M - 1) / 2)
+    for c in range(Y.shape[1]):
+        DconvS[:, c, :] = F.conv1d(S[:, c, :, :], Dcopy[c, :, :, :], groups=K, padding=M - 1).sum(1)[:, M_2:M_2 + T]
+
+    R = F.conv1d(S0, D0.flip(1).unsqueeze(1), groups=D0.shape[0], padding=M - 1).sum(1)[:, M_2:M_2 + T]
 
     plt.figure()
-    plt.subplot(121)
-    plt.imshow((R + DconvS.sum(1)).cpu().numpy(), aspect='auto')
-    plt.title('Reconstruted data')
+    plt.subplot(1, 2, 1)
+    plt.imshow((R + DconvS.sum(1)).cpu().numpy(), aspect='auto', cmap='viridis')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
-    plt.subplot(122)
-    plt.imshow(X.cpu().numpy(), aspect='auto')
-    plt.title('Given data')
+    plt.subplot(1, 2, 2)
+    plt.imshow(X.cpu().numpy(), aspect='auto', cmap='viridis')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
-    plt.tight_layout()
-    if opts.savefig : plt.savefig('figures/Reconstruted.eps', format='eps')
+    save_fig('reconstructed_data')
 
+    # 4. Zoomed-in version
     plt.figure()
-    plt.subplot(121)
-    plt.imshow((R + DconvS.sum(1))[200:250, 200:250].cpu().numpy(), aspect='auto')
-    plt.title('Reconstruted data, zoomed-in')
+    plt.subplot(1, 2, 1)
+    plt.imshow((R + DconvS.sum(1))[200:250, 200:250].cpu().numpy(), aspect='auto', cmap='viridis')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
-    plt.subplot(122)
-    plt.imshow(X[200:250, 200:250].cpu().numpy(), aspect='auto')
-    plt.title('Given data, zoomed-in')
+    plt.subplot(1, 2, 2)
+    plt.imshow(X[200:250, 200:250].cpu().numpy(), aspect='auto', cmap='viridis')
     plt.xlabel('Time index')
     plt.ylabel('Example index')
-    plt.tight_layout()
-    if opts.savefig : plt.savefig('figures/Reconstruted_zoomed.eps', format='eps')
+    save_fig('reconstructed_zoomed')
 
+    # 5. Loss plot
     if ft != 0:
         plt.figure()
-        plt.plot(loss.cpu().numpy(), '-x')
-        plt.title('Loss function value')
+        plt.plot(loss.cpu().numpy(), '-x', linewidth=2)
         plt.xlabel('Epoch index')
-        plt.ylabel('Magnitude')
-        plt.grid()
-        if opts.savefig : plt.savefig('figures/Loss_function.eps', format='eps')
+        plt.ylabel('Loss')
+        plt.grid(True)
+        save_fig('loss_curve')
+
         if opts.show_details:
             l = loss.clone()
-            l[:]= torch.log(torch.tensor(-1.0))
+            l[:] = torch.log(torch.tensor(-1.0))
             l[::5] = loss[::5]
             plt.plot(l.cpu().numpy(), '--o')
-            plt.xlabel('Indexed when each variable is updated')
-            plt.legend(['Loss details', 'Loss after each epoch'])
+            plt.xlabel('Update Index')
+            plt.legend(['Loss (epoch)', 'Loss (updates)'])
+            save_fig('loss_details')
 
+        # Common component
         plt.figure()
-        plt.plot(D0.squeeze().cpu().numpy())
-        plt.plot(ft[0] / (ft[0].norm()+1e-38), '-x')
-        plt.title('Commom component')
-        plt.legend(['Learned feature', 'Ground truth'])
+        plt.plot(D0.squeeze().cpu().numpy(), label='Learned', linewidth=2)
+        plt.plot(ft[0] / (ft[0].norm() + 1e-38), '-x', label='Ground truth', linewidth=2)
         plt.xlabel('Time index')
         plt.ylabel('Magnitude')
-        if opts.savefig : plt.savefig('figures/comm_feat.eps', format='eps')
+        plt.legend()
+        save_fig('common_feature')
 
+        # Learned features
         for i in range(4):
             plt.figure()
-            plt.plot(D[i, 0, :].cpu().numpy()/D[i, 0, :].cpu().norm().numpy())
-            plt.plot(ft[i + 1] / ft[i + 1].norm(), '-x')
-            plt.title('Feature ' + str(i + 1))
-            plt.legend(['Learned feature', 'Ground truth'])
+            plt.plot(D[i, 0, :].cpu().numpy()/D[i, 0, :].cpu().norm().numpy(), label='Learned', linewidth=2)
+            plt.plot(ft[i + 1] / ft[i + 1].norm(), '-x', label='Ground truth', linewidth=2)
             plt.xlabel('Time index')
             plt.ylabel('Magnitude')
-            if opts.savefig : plt.savefig(f'figures/feature{i}.eps', format='eps')
-    # plot labels
+            plt.legend()
+            save_fig(f'feature_{i+1}')
+
+    # 6. Labels
     plt.figure()
-    plt.imshow(Y.cpu().numpy(), aspect='auto', interpolation='None')
-    plt.title('True labels')
+    plt.imshow(Y.cpu().numpy(), aspect='auto', cmap='Blues', interpolation='none')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
-    if opts.savefig : plt.savefig('figures/true_labels.eps', format='eps')
+    save_fig('true_labels')
 
     plt.figure()
-    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', interpolation='None')
-    plt.title('Reconstructed labels')
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', cmap='Blues', interpolation='none')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
-    if opts.savefig : plt.savefig('figures/rec_labels.eps', format='eps')
+    save_fig('reconstructed_labels')
 
     plt.figure()
-    Y_hat[Y_hat>0.5] = 1
-    Y_hat[Y_hat<=0.5] = 0
-    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', interpolation='None')
-    plt.title('Reconstructed labels after thresholding')
+    Y_hat[Y_hat > 0.5] = 1
+    Y_hat[Y_hat <= 0.5] = 0
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', cmap='Blues', interpolation='none')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
-    if opts.savefig : plt.savefig('figures/rec_labels_thr.eps', format='eps')
-    # with open('myplot.pkl', 'wb') as fid: pickle.dump(ax, fid)
-    # with open('testplot.pkl', 'rb') as fid: pickle.load(fid)  # pop-up in a new figure
-
+    save_fig('reconstructed_labels_thresholded')
 
 def test(D, D0, S, S0, W, X, Y, opts):
     """
