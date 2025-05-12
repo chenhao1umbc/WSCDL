@@ -1542,6 +1542,8 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     def save_fig(name): 
         if opts.savefig:
             plt.tight_layout()
+            if not os.path.exists('./figures'):
+                os.makedirs('./figures')
             plt.savefig(f'./figures/{name}.pdf', format='pdf', bbox_inches='tight')
         plt.close()
 
@@ -1665,6 +1667,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.ylabel('Example index')
     plt.xlabel('Label index')
     save_fig('reconstructed_labels_thresholded')
+
 
 def test(D, D0, S, S0, W, X, Y, opts):
     """
