@@ -1522,7 +1522,7 @@ def loss_fun_test_spec(X, D, D0, S, S0, opts):
 
 
 def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
-    sns.set(style="darkgrid")
+    sns.set_theme(style="darkgrid")
     plt.rcParams.update({
         'font.size': 22,
         'axes.titlesize': 22,
@@ -1542,7 +1542,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     def save_fig(name): 
         if opts.savefig:
             plt.tight_layout()
-            plt.savefig(f'figures/{name}.pdf', format='pdf', bbox_inches='tight')
+            plt.savefig(f'./figures/{name}.pdf', format='pdf', bbox_inches='tight')
         plt.close()
 
     # 1. Sparse coefficients
