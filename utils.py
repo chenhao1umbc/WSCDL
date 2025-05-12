@@ -56,7 +56,7 @@ class OPT:
 
 
 def init(X, opts):
-    """
+    r"""
     This function will generate the initial value for D D0 S S0 and W
     :param X: training data with shape of [N, T]
     :param Y: training labels with shape of [N, C]
@@ -529,7 +529,7 @@ def toeplitz(x, m=10, T=10):
 
 
 def updateD(DD0SS0W, X, Y, opts):
-    """this function is to update the distinctive D using BPG-M, updating each d_k^(c)
+    r"""this function is to update the distinctive D using BPG-M, updating each d_k^(c)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
@@ -604,7 +604,7 @@ def loss_D(Tsck_t, dck, b):
 
 
 def updateD0(DD0SS0, X, Y, opts):
-    """this function is to update the common dictionary D0 using BPG-M, updating each d_k^(0)
+    r"""this function is to update the common dictionary D0 using BPG-M, updating each d_k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
@@ -665,7 +665,7 @@ def loss_D0(Tsnk0_t, dk0, b, D0, mu):
 
 
 def updateS0(DD0SS0, X, Y, opts):
-    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    r"""this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
@@ -806,7 +806,7 @@ def loss_S0(_2Tdk0, snk0, b, lamb):
 
 
 def updateS(DD0SS0W, X, Y, opts):
-    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    r"""this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
         S is 4-d tensor [N,C,K,T] [samples,classes, num of atoms, time series,]
@@ -968,7 +968,7 @@ def updateS_test_fista(DD0SS0, X, opts):
 
 
 def updateW(SW, Y, opts):
-    """this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
+    r"""this function is to update the sparse coefficients for common dictionary D0 using BPG-M, updating each S_n,k^(0)
     input is initialed  DD0SS0
     the data structure is not in matrix format for computation simplexity
         SW is a list of [S, W]
