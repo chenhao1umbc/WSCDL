@@ -1649,13 +1649,13 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
 
     # 6. Labels
     plt.figure()
-    plt.imshow(Y.cpu().numpy(), aspect='auto', cmap='viridis', interpolation='none')
+    plt.imshow(Y.cpu().numpy(), aspect='auto', cmap='viridis', interpolation='nearest')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
     save_fig('true_labels')
 
     plt.figure()
-    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', cmap='viridis', interpolation='none')
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', cmap='viridis', interpolation='nearest')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
     save_fig('reconstructed_labels')
@@ -1663,7 +1663,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.figure()
     Y_hat[Y_hat > 0.5] = 1
     Y_hat[Y_hat <= 0.5] = 0
-    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', cmap='viridis', interpolation='none')
+    plt.imshow(Y_hat.cpu().numpy(), aspect='auto', cmap='viridis', interpolation='nearest')
     plt.ylabel('Example index')
     plt.xlabel('Label index')
     save_fig('reconstructed_labels_thresholded')
