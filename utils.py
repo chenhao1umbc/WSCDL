@@ -1691,6 +1691,7 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts, xx=None):
     plt.ylabel('Example index')
     plt.xlabel('Label index')
     save_fig('reconstructed_labels_thresholded')
+    plt.close('all')
 
 
 def test(D, D0, S, S0, W, X, Y, opts):
