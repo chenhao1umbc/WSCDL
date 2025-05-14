@@ -10,7 +10,7 @@ opts.snr = 10
 opts.lamb = 3  # for sparsity penalty
 opts.eta = 3  # for label penalty
 opts.mu = 0.1  # for low rank penalty
-opts.savefig = True # save plots
+opts.savefig = False # save plots
 opts.show_details = False  # default as true
 
 # %% training section
