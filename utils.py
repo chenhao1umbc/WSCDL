@@ -1521,7 +1521,7 @@ def loss_fun_test_spec(X, D, D0, S, S0, opts):
     return fidelity, sparse
 
 
-def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
+def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts, xx=None):
     sns.set_theme(style="darkgrid")
     plt.rcParams.update({
         'font.size': 22,
@@ -1597,6 +1597,13 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts):
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     save_fig('reconstructed_data')
+
+    if xx:
+        plt.figure()
+        plt.imshow(xx[200:250, 200:250].numpy(), aspect='auto', cmap='viridis')
+        plt.xlabel('Time index')
+        plt.ylabel('Example index')
+        save_fig('reconstructed_zoomed')
 
     # 4. Zoomed-in version
     plt.figure()
