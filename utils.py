@@ -1545,7 +1545,6 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts, xx=None):
             if not os.path.exists('./figures'):
                 os.makedirs('./figures')
             plt.savefig(f'./figures/{name}.pdf', format='pdf', bbox_inches='tight')
-        plt.close()
 
     # 1. Sparse coefficients
     ss = S.clone().reshape(S.shape[0], -1)
@@ -1576,7 +1575,6 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts, xx=None):
     plt.xlabel('Time index')
     plt.ylabel('Example index')
     save_fig('common_coefficients_binary')
-
     # 3. Reconstructed vs Original
     DconvS = S[:, :, 0, :].clone()
     Dcopy = D.clone().flip(2).unsqueeze(2)
@@ -1599,19 +1597,26 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts, xx=None):
     save_fig('reconstructed_data')
 
     if xx is not None:
-        plt.figure(figsize=(15, 6))
+        plt.figure(figsize=(12, 6))
         plt.subplot(1, 3, 1)
-        plt.imshow(znorm(X[200:250, 200:250].cpu().numpy()), aspect='auto', cmap='viridis')
+        focus_part = X[200:250, 200:250].reshape(1, -1)
+        imshow_input = znorm(focus_part).reshape(50, -1).cpu().numpy()
+        plt.imshow(imshow_input, aspect='auto', cmap='viridis')
         plt.xlabel('Time index')
         plt.ylabel('Example index')
         plt.title('Training Data')
 
         plt.subplot(1, 3, 2)
-        plt.imshow(znorm((R + DconvS.sum(1))[200:250, 200:250].cpu().numpy()), aspect='auto', cmap='viridis')
+        focus_part = (R + DconvS.sum(1))[200:250, 200:250].reshape(1, -1)
+        imshow_input = znorm(focus_part).reshape(50, -1).cpu().numpy()
+        plt.imshow(imshow_input, aspect='auto', cmap='viridis')
         plt.xlabel('Time index')
         plt.title('Reconstructed')
+
         plt.subplot(1, 3, 3)
-        plt.imshow(znorm(xx[200:250, 200:250].cpu().numpy()), aspect='auto', cmap='viridis')
+        focus_part = xx[200:250, 200:250].reshape(1, -1)
+        imshow_input = znorm(focus_part).reshape(50, -1).cpu().numpy()
+        plt.imshow(imshow_input, aspect='auto', cmap='viridis')
         plt.xlabel('Time index')
         plt.title('Ground Truth')
         plt.colorbar()
