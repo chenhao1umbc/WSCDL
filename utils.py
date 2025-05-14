@@ -1598,24 +1598,36 @@ def plot_result(X, Y, D, D0, S, S0, W, ft, loss, opts, xx=None):
     plt.ylabel('Example index')
     save_fig('reconstructed_data')
 
-    if xx:
+    if xx is not None:
+        plt.figure(figsize=(15, 6))
+        plt.subplot(1, 3, 1)
+        plt.imshow(znorm(X[200:250, 200:250].cpu().numpy()), aspect='auto', cmap='viridis')
+        plt.xlabel('Time index')
+        plt.ylabel('Example index')
+        plt.title('Training Data')
+
+        plt.subplot(1, 3, 2)
+        plt.imshow(znorm((R + DconvS.sum(1))[200:250, 200:250].cpu().numpy()), aspect='auto', cmap='viridis')
+        plt.xlabel('Time index')
+        plt.title('Reconstructed')
+        plt.subplot(1, 3, 3)
+        plt.imshow(znorm(xx[200:250, 200:250].cpu().numpy()), aspect='auto', cmap='viridis')
+        plt.xlabel('Time index')
+        plt.title('Ground Truth')
+        plt.colorbar()
+        save_fig('reconstructed_zoomed_with_ground_truth')
+
+    else:
         plt.figure()
-        plt.imshow(xx[200:250, 200:250].numpy(), aspect='auto', cmap='viridis')
+        plt.subplot(1, 2, 1)
+        plt.imshow((R + DconvS.sum(1))[200:250, 200:250].cpu().numpy(), aspect='auto', cmap='viridis')
+        plt.xlabel('Time index')
+        plt.ylabel('Example index')
+        plt.subplot(1, 2, 2)
+        plt.imshow(X[200:250, 200:250].cpu().numpy(), aspect='auto', cmap='viridis')
         plt.xlabel('Time index')
         plt.ylabel('Example index')
         save_fig('reconstructed_zoomed')
-
-    # 4. Zoomed-in version
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.imshow((R + DconvS.sum(1))[200:250, 200:250].cpu().numpy(), aspect='auto', cmap='viridis')
-    plt.xlabel('Time index')
-    plt.ylabel('Example index')
-    plt.subplot(1, 2, 2)
-    plt.imshow(X[200:250, 200:250].cpu().numpy(), aspect='auto', cmap='viridis')
-    plt.xlabel('Time index')
-    plt.ylabel('Example index')
-    save_fig('reconstructed_zoomed')
 
     # 5. Loss plot
     if ft != 0:
