@@ -3,11 +3,13 @@
 This project is the code for the paper "Weakly supervised common and distinctive convolutional dictionary learning". 
 ## Requirements
 ```
-Python 3.6+
-PyTorch 1.1.0+
+Python 3.13+
+PyTorch 2.7.0+
 Numpy
 Matplotlib
 ```
+Suggest using uv to preproduce the depandency
+`uv sync`
 ## Details
 The default data type is `torch.tensor` with precision `float32`, the code is written for single GPU or CPU.
 User can start with `main_toy.py` to get the general idea.
